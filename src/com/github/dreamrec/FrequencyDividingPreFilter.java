@@ -6,28 +6,27 @@ import java.util.Queue;
 /**
  *
  */
-public class FrequencyDividingPreFilter {
-    private int bufferSize;
-    private Queue<Short> filteredData = new LinkedList<Short>();
+public abstract class FrequencyDividingPreFilter {
+    private Queue<Integer> filteredData = new LinkedList<Integer>();
     private int divider;
+    private int counter;
 
     public FrequencyDividingPreFilter(int divider) {
         this.divider = divider;
     }
 
-    public int size() {
-        return filteredData.size() / divider;
-    }
-
-    public void add(short value) {
+    public void add(Integer value) {
+        counter++;
         filteredData.offer(value);
+        if (counter == divider) {
+            int sum = 0;
+            for (int i = 0; i < divider; i++) {
+                sum += filteredData.poll();
+            }
+            notifyListeners(sum / divider);
+            counter = 0;
+        }
     }
 
-    public short poll() {
-        int sum = 0;
-        for (int i = 0; i < divider; i++) {
-            sum += filteredData.poll();
-        }
-        return  (short)(sum / divider);
-    }
+    public abstract void notifyListeners(int filteredValue);
 }
