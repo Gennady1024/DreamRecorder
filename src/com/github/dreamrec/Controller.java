@@ -1,11 +1,12 @@
 package com.github.dreamrec;
 
+import com.crostec.ads.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 /**
  *
@@ -20,7 +21,9 @@ public class Controller {
     public static int CURSOR_SCROLL_STEP = 1; //in points
     private boolean isAutoScroll = false;
     private boolean isRecording = false;
-    private ArrayList<AdsDataListener> adsDataListeners = new ArrayList<AdsDataListener>();
+    private Ads ads = new Ads();
+    private BdfWriter bdfWriter;
+    private IncomingDataBuffer incomingDataBuffer;
 
     public Controller(ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -42,29 +45,48 @@ public class Controller {
     }
 
     protected void updateModel() {
+        while (incomingDataBuffer.available()) {
+            int[] frame = incomingDataBuffer.poll();
+            model.addEyeData(ch1PreFilter.getFilteredValue(frame[0]));
+            model.addCh2Data(ch2PreFilter.getFilteredValue(frame[1]));
+            model.addAcc1Data(acc1PreFilter.getFilteredValue(frame[2]));
+            model.addAcc2Data(acc2PreFilter.getFilteredValue(frame[3]));
+            model.addAcc3Data(acc3PreFilter.getFilteredValue(frame[4]));
+        }
         if (isAutoScroll) {
             model.setFastGraphIndexMaximum();
         }
     }
 
-    private void notifyListeners(int[] frame) {
-        for (AdsDataListener adsDataListener : adsDataListeners) {
-            adsDataListener.onDataReceived(frame);
-        }
-    }
-
-
     public void startRecording() {
         isRecording = true;
+        AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
+        BdfHeaderData bdfHeaderData = new BdfHeaderData(adsConfiguration);
+        if (bdfWriter != null) {
+            ads.removeAdsDataListener(bdfWriter);
+        }
+        bdfWriter = new BdfWriter(bdfHeaderData);
+        ads.addAdsDataListener(bdfWriter);
+        incomingDataBuffer = new IncomingDataBuffer();
+        ads.addAdsDataListener(incomingDataBuffer);
+        try {
+            ads.startRecording(bdfHeaderData.getAdsConfiguration());
+        } catch (AdsException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            System.exit(0);
+        }
         model.clear();
         model.setFrequency(10);
-        model.setStartTime(System.currentTimeMillis());
+        model.setStartTime(System.currentTimeMillis());  //todo remove
         repaintTimer.start();
         isAutoScroll = true;
     }
 
     public void stopRecording() {
+        if (!isRecording) return;
         isRecording = false;
+        ads.stopRecording();
+        bdfWriter.stopRecording();
         repaintTimer.stop();
         isAutoScroll = false;
     }
