@@ -3,14 +3,14 @@ package com.github.dreamrec;
 /**
  *
  */
-public class SecondDerivativeFilter extends AbstractFilter<Short> {
+public class SecondDerivativeFilter extends AbstractFilter<Integer> {
 
-    public SecondDerivativeFilter(Filter<Short> inputData) {
+    public SecondDerivativeFilter(Filter<Integer> inputData) {
         super(inputData);
     }
 
     @Override
-    protected Short doFilter(int index) {
+    protected Integer doFilter(int index) {
         if (index < 8) {
             return 0;
         }
@@ -22,6 +22,6 @@ public class SecondDerivativeFilter extends AbstractFilter<Short> {
                 inputData.get(index - 2) * 4 +
                 inputData.get(index - 1) * 2 +
                 inputData.get(index);
-        return (short)(inputData.get(index - 4) - sum / 30);
+        return (inputData.get(index - 4) - sum / 30);
     }
 }

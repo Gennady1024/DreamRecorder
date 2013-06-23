@@ -69,7 +69,7 @@ public class Controller {
                channel1FrequencyDividingPreFilter.add(frame[i]);
             }
             for (int i = 0; i < 50; i++) {
-               mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(frame[i])));
+               mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(50 + frame[i])));
             }
             for (int i = 0; i < 2; i++) {
                model.addAcc1Data(frame[100 + i]);

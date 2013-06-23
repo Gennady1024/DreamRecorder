@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Model {
     private int xSize; //data points per screen.
-    public static final int DIVIDER = 3000; //frequency divider for slow graphics
+    public static final int DIVIDER = 120; //frequency divider for slow graphics
     private DataList<Integer> eyeDataList = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel2DataList = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
     private DataList<Integer> acc1DataList = new DataList<Integer>();   //list with accelerometer 1 chanel data

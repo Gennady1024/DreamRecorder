@@ -72,7 +72,7 @@ public class BdfWriter implements AdsDataListener {
         if(stopRecordingRequest) return;
         stopRecordingRequest = true;
         double durationOfDataRecord = (stopRecordingTime - startRecordingTime) * 0.001 / numberOfDataRecords;
-        bdfHeaderData.setDurationOfDataRecord(durationOfDataRecord);
+//        bdfHeaderData.setDurationOfDataRecord(durationOfDataRecord);
         bdfHeaderData.setNumberOfDataRecords(numberOfDataRecords);
         try {
             fileToSave.seek(0);
