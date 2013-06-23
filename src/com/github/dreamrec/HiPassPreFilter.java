@@ -30,7 +30,7 @@ public class HiPassPreFilter {
         return cutOffFrequency;
     }
 
-    public short getFilteredValue(int value) {
+    public int getFilteredValue(int value) {
         int filteredValue = value;
         if (bufferSize != 0){
             rawData.add(value);

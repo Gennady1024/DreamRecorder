@@ -57,8 +57,8 @@ public class MainWindow extends JFrame {
         mainPanel.add(ch2DataView);
         ch2DataView.getComponentModel().centreX();
 
-        /*Filter<Short> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
-        mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));*/
+        Filter<Short> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
+        mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
 
         add(mainPanel, BorderLayout.CENTER);
         graphScrollBar = Factory.getSlowGraphScrollBar(model, controller);

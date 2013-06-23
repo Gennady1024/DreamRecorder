@@ -27,10 +27,9 @@ public class Controller {
     private BdfWriter bdfWriter;
     private IncomingDataBuffer incomingDataBuffer;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
-    private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.1);
-   /* private FrequencyDividingPreFilter accelXFrequencyDividingPreFilter;
-    private FrequencyDividingPreFilter accelYFrequencyDividingPreFilter;
-    private FrequencyDividingPreFilter accelZFrequencyDividingPreFilter;*/
+    private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
+    private HiPassPreFilter mioHiPassPreFilter = new HiPassPreFilter(250, 10);
+    private FrequencyDividingPreFilter mioFrequencyDividingPreFilter;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -47,24 +46,12 @@ public class Controller {
                 model.addEyeData(channel1HiPassPreFilter.getFilteredValue(value));
             }
         };
-        /*accelXFrequencyDividingPreFilter = new FrequencyDividingPreFilter(5) {
+        mioFrequencyDividingPreFilter = new FrequencyDividingPreFilter(25){
             @Override
             public void notifyListeners(int value) {
-                model.addAcc1Data(value);
+                model.addCh2Data(value);
             }
         };
-        accelYFrequencyDividingPreFilter = new FrequencyDividingPreFilter(5) {
-            @Override
-            public void notifyListeners(int value) {
-                model.addAcc2Data(value);
-            }
-        };
-        accelZFrequencyDividingPreFilter = new FrequencyDividingPreFilter(5) {
-            @Override
-            public void notifyListeners(int value) {
-                model.addAcc3Data(value);
-            }
-        };*/
     }
 
     public void setMainWindow(MainWindow mainWindow) {
@@ -80,6 +67,9 @@ public class Controller {
             int[] frame = incomingDataBuffer.poll();
             for (int i = 0; i < 50; i++) {
                channel1FrequencyDividingPreFilter.add(frame[i]);
+            }
+            for (int i = 0; i < 50; i++) {
+               mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(frame[i])));
             }
             for (int i = 0; i < 2; i++) {
                model.addAcc1Data(frame[100 + i]);
