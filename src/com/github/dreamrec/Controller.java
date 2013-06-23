@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -26,13 +28,13 @@ public class Controller {
     private IncomingDataBuffer incomingDataBuffer;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
     private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.1);
-    private FrequencyDividingPreFilter accelXFrequencyDividingPreFilter;
+   /* private FrequencyDividingPreFilter accelXFrequencyDividingPreFilter;
     private FrequencyDividingPreFilter accelYFrequencyDividingPreFilter;
-    private FrequencyDividingPreFilter accelZFrequencyDividingPreFilter;
+    private FrequencyDividingPreFilter accelZFrequencyDividingPreFilter;*/
 
-    public Controller(ApplicationProperties applicationProperties) {
+    public Controller(final Model model, ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
-        model = Factory.getModel(applicationProperties);
+        this.model = model;
         repaintTimer = new Timer(applicationProperties.getRepaintDelay(), new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 updateModel();
@@ -45,7 +47,7 @@ public class Controller {
                 model.addEyeData(channel1HiPassPreFilter.getFilteredValue(value));
             }
         };
-        accelXFrequencyDividingPreFilter = new FrequencyDividingPreFilter(5) {
+        /*accelXFrequencyDividingPreFilter = new FrequencyDividingPreFilter(5) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc1Data(value);
@@ -62,7 +64,7 @@ public class Controller {
             public void notifyListeners(int value) {
                 model.addAcc3Data(value);
             }
-        };
+        };*/
     }
 
     public void setMainWindow(MainWindow mainWindow) {
@@ -76,15 +78,17 @@ public class Controller {
     protected void updateModel() {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
-            channel1FrequencyDividingPreFilter.add(frame[0]);
-            for (int i = 0; i < 5; i++) {
-               accelXFrequencyDividingPreFilter.add(frame[2 + i]);
+            for (int i = 0; i < 50; i++) {
+               channel1FrequencyDividingPreFilter.add(frame[i]);
             }
-            for (int i = 0; i < 5; i++) {
-               accelYFrequencyDividingPreFilter.add(frame[7 + i]);
+            for (int i = 0; i < 2; i++) {
+               model.addAcc1Data(frame[100 + i]);
             }
-            for (int i = 0; i < 5; i++) {
-               accelZFrequencyDividingPreFilter.add(frame[12 + i]);
+            for (int i = 0; i < 2; i++) {
+                model.addAcc2Data(frame[102 + i]);
+            }
+            for (int i = 0; i < 2; i++) {
+                model.addAcc3Data(frame[104 + i]);
             }
         }
         if (isAutoScroll) {
@@ -99,8 +103,13 @@ public class Controller {
         if (bdfWriter != null) {
             ads.removeAdsDataListener(bdfWriter);
         }
+        bdfHeaderData.setFileNameToSave(new SimpleDateFormat("dd-MM-yyyy_HH-mm").format(new Date(System.currentTimeMillis())) + ".bdf");
         bdfWriter = new BdfWriter(bdfHeaderData);
         ads.addAdsDataListener(bdfWriter);
+        model.clear();
+        model.setFrequency(10);
+        model.setStartTime(System.currentTimeMillis());  //todo remove
+        repaintTimer.start();
         incomingDataBuffer = new IncomingDataBuffer();
         ads.addAdsDataListener(incomingDataBuffer);
         try {
@@ -109,10 +118,7 @@ public class Controller {
             JOptionPane.showMessageDialog(null, e.getMessage());
             System.exit(0);
         }
-        model.clear();
-        model.setFrequency(10);
-        model.setStartTime(System.currentTimeMillis());  //todo remove
-        repaintTimer.start();
+
         isAutoScroll = true;
     }
 
@@ -157,6 +163,7 @@ public class Controller {
     }
 
     public void closeApplication() {
-        throw new UnsupportedOperationException("todo");
+        stopRecording();
+        System.exit(0);
     }
 }
