@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -155,5 +156,23 @@ public class Controller {
     public void closeApplication() {
         stopRecording();
         System.exit(0);
+    }
+
+    public void readBdfFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        int returnVal = fileChooser.showOpenDialog(mainWindow);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            log.info("Opening: " + file.getName() + ".");
+            BdfReader bdfReader = new BdfReader();
+            incomingDataBuffer = new IncomingDataBuffer();
+            model.clear();
+            bdfReader.addDataListener(incomingDataBuffer);
+            bdfReader.read(file);
+            updateModel();
+            mainWindow.repaint();
+        } else {
+            log.info("Open command cancelled by user.");
+        }
     }
 }

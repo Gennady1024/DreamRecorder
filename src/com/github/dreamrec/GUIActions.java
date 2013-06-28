@@ -7,8 +7,6 @@ public class GUIActions {
 
     private Controller controller;
 
-    public static final String SAVE_ACTION = "save";
-    public static final String SAVE_AS_EDF_ACTION = "save_as_edf";
     public static final String OPEN_ACTION = "open";
     public static final String SCROLL_CURSOR_FORWARD_ACTION = "scroll_forward";
     public static final String SCROLL_CURSOR_BACKWARD_ACTION = "scroll_backward";
@@ -48,7 +46,7 @@ public class GUIActions {
         }
 
         public void actionPerformed(ActionEvent e) {
-//            controller.readFromFile();
+            controller.readBdfFile();
         }
     }
 
