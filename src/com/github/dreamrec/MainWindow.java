@@ -53,9 +53,9 @@ public class MainWindow extends JFrame {
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
 
-        GComponentView ch2DataView = Factory.getGComponentView(model, controller, model.getCh2DataList());
+       /* GComponentView ch2DataView = Factory.getGComponentView(model, controller, model.getCh2DataList());
         mainPanel.add(ch2DataView);
-        ch2DataView.getComponentModel().centreX();
+        ch2DataView.getComponentModel().centreX();*/
 
         Filter<Integer> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
@@ -84,7 +84,6 @@ public class MainWindow extends JFrame {
     }
 
     private void registerKeyActions() {
-        mainPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK), SAVE_ACTION);
         mainPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK), OPEN_ACTION);
         mainPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), SCROLL_CURSOR_BACKWARD_ACTION);
         mainPanel.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), SCROLL_CURSOR_FORWARD_ACTION);

@@ -29,8 +29,8 @@ public class Controller {
     private IncomingDataBuffer incomingDataBuffer;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
     private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
-    private HiPassPreFilter mioHiPassPreFilter = new HiPassPreFilter(250, 10);
-    private FrequencyDividingPreFilter mioFrequencyDividingPreFilter;
+//    private HiPassPreFilter mioHiPassPreFilter = new HiPassPreFilter(250, 10);
+//    private FrequencyDividingPreFilter mioFrequencyDividingPreFilter;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -47,12 +47,12 @@ public class Controller {
                 model.addEyeData(channel1HiPassPreFilter.getFilteredValue(value));
             }
         };
-        mioFrequencyDividingPreFilter = new FrequencyDividingPreFilter(25){
+        /*mioFrequencyDividingPreFilter = new FrequencyDividingPreFilter(25){
             @Override
             public void notifyListeners(int value) {
                 model.addCh2Data(value);
             }
-        };
+        };*/
     }
 
     public void setMainWindow(MainWindow mainWindow) {
@@ -69,17 +69,17 @@ public class Controller {
             for (int i = 0; i < 50; i++) {
                channel1FrequencyDividingPreFilter.add(frame[i]);
             }
-            for (int i = 0; i < 50; i++) {
+            /*for (int i = 0; i < 50; i++) {
                mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(50 + frame[i])));
+            }*/
+            for (int i = 0; i < 2; i++) {
+               model.addAcc1Data(frame[50 + i]);
             }
             for (int i = 0; i < 2; i++) {
-               model.addAcc1Data(frame[100 + i]);
+                model.addAcc2Data(frame[52 + i]);
             }
             for (int i = 0; i < 2; i++) {
-                model.addAcc2Data(frame[102 + i]);
-            }
-            for (int i = 0; i < 2; i++) {
-                model.addAcc3Data(frame[104 + i]);
+                model.addAcc3Data(frame[54 + i]);
             }
         }
         if (isAutoScroll) {

@@ -18,8 +18,6 @@ public class
 		JMenu fileMenu = new JMenu("File");
 		add(fileMenu);
 		fileMenu.add(actionMap.get(GUIActions.OPEN_ACTION));
-		fileMenu.add(actionMap.get(GUIActions.SAVE_ACTION));
-		fileMenu.add(actionMap.get(GUIActions.SAVE_AS_EDF_ACTION));
 
 		JMenu recordMenu = new JMenu("Record");
 		add(recordMenu);
