@@ -29,6 +29,8 @@ public class Controller {
     private IncomingDataBuffer incomingDataBuffer;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
     private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
+    AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
+    int accelerometerFrameOffset = adsConfiguration.getAdsChannels().get(1).isEnabled() ? 100 : 50;
 //    private HiPassPreFilter mioHiPassPreFilter = new HiPassPreFilter(250, 10);
 //    private FrequencyDividingPreFilter mioFrequencyDividingPreFilter;
 
@@ -72,14 +74,15 @@ public class Controller {
             /*for (int i = 0; i < 50; i++) {
                mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(50 + frame[i])));
             }*/
+
             for (int i = 0; i < 2; i++) {
-               model.addAcc1Data(frame[50 + i]);
+               model.addAcc1Data(frame[accelerometerFrameOffset + i]);
             }
             for (int i = 0; i < 2; i++) {
-                model.addAcc2Data(frame[52 + i]);
+                model.addAcc2Data(frame[accelerometerFrameOffset + 2 + i]);
             }
             for (int i = 0; i < 2; i++) {
-                model.addAcc3Data(frame[54 + i]);
+                model.addAcc3Data(frame[accelerometerFrameOffset + 4 + i]);
             }
         }
         if (isAutoScroll) {
@@ -89,7 +92,6 @@ public class Controller {
 
     public void startRecording() {
         isRecording = true;
-        AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
         BdfHeaderData bdfHeaderData = new BdfHeaderData(adsConfiguration);
         if (bdfWriter != null) {
             ads.removeAdsDataListener(bdfWriter);
