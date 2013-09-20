@@ -46,7 +46,7 @@ public class GUIActions {
         }
 
         public void actionPerformed(ActionEvent e) {
-            controller.readBdfFile();
+            controller.readFromFile();
         }
     }
 

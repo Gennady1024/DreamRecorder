@@ -69,14 +69,14 @@ public class Controller {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
             for (int i = 0; i < 50; i++) {
-               channel1FrequencyDividingPreFilter.add(frame[i]);
+                channel1FrequencyDividingPreFilter.add(frame[i]);
             }
             /*for (int i = 0; i < 50; i++) {
                mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(50 + frame[i])));
             }*/
 
             for (int i = 0; i < 2; i++) {
-               model.addAcc1Data(frame[accelerometerFrameOffset + i]);
+                model.addAcc1Data(frame[accelerometerFrameOffset + i]);
             }
             for (int i = 0; i < 2; i++) {
                 model.addAcc2Data(frame[accelerometerFrameOffset + 2 + i]);
@@ -122,6 +122,18 @@ public class Controller {
         bdfWriter.stopRecording();
         repaintTimer.stop();
         isAutoScroll = false;
+        saveToFile();
+    }
+
+    private void saveToFile() {
+        String fileName = new SimpleDateFormat("dd-MM-yyyy_HH-mm").format(new Date(System.currentTimeMillis())) + ".drm";
+        try {
+            new DataSaveManager().saveToFile(new File(fileName), model);
+        } catch (ApplicationException e) {
+            String msg = "error saving to file " + fileName;
+            log.error(msg, e);
+            mainWindow.showMessage(msg);
+        }
     }
 
     public void changeXSize(int xSize) {
@@ -176,5 +188,18 @@ public class Controller {
         } else {
             log.info("Open command cancelled by user.");
         }
+    }
+
+    public void readFromFile() {
+        try {
+            JFileChooser fileChooser = new JFileChooser();
+            int fileChooserState = fileChooser.showOpenDialog(mainWindow);
+            if (fileChooserState == JFileChooser.APPROVE_OPTION) {
+                new DataSaveManager().readFromFile(fileChooser.getSelectedFile(), model);
+            }
+        } catch (ApplicationException e) {
+            mainWindow.showMessage(e.getMessage());
+        }
+        mainWindow.repaint();
     }
 }
