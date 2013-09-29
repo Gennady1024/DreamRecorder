@@ -30,7 +30,7 @@ public class Controller {
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
     private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
     AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
-    private HiPassPreFilter Channel2HiPassPreFilter = new HiPassPreFilter(250, 10);
+//    private HiPassPreFilter Channel2HiPassPreFilter = new HiPassPreFilter(250, 10);
     private FrequencyDividingPreFilter Channel2DividingPreFilter;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
@@ -71,7 +71,7 @@ public class Controller {
                 channel1FrequencyDividingPreFilter.add(frame[i]);
             }
             for (int i = 0; i < 50; i++) {
-               Channel2DividingPreFilter.add(Math.abs(Channel2HiPassPreFilter.getFilteredValue(50 + frame[i])));
+               Channel2DividingPreFilter.add(frame[i + 50]);
             }
 
             for (int i = 0; i < 2; i++) {

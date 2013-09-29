@@ -34,10 +34,11 @@ public class DataSaveManager {
         outStream.writeLong(model.getStartTime());
         outStream.writeDouble(model.getFrequency());
         for (int i = 0; i < model.getEyeDataList().size(); i++) {
-            outStream.writeShort(model.getEyeDataList().get(i).intValue());
-            outStream.writeShort(model.getAcc1DataList().get(i).intValue());
-            outStream.writeShort(model.getAcc2DataList().get(i).intValue());
-            outStream.writeShort(model.getAcc3DataList().get(i).intValue());
+            outStream.writeInt(model.getEyeDataList().get(i));
+            outStream.writeInt(model.getCh2DataList().get(i));
+            outStream.writeInt(model.getAcc1DataList().get(i));
+            outStream.writeInt(model.getAcc2DataList().get(i));
+            outStream.writeInt(model.getAcc3DataList().get(i));
         }
     }
 
@@ -67,10 +68,11 @@ public class DataSaveManager {
             model.setFrequency(frequency);
             model.setStartTime(startTime);
             while (true) {
-                model.addEyeData(inputStream.readShort());
-                model.addAcc1Data(inputStream.readShort());
-                model.addAcc2Data(inputStream.readShort());
-                model.addAcc3Data(inputStream.readShort());
+                model.addEyeData(inputStream.readInt());
+                model.addCh2Data(inputStream.readInt());
+                model.addAcc1Data(inputStream.readInt());
+                model.addAcc2Data(inputStream.readInt());
+                model.addAcc3Data(inputStream.readInt());
             }
         } catch (EOFException e) {
             log.info("End of file");
