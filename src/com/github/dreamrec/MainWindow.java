@@ -47,15 +47,17 @@ public class MainWindow extends JFrame {
         mainPanel.add(acc1DataView);
         acc1DataView.getComponentModel().centreX();
 
-//        GComponentView eyeDataView = Factory.getGComponentView(model, controller, new FirstDerivativeAbsFilter(model.getEyeDataList()));
         GComponentView eyeDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
-//        GComponentView eyeDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
 
-        GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
+        GComponentView Channel2DataView = Factory.getGComponentView(model, controller, model.getCh2DataList());
+        mainPanel.add(Channel2DataView);
+        Channel2DataView.getComponentModel().centreX();
+
+       /* GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(testDataView);
-        testDataView.getComponentModel().centreX();
+        testDataView.getComponentModel().centreX();*/
 
         Filter<Integer> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));

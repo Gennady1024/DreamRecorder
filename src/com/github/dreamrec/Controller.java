@@ -30,9 +30,8 @@ public class Controller {
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
     private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
     AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
-    int accelerometerFrameOffset = adsConfiguration.getAdsChannels().get(1).isEnabled() ? 100 : 50;
-//    private HiPassPreFilter mioHiPassPreFilter = new HiPassPreFilter(250, 10);
-//    private FrequencyDividingPreFilter mioFrequencyDividingPreFilter;
+    private HiPassPreFilter Channel2HiPassPreFilter = new HiPassPreFilter(250, 10);
+    private FrequencyDividingPreFilter Channel2DividingPreFilter;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
@@ -49,12 +48,12 @@ public class Controller {
                 model.addEyeData(channel1HiPassPreFilter.getFilteredValue(value));
             }
         };
-        /*mioFrequencyDividingPreFilter = new FrequencyDividingPreFilter(25){
+        Channel2DividingPreFilter = new FrequencyDividingPreFilter(25){
             @Override
             public void notifyListeners(int value) {
                 model.addCh2Data(value);
             }
-        };*/
+        };
     }
 
     public void setMainWindow(MainWindow mainWindow) {
@@ -71,18 +70,18 @@ public class Controller {
             for (int i = 0; i < 50; i++) {
                 channel1FrequencyDividingPreFilter.add(frame[i]);
             }
-            /*for (int i = 0; i < 50; i++) {
-               mioFrequencyDividingPreFilter.add(Math.abs(mioHiPassPreFilter.getFilteredValue(50 + frame[i])));
-            }*/
+            for (int i = 0; i < 50; i++) {
+               Channel2DividingPreFilter.add(Math.abs(Channel2HiPassPreFilter.getFilteredValue(50 + frame[i])));
+            }
 
             for (int i = 0; i < 2; i++) {
-                model.addAcc1Data(frame[accelerometerFrameOffset + i]);
+                model.addAcc1Data(frame[100 + i]);
             }
             for (int i = 0; i < 2; i++) {
-                model.addAcc2Data(frame[accelerometerFrameOffset + 2 + i]);
+                model.addAcc2Data(frame[102 + i]);
             }
             for (int i = 0; i < 2; i++) {
-                model.addAcc3Data(frame[accelerometerFrameOffset + 4 + i]);
+                model.addAcc3Data(frame[104 + i]);
             }
         }
         if (isAutoScroll) {
