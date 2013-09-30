@@ -28,9 +28,7 @@ public class Controller {
     private BdfWriter bdfWriter;
     private IncomingDataBuffer incomingDataBuffer;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
-    private HiPassPreFilter channel1HiPassPreFilter = new HiPassPreFilter(10, 0.05);
     AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
-    private HiPassPreFilter channel2HiPassPreFilter = new HiPassPreFilter(250, 0.05);
     private FrequencyDividingPreFilter Channel2DividingPreFilter;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
@@ -45,13 +43,13 @@ public class Controller {
         channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(25) {
             @Override
             public void notifyListeners(int value) {
-                model.addEyeData(channel1HiPassPreFilter.getFilteredValue(value));
+                model.addEyeData(value);
             }
         };
         Channel2DividingPreFilter = new FrequencyDividingPreFilter(25){
             @Override
             public void notifyListeners(int value) {
-                model.addCh2Data(channel2HiPassPreFilter.getFilteredValue(value));
+                model.addCh2Data(value);
             }
         };
     }
