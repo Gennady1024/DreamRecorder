@@ -12,12 +12,12 @@ public class AveragingFilter extends AbstractFilter<Integer> {
 
     @Override
     protected Integer doFilter(int index) {
+        if(index == 0) return 0;
         int sum = 0;
-        int incomingDataIndex = index*divider;
+        int incomingDataIndex = index*divider - 1;
         for (int i = 0; i < divider; i++) {
-            sum += Math.abs(inputData.get(incomingDataIndex+i));
-
+            sum += Math.abs(inputData.get(incomingDataIndex - i));
         }
-        return sum*100/divider;
+        return sum/divider;
     }
 }
