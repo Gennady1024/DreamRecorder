@@ -72,7 +72,7 @@ public class BdfWriter implements AdsDataListener {
         if(stopRecordingRequest) return;
         stopRecordingRequest = true;
         double durationOfDataRecord = (stopRecordingTime - startRecordingTime) * 0.001 / numberOfDataRecords;
-//        bdfHeaderData.setDurationOfDataRecord(durationOfDataRecord);
+        bdfHeaderData.setDurationOfDataRecord(durationOfDataRecord);
         bdfHeaderData.setNumberOfDataRecords(numberOfDataRecords);
         try {
             fileToSave.seek(0);
@@ -85,6 +85,7 @@ public class BdfWriter implements AdsDataListener {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss:SS");
         LOG.info("Start recording time = " + startRecordingTime + " (" + dateFormat.format(new Date(startRecordingTime)));
         LOG.info("Stop recording time = " + stopRecordingTime + " (" + dateFormat.format(new Date(stopRecordingTime)));
+        LOG.info("Number of data records = " + numberOfDataRecords);
         LOG.info("Duration of a data record = " + durationOfDataRecord);
     }
 

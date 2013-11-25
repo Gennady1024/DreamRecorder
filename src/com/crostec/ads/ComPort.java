@@ -24,18 +24,19 @@ class ComPort {
     SerialWriter serialWriter;
     Thread serialWriterThread;
 
-    public void connect(String comPortName) throws Exception {
+    public void connect(AdsConfiguration adsConfiguration) throws Exception {
         if (isConnected) {
             return;
         }
-        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(comPortName);
+        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(adsConfiguration.getComPortName());
         if (portIdentifier.isCurrentlyOwned()) {
-            System.out.println("Error: Port is currently in use");
+            log.error("Error: Port is currently in use");
         } else {
             commPort = portIdentifier.open(this.getClass().getName(), 2000);
             if (commPort instanceof SerialPort) {
                 SerialPort serialPort = (SerialPort) commPort;
-                serialPort.setSerialPortParams(230400, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                ComPortParams comPortParams = adsConfiguration.getDeviceType().getComPortParams();
+                serialPort.setSerialPortParams(comPortParams.getSpeed(), SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
                 inputStream = serialPort.getInputStream();
                 outputStream = serialPort.getOutputStream();
                 isConnected = true;
@@ -46,7 +47,7 @@ class ComPort {
                 serialWriterThread = new Thread(serialWriter);
                 serialWriterThread.start();
             } else {
-                System.out.println("Error: Not a serial ports.");
+                log.error("Error: Not a serial ports.");
             }
         }
     }
@@ -117,7 +118,9 @@ class ComPort {
                     }
                     Thread.sleep(100);
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
+                log.error(e);
+            } catch (InterruptedException e){
                 log.error(e);
             }
         }
@@ -172,9 +175,9 @@ class ComPort {
         public void disconnect() {
             isConnected = false;
             isDataReady = true;
-            synchronized (data) {
-                data.notifyAll();
-            }
+           /* synchronized (data) {
+                data.notifyAll();    //todo lock
+            }*/
         }
     }
 }

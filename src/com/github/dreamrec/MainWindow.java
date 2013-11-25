@@ -43,7 +43,7 @@ public class MainWindow extends JFrame {
 
        // Filter<Short> fastDreamView = new FirstDerivativeAbsFilter(model.getEyeDataList());
        // mainPanel.add(Factory.getGComponentView(fastDreamView, model, controller));
-        GComponentView acc1DataView = Factory.getGComponentView(model, controller, new AccelerometerPositionFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList()));
+        GComponentView acc1DataView = Factory.getGComponentView(model, controller, model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList());
         mainPanel.add(acc1DataView);
         acc1DataView.getComponentModel().centreX();
 
@@ -51,9 +51,9 @@ public class MainWindow extends JFrame {
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
 
-        GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
+        /*GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
         mainPanel.add(Channel2DataView);
-        Channel2DataView.getComponentModel().centreX();
+        Channel2DataView.getComponentModel().centreX();*/
 
        /* GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(testDataView);

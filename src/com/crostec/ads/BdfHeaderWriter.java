@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
 import static com.crostec.ads.AdsUtils.*;
 
 class BdfHeaderWriter {
@@ -27,13 +29,11 @@ class BdfHeaderWriter {
 
         String channelsDigitalMaximum = "8388607";
         String channelsDigitalMinimum = "-8388608";
-        String channelsPhysicalMaximum = "400000";  // todo function(channel.gain)
-        String channelsPhysicalMinimum = "-400000"; // todo function(channel.gain)
 
-        String accelerometerDigitalMaximum = "1024";
-        String accelerometerDigitalMinimum = "-1024";
-        String accelerometerPhysicalMaximum = "1";
-        String accelerometerPhysicalMinimum = "0";
+        String accelerometerDigitalMaximum = "30800";
+        String accelerometerDigitalMinimum = "-30800";
+        String accelerometerPhysicalMaximum = "2";
+        String accelerometerPhysicalMinimum = "-2";
 
         bdfHeader.append(adjustLength(identificationCode, 7));  //7 not 8 because first non ascii byte we will add later
         bdfHeader.append(adjustLength(localPatientIdentification, 80));
@@ -57,18 +57,20 @@ class BdfHeaderWriter {
         StringBuilder samplesNumbers = new StringBuilder();
         StringBuilder reservedForChannels = new StringBuilder();
         AdsConfiguration adsConfiguration = bdfHeaderData.getAdsConfiguration();
-        for (int i = 0; i < adsConfiguration.getAdsChannels().size(); i++) {
-            if (adsConfiguration.getAdsChannels().get(i).isEnabled) {
+        List<AdsChannelConfiguration> channelConfigurations = adsConfiguration.getAdsChannels();
+        for (int i = 0; i < channelConfigurations.size(); i++) {
+            if (channelConfigurations.get(i).isEnabled) {
                 labels.append(adjustLength(bdfHeaderData.getAdsChannelNames().get(i), 16));
                 transducerTypes.append(adjustLength("Unknown", 80));
                 physicalDimensions.append(adjustLength("uV", 8));
-                physicalMinimums.append(adjustLength(channelsPhysicalMinimum, 8));
-                physicalMaximums.append(adjustLength(channelsPhysicalMaximum, 8));
+                int physicalMaximum = 2400000/channelConfigurations.get(i).getGain().getValue();
+                physicalMinimums.append(adjustLength("-" + physicalMaximum, 8));
+                physicalMaximums.append(adjustLength("" + physicalMaximum, 8));
                 digitalMinimums.append(adjustLength(channelsDigitalMinimum, 8));
                 digitalMaximums.append(adjustLength(channelsDigitalMaximum, 8));
                 preFilterings.append(adjustLength("None", 80));
                 int nrOfSamplesInEachDataRecord = (int) Math.round(bdfHeaderData.getDurationOfDataRecord()) * adsConfiguration.getSps().getValue() /
-                        adsConfiguration.getAdsChannels().get(i).getDivider().getValue();
+                        channelConfigurations.get(i).getDivider().getValue();
                 samplesNumbers.append(adjustLength(Integer.toString(nrOfSamplesInEachDataRecord), 8));
                 reservedForChannels.append(adjustLength("", 32));
             }

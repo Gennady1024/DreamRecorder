@@ -27,14 +27,14 @@ public class AdsUtils {
      public static int getDecodedFrameSize(AdsConfiguration adsConfiguration) {
         int frameSize = 0;
         for (Integer divider : getDividersForActiveChannels(adsConfiguration)) {
-            frameSize += AdsChannelConfiguration.MAX_DIV.getValue() / divider;
+            frameSize += adsConfiguration.getDeviceType().getMaxDiv().getValue() / divider;
         }
-        return frameSize + 2; //1 value for counter and 1 for loff status
+        return frameSize + 2; // 2 values for device specific information (counter and loff status);
     }
 
     /**
      * convert int data format to 24 bit (3 bytes) data format valid for Bdf and
-     * change Big_endian dateFormat of numbers (java)  to Little_endian dateFormat (for bdf and microcontroller)
+     * change Big_endian (java)  to Little_endian (for bdf)
      */
     public static byte[] to24BitLittleEndian(int value) {
         int sizeOfInt = 4;

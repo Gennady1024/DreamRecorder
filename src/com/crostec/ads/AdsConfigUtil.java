@@ -5,16 +5,16 @@ package com.crostec.ads;
  */
 public class AdsConfigUtil {
 
-    public static final int NUMBER_OF_CHANNELS = 2;
     AdsConfigProperties adsConfigProperties = new AdsConfigProperties();
 
     public  AdsConfiguration readConfiguration() {
         AdsConfiguration adsConfiguration = new AdsConfiguration();
+        adsConfiguration.setDeviceType(adsConfigProperties.getDeviceType());
         adsConfiguration.setSps(adsConfigProperties.getSps());
         adsConfiguration.setComPortName(adsConfigProperties.getComPortName());
         adsConfiguration.setAccelerometerEnabled(adsConfigProperties.isAccelerometerEnabled());
         adsConfiguration.setAccelerometerDivider(adsConfigProperties.getAccelerometerDivider());
-        for (int chNum = 0; chNum < NUMBER_OF_CHANNELS; chNum++) {
+        for (int chNum = 0; chNum < adsConfigProperties.getDeviceType().getNumberOfAdsChannels(); chNum++) {
             AdsChannelConfiguration adsChannelConfiguration = new AdsChannelConfiguration();
             adsChannelConfiguration.setDivider(adsConfigProperties.getChannelDivider(chNum));
             adsChannelConfiguration.setGain(adsConfigProperties.getChannelGain(chNum));
@@ -32,9 +32,11 @@ public class AdsConfigUtil {
         adsConfigProperties.setComPortName(adsConfiguration.getComPortName());
         adsConfigProperties.setAccelerometerDivider(adsConfiguration.getAccelerometerDivider());
         adsConfigProperties.setAccelerometerEnabled(adsConfiguration.isAccelerometerEnabled());
-        for (int i = 0; i < NUMBER_OF_CHANNELS; i++) {
+        for (int i = 0; i < adsConfiguration.getDeviceType().getNumberOfAdsChannels(); i++) {
             AdsChannelConfiguration channel = adsConfiguration.getAdsChannels().get(i);
             adsConfigProperties.setChannelDivider(i, channel.getDivider());
+            adsConfigProperties.setChannelGain(i, channel.getGain());
+            adsConfigProperties.setChannelCommutatorState(i, channel.getCommutatorState());
             adsConfigProperties.setChannelEnabled(i, channel.isEnabled());
             adsConfigProperties.setChannelLoffEnabled(i, channel.isLoffEnable());
             adsConfigProperties.setChannelRldSenseEnabled(i, channel.isRldSenseEnabled());

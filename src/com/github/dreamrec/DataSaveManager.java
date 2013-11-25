@@ -15,11 +15,17 @@ public class DataSaveManager {
 
     public void saveToFile(File file, Model model) throws ApplicationException {
         DataOutputStream outStream = null;
+//        try {
         try {
             outStream = new DataOutputStream(new FileOutputStream(file));
+        } catch (FileNotFoundException e) {
+           log.error(e);
+            throw new ApplicationException("Error while saving file " + file.getName());
+        }
+        try {
             saveStateToStream(outStream, model);
-        } catch (Exception e) {
-            log.error(e);
+        } catch (IOException e) {
+           log.error(e);
             throw new ApplicationException("Error while saving file " + file.getName());
         } finally {
             try {

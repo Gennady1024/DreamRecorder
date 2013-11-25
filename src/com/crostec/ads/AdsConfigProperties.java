@@ -13,6 +13,8 @@ import org.apache.commons.logging.LogFactory;
 class AdsConfigProperties {
     private static final Log log = LogFactory.getLog(AdsConfigProperties.class);
     private static final String ADS_CONFIG_PROPERTIES = "ads_config.properties";
+
+    public static final String DEVICE_TYPE = "deviceType";
     public static final String COM_PORT_NAME = "comPort";
     public static final String SPS = "sps";
     public static final String CHANNEL_DIVIDER = "dividerChannel";
@@ -31,6 +33,10 @@ class AdsConfigProperties {
         } catch (ConfigurationException e) {
             log.error(e);
         }
+    }
+
+    public DeviceType getDeviceType(){
+            return DeviceType.valueOf(config.getString(DEVICE_TYPE));
     }
 
     public String getComPortName() {
@@ -109,6 +115,14 @@ class AdsConfigProperties {
 
     public void setChannelDivider(int channelNumber, Divider divider) {
         config.setProperty(CHANNEL_DIVIDER + channelNumber, divider);
+    }
+
+    public void setChannelGain(int channelNumber, Gain gain) {
+        config.setProperty(CHANNEL_GAIN + channelNumber, gain);
+    }
+
+    public void setChannelCommutatorState(int channelNumber, CommutatorState commutatorState) {
+        config.setProperty(CHANNEL_COMMUTATOR_STATE + channelNumber, commutatorState);
     }
 
     public void setAccelerometerDivider(Divider divider) {

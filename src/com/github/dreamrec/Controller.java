@@ -27,29 +27,67 @@ public class Controller {
     private Ads ads = new Ads();
     private BdfWriter bdfWriter;
     private IncomingDataBuffer incomingDataBuffer;
+    private FrequencyDividingPreFilter channel0FrequencyDividingPreFilter;
     private FrequencyDividingPreFilter channel1FrequencyDividingPreFilter;
-    AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
-    private FrequencyDividingPreFilter Channel2DividingPreFilter;
+    private FrequencyDividingPreFilter accelerometer0DividingPreFilter;
+    private FrequencyDividingPreFilter accelerometer1DividingPreFilter;
+    private FrequencyDividingPreFilter accelerometer2DividingPreFilter;
+    private AdsConfiguration adsConfiguration = new AdsConfigUtil().readConfiguration();
+
+    private int maxDiv;
+    private int nrOfChannel0Samples; //number of channel0 samples in data frame
+    private int nrOfChannel1Samples;
+    private int nrOfAccelerometerSamples;
+    private int sps;
+    private int accelerometerOffset;
 
     public Controller(final Model model, ApplicationProperties applicationProperties) {
         this.applicationProperties = applicationProperties;
         this.model = model;
+        sps = adsConfiguration.getSps().getValue();
+        maxDiv = adsConfiguration.getDeviceType().getMaxDiv().getValue();
+        int channel0Divider = adsConfiguration.getAdsChannels().get(0).getDivider().getValue();
+        nrOfChannel0Samples = maxDiv / channel0Divider;
+        int channel1Divider = adsConfiguration.getAdsChannels().get(1).getDivider().getValue();
+        nrOfChannel1Samples = maxDiv / channel1Divider;
+        int accelerometerDivider = adsConfiguration.getAccelerometerDivider().getValue();
+        nrOfAccelerometerSamples = maxDiv / accelerometerDivider;
+        accelerometerOffset = AdsUtils.getDecodedFrameSize(adsConfiguration) - 2 - 3 * nrOfAccelerometerSamples;
+
         repaintTimer = new Timer(applicationProperties.getRepaintDelay(), new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 updateModel();
                 mainWindow.repaint();
             }
         });
-        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(25) {
+        channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * channel0Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addEyeData(value);
             }
         };
-        Channel2DividingPreFilter = new FrequencyDividingPreFilter(25){
+        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * channel1Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addCh2Data(value);
+            }
+        };
+        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+            @Override
+            public void notifyListeners(int value) {
+                model.addAcc1Data(value);
+            }
+        };
+        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+            @Override
+            public void notifyListeners(int value) {
+                model.addAcc2Data(value);
+            }
+        };
+        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+            @Override
+            public void notifyListeners(int value) {
+                model.addAcc3Data(value);
             }
         };
     }
@@ -65,21 +103,20 @@ public class Controller {
     protected void updateModel() {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < nrOfChannel0Samples; i++) {
+                channel0FrequencyDividingPreFilter.add(frame[i]);
+            }
+            for (int i = nrOfChannel0Samples; i < nrOfChannel0Samples + nrOfChannel1Samples; i++) {
                 channel1FrequencyDividingPreFilter.add(frame[i]);
             }
-            for (int i = 0; i < 50; i++) {
-               Channel2DividingPreFilter.add(frame[i + 50]);
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                accelerometer0DividingPreFilter.add(frame[accelerometerOffset + i]);
             }
-
-            for (int i = 0; i < 2; i++) {
-                model.addAcc1Data(frame[100 + i]);
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                accelerometer1DividingPreFilter.add(frame[accelerometerOffset + nrOfAccelerometerSamples + i]);
             }
-            for (int i = 0; i < 2; i++) {
-                model.addAcc2Data(frame[102 + i]);
-            }
-            for (int i = 0; i < 2; i++) {
-                model.addAcc3Data(frame[104 + i]);
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                accelerometer2DividingPreFilter.add(frame[accelerometerOffset + 2 * nrOfAccelerometerSamples + i]);
             }
         }
         if (isAutoScroll) {

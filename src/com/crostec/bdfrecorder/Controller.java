@@ -1,7 +1,9 @@
 package com.crostec.bdfrecorder;
 
 import com.crostec.ads.*;
-import com.crostec.bdfrecorder.SettingsWindow;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 import javax.swing.*;
 
@@ -11,6 +13,7 @@ public class Controller {
     private SettingsWindow settingsWindow;
     private Ads ads;
     private BdfWriter bdfWriter;
+    private static  final Log log = LogFactory.getLog(Controller.class);
 
     public Controller(Ads ads) {
         this.ads = ads;
@@ -21,6 +24,8 @@ public class Controller {
     }
 
     public void startRecording(BdfHeaderData bdfHeaderData) {
+        new AdsConfigUtil().saveAdsConfiguration(bdfHeaderData.getAdsConfiguration());
+        log.info(bdfHeaderData.getAdsConfiguration().toString());
         isRecording = true;
         if (bdfWriter != null) {
             ads.removeAdsDataListener(bdfWriter);
@@ -38,14 +43,14 @@ public class Controller {
 
     public void stopRecording() {
         if (!isRecording) return;
-        ads.stopRecording();
         bdfWriter.stopRecording();
+        ads.stopRecording();
         isRecording = false;
     }
 
     public void closeApplication(BdfHeaderData bdfHeaderData) {
-        stopRecording();
         new AdsConfigUtil().saveAdsConfiguration(bdfHeaderData.getAdsConfiguration());
+        stopRecording();
         System.exit(0);
     }
 
