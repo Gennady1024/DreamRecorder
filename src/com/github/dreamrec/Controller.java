@@ -227,6 +227,8 @@ public class Controller {
     public void readFromFile() {
         try {
             JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File("./"));
+            fileChooser.setFileFilter(new ExtFileFilter("drm", "*.drm Dream records"));
             int fileChooserState = fileChooser.showOpenDialog(mainWindow);
             if (fileChooserState == JFileChooser.APPROVE_OPTION) {
                 new DataSaveManager().readFromFile(fileChooser.getSelectedFile(), model);
