@@ -37,10 +37,15 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
 
        if (data_Z > data_Sin_45){Z_mod *= -1; return Z_mod; }
 
-       calibrXY(data_X, data_Y);
+       double Z = (double)data_Z / Z_data_mod;
 
-       int X = data_X * X_mod / X_data_mod;
-       int Y = data_Y * Y_mod / Y_data_mod;
+       double ZZ = Z*Z;
+       double sec_Z = 1 + ZZ*0.43 + ZZ*ZZ*0.77;
+
+       double double_X = ((double)data_X / X_data_mod)* sec_Z;
+       double double_Y = ((double)data_Y / Y_data_mod)* sec_Z;
+       int X = (int)(double_X * X_mod);
+       int Y = (int)(double_Y * Y_mod);
 
        XY_angle = angle(X, Y);
 
@@ -50,7 +55,6 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
     }
 
     protected int angle(int X, int Y) {
-        // double X_Sin, Y_Sin, Z_Sin;
         int XY_angle = 0;
         // XY_angle =  1 + sin(x) - cos(x); if (X >= 0 && Y >=0)
         // XY_angle =  3 - sin(x) - cos(x); if (X >= 0 && Y < 0)
@@ -66,26 +70,7 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
         return XY_angle/10;
     }
 
-    protected boolean zeroTrigger(int data_0, int data_1) {
-       if (data_1 >= 0 && data_0 <= 0 || data_1 <= 0 && data_0 >= 0)
-            return true;
-       else return  false;
-    }
 
-    protected void calibrXY(int data_X, int data_Y) {
-
-        boolean zero_X;
-        zero_X = zeroTrigger(data_X_1, data_X );
-        data_X_1 = data_X;
-        boolean zero_Y;
-        zero_Y = zeroTrigger(data_Y_1, data_Y );
-        data_Y_1 = data_Y;
-        if(zero_X) Y_data_mod = data_Y;
-        if (Y_data_mod < 0)Y_data_mod = -Y_data_mod;
-        if(zero_Y) X_data_mod = data_X;
-        if (X_data_mod < 0)X_data_mod = -X_data_mod;
-    }
-    
     protected void data_Max_Min(int X, int Y, int Z) {
 
         if (data_X_Max < X) data_X_Max = X;  if (data_X_Min > X) data_X_Min = X;
