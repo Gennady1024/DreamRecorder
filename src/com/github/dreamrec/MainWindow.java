@@ -43,25 +43,38 @@ public class MainWindow extends JFrame {
 
        // Filter<Short> fastDreamView = new FirstDerivativeAbsFilter(model.getEyeDataList());
        // mainPanel.add(Factory.getGComponentView(fastDreamView, model, controller));
+        // Панель Акселерометра
         GComponentView acc1DataView = Factory.getGComponentView(model, controller, new AccelerometerPositionFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList())
         , new AccelerometerDynamicFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList()));
         mainPanel.add(acc1DataView);
         acc1DataView.getComponentModel().centreX();
 
-        GComponentView eyeDataView = Factory.getGComponentView(model, controller,  new HiPassFilter(model.getEyeDataList(), 50), new HiPassFilter(model.getCh2DataList(), 50));
+        // Панель движения глаз    Сдвоенная
+        GComponentView eyeDataView = Factory.getGComponentView(model, controller,
+                new HiPassFilter(model.getEyeDataList(), 50)
+ //               ,
+ //               new HiPassFilter(model.getCh2DataList(), 50)
+        );
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
-
-       /* GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
+        // Панель движения глаз    Вторая панель для 2-го канала
+         GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
         mainPanel.add(Channel2DataView);
-        Channel2DataView.getComponentModel().centreX();*/
+        Channel2DataView.getComponentModel().centreX();
 
        /* GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(testDataView);
         testDataView.getComponentModel().centreX();*/
 
+        // Медленный график 1
         Filter<Integer> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
+
+        // Медленный график 2
+        Filter<Integer> slowDreamView2 = new AveragingFilter(new SlowSleepFilter(new AccelerometerPositionFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList()),
+                new AccelerometerDynamicFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList()),
+                new HiPassFilter(model.getEyeDataList(), 50), new HiPassFilter(model.getCh2DataList(), 50)), Model.DIVIDER);
+        mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView2));
 
         add(mainPanel, BorderLayout.CENTER);
         graphScrollBar = Factory.getSlowGraphScrollBar(model, controller);

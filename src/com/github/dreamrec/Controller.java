@@ -107,7 +107,7 @@ public class Controller {
                 channel0FrequencyDividingPreFilter.add(frame[i]);
             }
             for (int i = nrOfChannel0Samples; i < nrOfChannel0Samples + nrOfChannel1Samples; i++) {
-                channel1FrequencyDividingPreFilter.add(-frame[i]);
+                channel1FrequencyDividingPreFilter.add(frame[i]);
             }
             for (int i = 0; i < nrOfAccelerometerSamples; i++) {
                 accelerometer0DividingPreFilter.add(frame[accelerometerOffset + i]);
