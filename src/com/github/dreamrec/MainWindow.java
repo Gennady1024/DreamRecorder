@@ -48,13 +48,13 @@ public class MainWindow extends JFrame {
         mainPanel.add(acc1DataView);
         acc1DataView.getComponentModel().centreX();
 
-        GComponentView eyeDataView = Factory.getGComponentView(model, controller,  new HiPassFilter(model.getEyeDataList(), 50));
+        GComponentView eyeDataView = Factory.getGComponentView(model, controller,  new HiPassFilter(model.getEyeDataList(), 50), new HiPassFilter(model.getCh2DataList(), 50));
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
 
-        GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
+       /* GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
         mainPanel.add(Channel2DataView);
-        Channel2DataView.getComponentModel().centreX();
+        Channel2DataView.getComponentModel().centreX();*/
 
        /* GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(testDataView);
