@@ -49,9 +49,7 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
 
        XY_angle = angle(X, Y);
 
-        return
-                XY_angle
-         ;
+        return XY_angle;
     }
 
     protected int angle(int X, int Y) {
