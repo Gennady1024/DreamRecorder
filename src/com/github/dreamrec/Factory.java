@@ -11,6 +11,8 @@ import java.awt.event.*;
  *
  */
 public class Factory {
+    private static final double dZoomPlus  = Math.sqrt(2.0);
+    private static final double dZoomMinus = 1.0/dZoomPlus;
 
     public static GComponentView getGComponentView(Model model, final Controller controller, Filter... filter) {
         GComponentView gComponentView;
@@ -49,17 +51,22 @@ public class Factory {
     private static void addGComponentListeners(final GComponentView gComponentView, final Controller controller) {
         gComponentView.addComponentListener(new ComponentAdapter() {
             @Override
-            public void componentResized(ComponentEvent componentEvent) {
+                public void componentResized(ComponentEvent componentEvent) {
                 GComponentModel gModel = gComponentView.getComponentModel();
                 gModel.setYSize(componentEvent.getComponent().getHeight() - gModel.getTopIndent() - gModel.getBottomIndent());
                 controller.changeXSize(componentEvent.getComponent().getWidth() - gModel.getLeftIndent() - gModel.getRightIndent());
             }
         });
+
         gComponentView.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 int rotation = e.getWheelRotation();
+                double zoom = 1.0;
                 GComponentModel gModel = gComponentView.getComponentModel();
-                gModel.setYZoom(gModel.getYZoom() * (1+rotation/10.0));
+                if(rotation > 0)zoom = dZoomPlus;
+                else { zoom = dZoomMinus; }
+                gModel.setYZoom(gModel.getYZoom() * zoom);
+
                 gComponentView.repaint();
             }
         });

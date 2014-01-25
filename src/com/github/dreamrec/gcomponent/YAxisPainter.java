@@ -7,7 +7,7 @@ import java.awt.*;
  */
 public class YAxisPainter implements IPainter<IYAxisPainterModel> {
 
-    private long minValueStep = 10;  //min value between two labels
+    private long minValueStep = 50;  //min value between two labels
     private int minPointStep = 20; //min distance between two labels in pixels
     private int minValue = 0;
 
@@ -27,7 +27,7 @@ public class YAxisPainter implements IPainter<IYAxisPainterModel> {
         for (int i = 1; i < numberOfColumns+1; i++) {
             long gridValue = (minValue/valueStep)*valueStep + i*valueStep;
             int position = (int)Math.round(paintModel.getYZoom()*(gridValue - minValue));
-            g.drawLine(-3, -position, +3, -position);
+            g.drawLine(12, -position, +18, -position);
             g.drawString(getLabelText(gridValue), -25, -position+5);
         }
     }

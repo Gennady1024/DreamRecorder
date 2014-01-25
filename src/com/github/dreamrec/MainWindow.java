@@ -72,12 +72,11 @@ public class MainWindow extends JFrame {
         Filter<Integer> slowDreamView = new AveragingFilter(new FirstDerivativeAbsFilter(model.getEyeDataList()), Model.DIVIDER);
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
 
-        // Медленный график 2
-        SlowSleepFilter slowSleepFilter = new SlowSleepFilter(accelerometerPositionFilter, accelerometerDynamicFilter,
-                new HiPassFilter(model.getEyeDataList(), 50), new HiPassFilter(model.getCh2DataList(), 50));
-
-        Filter<Integer> slowDreamView2 = new AveragingFilter(slowSleepFilter, Model.DIVIDER);
-        mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView2));
+        //Медленный график 2
+        Filter<Integer> slowAccelerometerFilter = new SlowAccelerometerFilter(accelerometerPositionFilter, accelerometerDynamicFilter);
+        GComponentView slowAccelerometerView = Factory.getGComponentView(model, controller,slowAccelerometerFilter);
+        mainPanel.add(slowAccelerometerView);
+        slowAccelerometerView.getComponentModel().centreX();
 
         add(mainPanel, BorderLayout.CENTER);
         graphScrollBar = Factory.getSlowGraphScrollBar(model, controller);

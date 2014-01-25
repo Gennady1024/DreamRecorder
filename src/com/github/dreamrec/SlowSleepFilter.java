@@ -1,4 +1,5 @@
-package com.github.dreamrec;
+package com.github.dreamrec;  
+import static java.lang.Math.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +27,11 @@ public class SlowSleepFilter extends AbstractFilter<Integer> {
             return 0;
         }
 
-        return inputData.get(index - 10) + accelerometerPosition.get(index-5)+ accelerometerDynamic.get(index)
-                +channel_2.get(index-3);
+          return
+        //         inputData.get(index - 10) +
+        accelerometerPosition.get(index-5)
+        + accelerometerDynamic.get(index)*10
+                  ;
+        //        +channel_2.get(index-3);
     }
 }
