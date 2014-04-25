@@ -1,5 +1,8 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
 
+
+import com.github.dreamrec.filters.AbstractFilter;
+import com.github.dreamrec.filters.Filter;
 
 public class FirstDerivativeAbsFilter extends AbstractFilter<Integer> {
 

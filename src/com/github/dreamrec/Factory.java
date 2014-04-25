@@ -1,5 +1,6 @@
 package com.github.dreamrec;
 
+import com.github.dreamrec.filters.Filter;
 import com.github.dreamrec.gcomponent.GComponentFastModel;
 import com.github.dreamrec.gcomponent.GComponentModel;
 import com.github.dreamrec.gcomponent.GComponentSlowModel;

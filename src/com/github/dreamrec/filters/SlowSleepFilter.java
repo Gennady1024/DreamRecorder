@@ -1,5 +1,6 @@
-package com.github.dreamrec;  
-import static java.lang.Math.*;
+package com.github.dreamrec.filters;
+import com.github.dreamrec.filters.AbstractFilter;
+import com.github.dreamrec.filters.Filter;
 
 /**
  * Created by IntelliJ IDEA.

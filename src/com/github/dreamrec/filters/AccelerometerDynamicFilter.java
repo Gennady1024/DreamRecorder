@@ -1,9 +1,9 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
 
 /**
  *
  */
-public class AccelerometerDynamicFilter extends AbstractFilter<Integer>  {
+public class AccelerometerDynamicFilter extends AbstractFilter<Integer> {
 
     protected final Filter<Integer> yData;
     protected final Filter<Integer> zData;

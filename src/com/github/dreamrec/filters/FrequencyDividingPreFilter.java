@@ -1,4 +1,4 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
 
 import java.util.LinkedList;
 import java.util.Queue;

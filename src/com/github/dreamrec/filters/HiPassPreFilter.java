@@ -1,4 +1,4 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
 
 
 import org.apache.commons.logging.Log;

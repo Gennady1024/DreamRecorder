@@ -1,5 +1,7 @@
 package com.github.dreamrec;
 
+import com.github.dreamrec.filters.Filter;
+
 import java.util.ArrayList;
 
 /**

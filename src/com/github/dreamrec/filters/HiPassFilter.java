@@ -1,7 +1,10 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
 
 
-public class HiPassFilter extends AbstractFilter<Integer>{
+import com.github.dreamrec.filters.AbstractFilter;
+import com.github.dreamrec.filters.Filter;
+
+public class HiPassFilter extends AbstractFilter<Integer> {
     private int bufferSize;
 
     public HiPassFilter(Filter<Integer> inputData, int bufferSize) {

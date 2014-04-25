@@ -1,4 +1,8 @@
-package com.github.dreamrec;
+package com.github.dreamrec.filters;
+
+import com.github.dreamrec.Model;
+import com.github.dreamrec.filters.AbstractFilter;
+import com.github.dreamrec.filters.Filter;
 
 /**
  * Фильтр усредняет данные Акселерометра

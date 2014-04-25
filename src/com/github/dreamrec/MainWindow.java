@@ -1,4 +1,5 @@
 package com.github.dreamrec;
+import com.github.dreamrec.filters.*;
 import com.github.dreamrec.gcomponent.GComponentView;
 import javax.swing.*;
 import java.awt.*;
@@ -60,9 +61,9 @@ public class MainWindow extends JFrame {
         eyeDataView.getComponentModel().centreX();
 
         // Панель движения глаз    Вторая панель для 2-го канала
-         GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
-        mainPanel.add(Channel2DataView);
-        Channel2DataView.getComponentModel().centreX();
+         //GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
+        //mainPanel.add(Channel2DataView);
+        //Channel2DataView.getComponentModel().centreX();
 
        /* GComponentView testDataView = Factory.getGComponentView(model, controller, model.getEyeDataList());
         mainPanel.add(testDataView);
@@ -73,10 +74,10 @@ public class MainWindow extends JFrame {
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
 
         //Медленный график 2
-        Filter<Integer> slowAccelerometerFilter = new SlowAccelerometerFilter(accelerometerPositionFilter, accelerometerDynamicFilter);
-        GComponentView slowAccelerometerView = Factory.getGComponentView(model, controller,slowAccelerometerFilter);
-        mainPanel.add(slowAccelerometerView);
-        slowAccelerometerView.getComponentModel().centreX();
+       // Filter<Integer> slowAccelerometerFilter = new SlowAccelerometerFilter(accelerometerPositionFilter, accelerometerDynamicFilter);
+        //GComponentView slowAccelerometerView = Factory.getGComponentView(model, controller,slowAccelerometerFilter);
+        //mainPanel.add(slowAccelerometerView);
+        //slowAccelerometerView.getComponentModel().centreX();
 
         add(mainPanel, BorderLayout.CENTER);
         graphScrollBar = Factory.getSlowGraphScrollBar(model, controller);

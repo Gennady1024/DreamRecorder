@@ -1,6 +1,7 @@
 package com.github.dreamrec;
 
 import com.crostec.ads.*;
+import com.github.dreamrec.filters.FrequencyDividingPreFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

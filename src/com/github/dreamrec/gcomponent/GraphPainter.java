@@ -1,6 +1,6 @@
 package com.github.dreamrec.gcomponent;
 
-import com.github.dreamrec.Filter;
+import com.github.dreamrec.filters.Filter;
 
 import java.awt.*;
 
