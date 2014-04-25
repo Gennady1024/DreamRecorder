@@ -8,14 +8,13 @@ public class AccelerometerDynamicFilter extends AbstractFilter<Integer> {
     protected final Filter<Integer> yData;
     protected final Filter<Integer> zData;
 
-    private final int data_mod = 16000;
-    private final int noise_level = 500;
-    private       int Z_data_mod = data_mod;
-    private final int data_Sin_45 = data_mod *3363/4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
+    private final int DATA_SIN_90 = 16000;
+    private final int NOISE_LEVEL = 500;
+    private final int DATA_SIN_45 = DATA_SIN_90 *3363/4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
 
-    private int data_X_Nul = -1088, data_X_1 = 0;
-    private int data_Y_Nul =  1630, data_Y_1 = 0;
-    private int data_Z_Nul =  4500, data_Z_1 = 0;
+    private int data_X_previous = 0;
+    private int data_Y_previous = 0;
+    private int data_Z_previous = 0;
 
     public AccelerometerDynamicFilter(Filter xData, Filter yData, Filter zData) {
         super(xData);
@@ -26,21 +25,23 @@ public class AccelerometerDynamicFilter extends AbstractFilter<Integer> {
     @Override
     protected Integer doFilter(int index) {
 
-        int data_Z = -(zData.get(index)    + data_Z_Nul);
-        int data_X =  (inputData.get(index)- data_X_Nul);
-        int data_Y = -(yData.get(index)    - data_Y_Nul);
+        int data_Z = zData.get(index);
+        int data_X =  inputData.get(index);
+        int data_Y = yData.get(index);
         int dX, dY, dZ, dXYZ;
         double ddX, ddY, ddZ, ddXYZ, ddOUT;
 
-        if (data_Z > data_Sin_45){ return 0; }
 
-        dX = data_X_1 - data_X; data_X_1 = data_X; if (dX < 0)dX = -dX;
-        dY = data_Y_1 - data_Y; data_Y_1 = data_Y; if (dY < 0)dY = -dY;
-        dZ = data_Z_1 - data_Z; data_Z_1 = data_Z; if (dZ < 0)dZ = -dZ;
 
-        dXYZ = (dX + dY + dZ) - noise_level;
+        if (data_Z > DATA_SIN_45){ return 0; }
 
-        ddXYZ = ((double)dXYZ)/noise_level;
+        dX =  data_X - data_X_previous; data_X_previous = data_X; if (dX < 0)dX = -dX;
+        dY =  data_Y - data_Y_previous; data_Y_previous = data_Y; if (dY < 0)dY = -dY;
+        dZ =  data_Z - data_Z_previous; data_Z_previous = data_Z; if (dZ < 0)dZ = -dZ;
+
+        dXYZ = (dX + dY + dZ) - NOISE_LEVEL;
+
+        ddXYZ = ((double)dXYZ)/ NOISE_LEVEL;
 
         if (ddXYZ <= 0)ddOUT = ddXYZ / 2.0;
         else
@@ -52,6 +53,8 @@ public class AccelerometerDynamicFilter extends AbstractFilter<Integer> {
 
         // return dXYZ;
 
-       return (int)ddOUT;
+        return (int)ddOUT;
     }
+
+
 }
