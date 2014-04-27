@@ -4,7 +4,11 @@ import com.github.dreamrec.filters.AbstractFilter;
 import com.github.dreamrec.filters.Filter;
 
 /**
+ *  Вычисляет угол поворота головы. Модуль с акселерометром расположен на макушке.
+ *  Ноль - когда лежим на спине, лищо вверх.
+ *  Величина меняется от -180 градусов до +180.
  *
+ *  to do: сделать возможность  располагать модуль с акселерометром также на лбу.
  */
 public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
 

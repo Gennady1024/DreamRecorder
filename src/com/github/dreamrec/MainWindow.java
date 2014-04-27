@@ -45,8 +45,11 @@ public class MainWindow extends JFrame {
        // Filter<Short> fastDreamView = new FirstDerivativeAbsFilter(model.getEyeDataList());
        // mainPanel.add(Factory.getGComponentView(fastDreamView, model, controller));
         // Панель Акселерометра
-        AccelerometerDynamicFilter accelerometerDynamicFilter = new AccelerometerDynamicFilter(new AccelerometerXNormalizeFilter(model.getAcc1DataList()) , new AccelerometerYNormalizeFilter(model.getAcc2DataList()) , new AccelerometerZNormalizeFilter(model.getAcc3DataList()) );
+
+        AccelerometerDynamicGraphFilter accelerometerDynamicFilter = new AccelerometerDynamicGraphFilter(new AccelerometerDynamicFilter(new AccelerometerXNormalizeFilter(model.getAcc1DataList()) , new AccelerometerYNormalizeFilter(model.getAcc2DataList()) , new AccelerometerZNormalizeFilter(model.getAcc3DataList()) ));
+
         AccelerometerPositionFilter accelerometerPositionFilter = new AccelerometerPositionFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList());
+
         GComponentView acc1DataView = Factory.getGComponentView(model, controller, accelerometerPositionFilter, accelerometerDynamicFilter);
         mainPanel.add(acc1DataView);
         acc1DataView.getComponentModel().centreX();
