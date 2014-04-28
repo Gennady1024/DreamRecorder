@@ -48,7 +48,7 @@ public class MainWindow extends JFrame {
 
         AccelerometerDynamicGraphFilter accelerometerDynamicFilter = new AccelerometerDynamicGraphFilter(new AccelerometerDynamicFilter(new AccelerometerXNormalizeFilter(model.getAcc1DataList()) , new AccelerometerYNormalizeFilter(model.getAcc2DataList()) , new AccelerometerZNormalizeFilter(model.getAcc3DataList()) ));
 
-        AccelerometerPositionFilter accelerometerPositionFilter = new AccelerometerPositionFilter(model.getAcc1DataList(), model.getAcc2DataList(), model.getAcc3DataList());
+        AccelerometerPositionFilter accelerometerPositionFilter = new AccelerometerPositionFilter(new AccelerometerXNormalizeFilter(model.getAcc1DataList()),new AccelerometerYNormalizeFilter( model.getAcc2DataList()),new AccelerometerZNormalizeFilter( model.getAcc3DataList()));
 
         GComponentView acc1DataView = Factory.getGComponentView(model, controller, accelerometerPositionFilter, accelerometerDynamicFilter);
         mainPanel.add(acc1DataView);

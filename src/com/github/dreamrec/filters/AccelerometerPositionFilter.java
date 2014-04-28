@@ -22,10 +22,9 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
     private final int Sin_90 = 1800/4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
     private int X_mod = Sin_90, Y_mod = Sin_90, Z_mod = 90;
 
-    private int data_X_Max = 0, data_X_Min = 0, data_X_Nul = -1088, data_X_1 = 0;
-    private int data_Y_Max = 0, data_Y_Min = 0, data_Y_Nul =  1630, data_Y_1 = 0;
-    private int data_Z_Max = 0, data_Z_Min = 0, data_Z_Nul =  4500;
-    private int data_X_mod = data_mod, data_Y_mod = data_mod, data_Z_mod = data_mod;
+    private int data_X_Max = 0, data_X_Min = 0;
+    private int data_Y_Max = 0, data_Y_Min = 0;
+    private int data_Z_Max = 0, data_Z_Min = 0;
 
     public AccelerometerPositionFilter(Filter xData, Filter yData, Filter zData) {
         super(xData);
@@ -37,24 +36,25 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
     @Override
     protected Integer doFilter(int index) {
         int XY_angle;
-        int data_Z = -(zData.get(index)    + data_Z_Nul);
-        int data_X =  (inputData.get(index)- data_X_Nul);
-        int data_Y = -(yData.get(index)    - data_Y_Nul);
-       // data_Max_Min(X, Y, Z);
+        int data_Z = zData.get(index);
+        int data_X = inputData.get(index);
+        int data_Y = yData.get(index);
 
-       if (data_Z > data_Sin_45){Z_mod *= -1; return Z_mod; }
+        if (data_Z > data_Sin_45){   // Если человек не лежит
+            Z_mod *= -1; return Z_mod;
+        }
 
-       double Z = (double)data_Z / Z_data_mod;
+        double Z = (double)data_Z / Z_data_mod;
 
-       double ZZ = Z*Z;
-       double sec_Z = 1 + ZZ*0.43 + ZZ*ZZ*0.77;
+        double ZZ = Z*Z;
+        double sec_Z = 1 + ZZ*0.43 + ZZ*ZZ*0.77;
 
-       double double_X = ((double)data_X / X_data_mod)* sec_Z;
-       double double_Y = ((double)data_Y / Y_data_mod)* sec_Z;
-       int X = (int)(double_X * X_mod);
-       int Y = (int)(double_Y * Y_mod);
+        double double_X = ((double)data_X / X_data_mod)* sec_Z;
+        double double_Y = ((double)data_Y / Y_data_mod)* sec_Z;
+        int X = (int)(double_X * X_mod);
+        int Y = (int)(double_Y * Y_mod);
 
-       XY_angle = angle(X, Y);
+        XY_angle = angle(X, Y);
 
         return XY_angle;
     }
@@ -66,7 +66,7 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
         // XY_angle = -1 + sin(x) + cos(x); if (X <  0 && Y >=0)
         // XY_angle = -3 - sin(x) + cos(x); if (X <  0 && Y < 0)
 
-             if (X >= 0 && Y >=0) { XY_angle =     Sin_90 + X - Y; }
+        if (X >= 0 && Y >=0) { XY_angle =     Sin_90 + X - Y; }
         else if (X >= 0 && Y < 0) { XY_angle =  3* Sin_90 - X - Y; }
 
         else if (X <  0 && Y >=0) { XY_angle =    -Sin_90 + X + Y; }

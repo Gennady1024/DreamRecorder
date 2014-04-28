@@ -13,6 +13,6 @@ public class AccelerometerZNormalizeFilter extends AbstractFilter<Integer> {
 
     @Override
     protected Integer doFilter(int index) {
-        return -(inputData.get(index) - DATA_Z_NULL);
+        return -(inputData.get(index) + DATA_Z_NULL);
     }
 }
