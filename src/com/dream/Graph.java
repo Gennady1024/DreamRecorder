@@ -1,5 +1,6 @@
 package com.dream;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
 /**
@@ -47,6 +48,8 @@ public class Graph {
 
     }
 
-
+    public void paint() {
+        JFrame mainFrame = new JFrame("DreamGraph");
+    }
 
 }
