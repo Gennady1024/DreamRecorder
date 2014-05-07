@@ -50,6 +50,8 @@ public class Graph {
 
     public void paint() {
         JFrame mainFrame = new JFrame("DreamGraph");
+        mainFrame.setVisible(true);
+        mainFrame.setSize(1000, 250);
     }
 
 }
