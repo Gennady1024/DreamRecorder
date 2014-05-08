@@ -11,5 +11,6 @@ public class RunGraph {
     public static void main(String[] args) {
       Graph panel = new Graph(0, 0);
         panel.paint();
+
     }
 }
