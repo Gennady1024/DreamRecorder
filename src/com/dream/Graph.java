@@ -1,6 +1,7 @@
 package com.dream;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -49,9 +50,24 @@ public class Graph {
     }
 
     public void paint() {
-        JFrame mainFrame = new JFrame("DreamGraph");
-        mainFrame.setVisible(true);
-        mainFrame.setSize(1000, 250);
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+    /*    GraphicsConfiguration gc = frame.getGraphicsConfiguration();
+        Rectangle bounds = gc.getBounds();
+        Insets insets = toolkit.getScreenInsets(gc);
+        bounds.x += insets.left;
+        bounds.y += insets.top;
+        bounds.width -= insets.left + insets.right;
+        bounds.height -= insets.top + insets.bottom;
+
+        frame.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+        frame.setVisible(true);    */
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize ();
+        frame.setSize(dimension);
+        frame.setVisible(true);
+
     }
 
 }
