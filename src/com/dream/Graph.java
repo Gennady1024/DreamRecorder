@@ -54,18 +54,12 @@ public class Graph {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Toolkit toolkit = Toolkit.getDefaultToolkit();
-    /*    GraphicsConfiguration gc = frame.getGraphicsConfiguration();
-        Rectangle bounds = gc.getBounds();
-        Insets insets = toolkit.getScreenInsets(gc);
-        bounds.x += insets.left;
-        bounds.y += insets.top;
-        bounds.width -= insets.left + insets.right;
-        bounds.height -= insets.top + insets.bottom;
-
-        frame.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
-        frame.setVisible(true);    */
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize ();
-        frame.setSize(dimension);
+        int screenWorkingWidth = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().width;
+        int screenWorkingHeight = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+
+        frame.setSize(screenWorkingWidth, screenWorkingHeight);
+
         frame.setVisible(true);
 
     }
