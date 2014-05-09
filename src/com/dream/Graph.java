@@ -54,23 +54,31 @@ public class Graph {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize ();
-        frame.setSize(dimension);
+        int screenWidth = dimension.width;
+        int screenHeight = dimension.height;
 
         JPanel mainPanel = new JPanel();
-       // mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setLayout(new GridLayout(0, 1));
-
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         PaintingPanel paintingPane_l = new PaintingPanel();
         PaintingPanel paintingPane_2 = new PaintingPanel();
+
+
+
+        paintingPane_l.setPreferredSize(new Dimension(screenWidth, screenHeight/6));
+        paintingPane_2.setPreferredSize(new Dimension(screenWidth, screenHeight/3));
         paintingPane_l.isFast(false);
         for (int i = 0; i < 1000; i++) {
           int data = (int)(100*Math.sin(((double)i)/100));
         paintingPane_l.addData(data);
+
         }
 
+        mainPanel.setBackground(Color.GRAY);
         mainPanel.add(paintingPane_l);
+        mainPanel.add(Box.createVerticalStrut(2));
         mainPanel.add(paintingPane_2);
         frame.add(mainPanel);
+        frame.pack();
         frame.setVisible(true);
     }
 }
