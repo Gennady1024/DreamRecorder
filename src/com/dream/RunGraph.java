@@ -8,7 +8,7 @@ package com.dream;
  * To change this template use File | Settings | File Templates.
  */
 public class RunGraph {
-    public static void main(String[] args) {
+    public static void main_(String[] args) {
       Graph panel = new Graph(0, 0);
         panel.paint();
 
