@@ -31,14 +31,30 @@ public class GraphPanel extends JPanel {
     public void addData(int graphNumber, int data) {
         if (graphNumber < graphsData.length) {
             graphsData[graphNumber].add(data);
+            Dimension currentDimention = getPreferredSize();
+            setPreferredSize(new Dimension(graphsData[graphNumber].size(), currentDimention.height));
         }
+    }
+
+    public int getGraphAmount() {
+        return graphsData.length;
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.translate(0, g.getClipBounds().height); // move XY origin to the left bottom point
+        g2d.transform(AffineTransform.getScaleInstance(1, -1*zoom)); // flip Y-axis and zoom it
         g.setColor(Color.green);
-        g.drawOval(100,100,100,100);
+        for(int i = 0; i < getGraphAmount(); i++) {
+           for (int j = 0; j < graphsData[i].size(); j++) {
+               int x = j;
+               int y = graphsData[i].get(j);
+               g.drawLine(x, y, x, y);
+           }
+        }
+
     }
 
 }

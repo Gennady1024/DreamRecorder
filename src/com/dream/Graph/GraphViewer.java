@@ -70,13 +70,27 @@ public class GraphViewer extends JFrame{
     }
 
     private void addScrollBar() {
-        JScrollBar scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-        add(scrollBar, BorderLayout.SOUTH);
-    }
-
-    public void addData() {
+        //JScrollBar scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+        //add(scrollBar, BorderLayout.SOUTH);
 
     }
+
+    public void addData(int[] data) {
+        int dataIndex = 0;
+        for(GraphPanel panel: graphPanels) {
+             int graphAmount = panel.getGraphAmount();
+            for(int j = 0; j < graphAmount; j++) {
+                if(dataIndex < data.length) {
+                    panel.addData(j, data[dataIndex]);
+                    dataIndex++;
+                }
+            }
+            panel.repaint();
+        }
+    }
+
+
+
     public void start() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -91,11 +105,13 @@ public class GraphViewer extends JFrame{
         for(int i = 0; i < graphPanels.size(); i++) {
             GraphPanel panel =  graphPanels.get(i);
             int panelWeight = panelWeights.get(i);
-            panel.setPreferredSize(new Dimension(screenWidth, screenHeight*panelWeight/sumWeight));
+            JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setPreferredSize(new Dimension(screenWidth, screenHeight*panelWeight/sumWeight));
+            panel.setPreferredSize(new Dimension(screenWidth-10, screenHeight*panelWeight/sumWeight));
             if(i > 0) {
                 mainPanel.add(Box.createVerticalStrut(strut));
             }
-            mainPanel.add(panel);
+            mainPanel.add(scrollPane);
         }
 
         for(int i = 0; i < bigScaledGraphPanels.size(); i++) {
