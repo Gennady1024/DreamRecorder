@@ -18,6 +18,7 @@ public class GraphPanel extends JPanel {
     protected long startTime;
     protected Color bgColor = Color.BLACK;
     protected int frequency;
+    protected int startIndex = 0;
 
     public GraphPanel(int graphAmount, int frequency) {
         graphsData = new ArrayList[graphAmount];
@@ -31,13 +32,15 @@ public class GraphPanel extends JPanel {
     public void addData(int graphNumber, int data) {
         if (graphNumber < graphsData.length) {
             graphsData[graphNumber].add(data);
-            Dimension currentDimention = getPreferredSize();
-            setPreferredSize(new Dimension(graphsData[graphNumber].size(), currentDimention.height));
         }
     }
 
     public int getGraphAmount() {
         return graphsData.length;
+    }
+
+    public void setStartIndex(int startIndex) {
+        this.startIndex = startIndex;
     }
 
     @Override
@@ -46,10 +49,12 @@ public class GraphPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
         g2d.translate(0, g.getClipBounds().height); // move XY origin to the left bottom point
         g2d.transform(AffineTransform.getScaleInstance(1, -1*zoom)); // flip Y-axis and zoom it
-        g.setColor(Color.green);
+        g2d.setColor(Color.green);
         for(int i = 0; i < getGraphAmount(); i++) {
-           for (int j = 0; j < graphsData[i].size(); j++) {
-               int x = j;
+            int endIndex = Math.min(g2d.getClipBounds().width, (graphsData[i].size()-startIndex));
+            System.out.println("end index = " + endIndex);
+           for (int j = startIndex; j < startIndex+endIndex; j++) {
+               int x = j-startIndex;
                int y = graphsData[i].get(j);
                g.drawLine(x, y, x, y);
            }

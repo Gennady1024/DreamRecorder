@@ -5,6 +5,8 @@ import com.github.dreamrec.GUIActions;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.util.ArrayList;
 
 /**
@@ -27,6 +29,8 @@ public class GraphViewer extends JFrame{
     private ArrayList<Integer>  panelWeights = new ArrayList<Integer>();
     private JPanel mainPanel = new JPanel();
     private int strut = 2; // strut between panels
+    private JPanel scrollablePanel = new JPanel();
+    private GraphController graphController;
 
 
     public GraphViewer(int frequency, int divider) {
@@ -39,7 +43,7 @@ public class GraphViewer extends JFrame{
         mainPanel.setBackground(Color.GRAY);
         addMenu();
         add(mainPanel, BorderLayout.CENTER);
-        addScrollBar();
+        graphController = new GraphController(this);
     }
 
     public void setZoomType(boolean isZoomAutomatic) {
@@ -56,6 +60,20 @@ public class GraphViewer extends JFrame{
         bigScaledGraphPanels.add(new  BigScaledGraphPanel(graphsAmount, frequency/divider));
     }
 
+    public void setStartIndex(int startIndex) {
+        for(GraphPanel panel: graphPanels) {
+            panel.setStartIndex(startIndex);
+            panel.repaint();
+        }
+    }
+
+    public void setBigScaledStartIndex(int startIndex) {
+        for(BigScaledGraphPanel panel: bigScaledGraphPanels) {
+            panel.setStartIndex(startIndex);
+            panel.repaint();
+        }
+    }
+
     private void addMenu() {
         JMenuBar mainMenu = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
@@ -69,11 +87,6 @@ public class GraphViewer extends JFrame{
         add(mainMenu,BorderLayout.NORTH);
     }
 
-    private void addScrollBar() {
-        //JScrollBar scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
-        //add(scrollBar, BorderLayout.SOUTH);
-
-    }
 
     public void addData(int[] data) {
         int dataIndex = 0;
@@ -89,6 +102,22 @@ public class GraphViewer extends JFrame{
         }
     }
 
+    public void addBigScaledData(int[] data) {
+        int dataIndex = 0;
+        for(BigScaledGraphPanel panel: bigScaledGraphPanels) {
+            int graphAmount = panel.getGraphAmount();
+            for(int j = 0; j < graphAmount; j++) {
+                if(dataIndex < data.length) {
+                    panel.addData(j, data[dataIndex]);
+                    dataIndex++;
+                }
+            }
+            panel.repaint();
+        }
+
+        Dimension oldDimension = scrollablePanel.getPreferredSize();
+        scrollablePanel.setPreferredSize(new Dimension(oldDimension.width+1, oldDimension.height));
+    }
 
 
     public void start() {
@@ -96,6 +125,7 @@ public class GraphViewer extends JFrame{
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = dimension.width-20;
         int screenHeight = dimension.height-200;
+        System.out.println("ScreenWidth = " + screenWidth);
 
         int sumWeight = 0;
         for(int i = 0; i < panelWeights.size(); i++) {
@@ -105,24 +135,35 @@ public class GraphViewer extends JFrame{
         for(int i = 0; i < graphPanels.size(); i++) {
             GraphPanel panel =  graphPanels.get(i);
             int panelWeight = panelWeights.get(i);
-            JScrollPane scrollPane = new JScrollPane(panel, JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-            scrollPane.setPreferredSize(new Dimension(screenWidth, screenHeight*panelWeight/sumWeight));
-            panel.setPreferredSize(new Dimension(screenWidth-10, screenHeight*panelWeight/sumWeight));
+            panel.setPreferredSize(new Dimension(screenWidth, screenHeight*panelWeight/sumWeight));
             if(i > 0) {
                 mainPanel.add(Box.createVerticalStrut(strut));
             }
-            mainPanel.add(scrollPane);
+            mainPanel.add(panel);
         }
+
 
         for(int i = 0; i < bigScaledGraphPanels.size(); i++) {
             BigScaledGraphPanel panel =  bigScaledGraphPanels.get(i);
             int panelWeight = panelWeights.get(i+graphPanels.size());
             panel.setPreferredSize(new Dimension(screenWidth, screenHeight*panelWeight/sumWeight));
-
             mainPanel.add(Box.createVerticalStrut(strut));
-
             mainPanel.add(panel);
+
         }
+
+        scrollablePanel.setPreferredSize(new Dimension(0,0));
+        scrollablePanel.setBackground(Color.red);
+        JScrollPane scrollPanel = new JScrollPane(scrollablePanel,JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        //JScrollBar scrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+        scrollPanel.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                graphController.moveScroll(e.getValue());
+                System.out.println("AdjustmentEvent = " + e.getValue());
+            }
+        });
+        add(scrollPanel, BorderLayout.SOUTH);
 
         pack();
         setVisible(true);

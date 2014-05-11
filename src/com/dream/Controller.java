@@ -1,4 +1,6 @@
-package com.dream.Graph;
+package com.dream;
+
+import com.dream.Graph.GraphViewer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,6 +24,7 @@ public class Controller {
             data[1] = x%50;
             data[2] = x%100;
             graphViewer.addData(data);
+            graphViewer.addBigScaledData(data);
         }
     }
 

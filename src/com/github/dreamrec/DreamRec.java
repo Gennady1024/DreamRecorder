@@ -2,7 +2,7 @@ package com.github.dreamrec;
 
 public class DreamRec {
 
-    public static void main_(String[] args) {
+    public static void main(String[] args) {
      ApplicationProperties applicationProperties = new ApplicationProperties();
         Model model = Factory.getModel(applicationProperties);
         Controller controller = new Controller(model, applicationProperties);
