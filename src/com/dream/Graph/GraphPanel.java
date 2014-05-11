@@ -31,6 +31,8 @@ public class GraphPanel extends JPanel {
     public void addData(int graphNumber, int data) {
         if (graphNumber < graphsData.length) {
             graphsData[graphNumber].add(data);
+            Dimension currentDimention = getPreferredSize();
+            setPreferredSize(new Dimension(graphsData[graphNumber].size(), currentDimention.height));
         }
     }
 

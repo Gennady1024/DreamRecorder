@@ -1,6 +1,6 @@
 package com.dream;
 
-import com.dream.Graph.GraphController;
+import com.dream.Graph.Controller;
 import com.dream.Graph.GraphViewer;
 
 /**
@@ -18,7 +18,7 @@ public class RunDream {
         graphWindow.addBigScaledGraphPanel(1,10);
         graphWindow.start();
 
-        GraphController graphController = new GraphController(graphWindow);
-        graphController.sendData();
+        Controller controller = new Controller(graphWindow);
+        controller.sendData();
     }
 }

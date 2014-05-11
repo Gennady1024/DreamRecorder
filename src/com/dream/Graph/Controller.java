@@ -7,15 +7,15 @@ package com.dream.Graph;
  * Time: 12:40
  * To change this template use File | Settings | File Templates.
  */
-public class GraphController {
+public class Controller {
     private GraphViewer graphViewer;
 
-    public GraphController(GraphViewer graphViewer) {
+    public Controller(GraphViewer graphViewer) {
         this.graphViewer = graphViewer;
     }
 
     public void sendData() {
-        for(int x = 0; x < 1000; x++) {
+        for(int x = 0; x < 2000; x++) {
             int[] data = new int[3];
 
             data[0] = x%25;
