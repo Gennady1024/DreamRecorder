@@ -74,9 +74,22 @@ public class GraphViewer extends JFrame{
         add(scrollBar, BorderLayout.SOUTH);
     }
 
-    public void addData() {
-
+    public void addData(int[] data) {
+        int dataIndex = 0;
+        for(GraphPanel panel: graphPanels) {
+             int graphAmount = panel.getGraphAmount();
+            for(int j = 0; j < graphAmount; j++) {
+                if(dataIndex < data.length) {
+                    panel.addData(j, data[dataIndex]);
+                    dataIndex++;
+                }
+            }
+            panel.repaint();
+        }
     }
+
+
+
     public void start() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();

@@ -34,11 +34,22 @@ public class GraphPanel extends JPanel {
         }
     }
 
+    public int getGraphAmount() {
+        return graphsData.length;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
         g.setColor(Color.green);
-        g.drawOval(100,100,100,100);
+        for(int i = 0; i < getGraphAmount(); i++) {
+           for (int j = 0; j < graphsData[i].size(); j++) {
+               int x = j;
+               int y = graphsData[i].get(j);
+               g.drawLine(x, y, x, y);
+           }
+        }
+
     }
 
 }
