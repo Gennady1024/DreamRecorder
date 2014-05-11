@@ -17,9 +17,6 @@ public class BigScaledGraphPanel extends GraphPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
-        g.setColor(bgColor);
-        g.fillRect(0, 0, g.getClipBounds().width, g.getClipBounds().height);
-        g.setColor(Color.yellow);
-        g.drawRect(100, 100, 100, 100);
+
     }
 }

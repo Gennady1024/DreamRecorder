@@ -1,6 +1,5 @@
 package com.dream;
 
-import com.dream.Graph.Controller;
 import com.dream.Graph.GraphViewer;
 
 /**
@@ -13,9 +12,10 @@ import com.dream.Graph.GraphViewer;
 public class RunDream {
     public static void main(String[] args) {
       GraphViewer graphWindow = new GraphViewer(10, 120);
-        graphWindow.addGraphPanel(1,5);
+        graphWindow.addGraphPanel(1,1);
         graphWindow.addGraphPanel(2,2);
-        graphWindow.addBigScaledGraphPanel(1,10);
+        graphWindow.addBigScaledGraphPanel(1,1);
+        graphWindow.addBigScaledGraphPanel(2,2);
         graphWindow.start();
 
         Controller controller = new Controller(graphWindow);
