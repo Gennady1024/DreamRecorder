@@ -24,8 +24,19 @@ public class Controller {
             data[1] = x%50;
             data[2] = x%100;
             graphViewer.addData(data);
-            graphViewer.addBigScaledData(data);
+            graphViewer.addCompressedData(data);
         }
+
+        for(int x = 0; x < 10; x++) {
+            int[] data = new int[3];
+
+            data[0] = 20;
+            data[1] = 20;
+            data[2] = 20;
+            graphViewer.addData(data);
+            graphViewer.addCompressedData(data);
+        }
+
     }
 
 }
