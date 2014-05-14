@@ -45,6 +45,15 @@ public class GraphPanel extends JPanel {
         });
     }
 
+    protected int getWorkspaceWidth() {
+        return (getPreferredSize().width - X_INDENT);
+    }
+
+    protected int getWorkspaceHeight() {
+        return (getPreferredSize().height - Y_INDENT);
+    }
+
+
     private void zooming(int zoomDirection) {
         if(zoomDirection > 0) {
             zoom = zoom*dZoomPlus;

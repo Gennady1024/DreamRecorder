@@ -1,8 +1,6 @@
 package com.dream.Graph;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -16,8 +14,9 @@ import java.util.ArrayList;
  */
 public class CompressedGraphPanel extends GraphPanel {
 
+
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
-    private int slotPosition = 0;
+    private int slotIndex = 0;  // according to the beginning of Data arrays
     private int divider;
     private Color slotColor = Color.MAGENTA;
 
@@ -29,46 +28,74 @@ public class CompressedGraphPanel extends GraphPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                notifySlotListeners(e.getX() - X_INDENT - slotPosition);
+                int newSlotIndex = e.getX() - X_INDENT + startIndex ;
+                notifySlotListeners(newSlotIndex - slotIndex);
             }
         });
     }
 
-    public int checkSlotWorkspaceBounds() {
-        int endIndex = startIndex + getPreferredSize().width - X_INDENT;
-        if( slotPosition <= startIndex) {
+    public int isSlotInWorkspace() {
+        int slotWorkspacePosition = slotIndex - startIndex;
+        if ( slotWorkspacePosition <= 0 ) {
             return -1;
         }
-
-        if ((slotPosition + getSlotWidth()) >= endIndex) {
+        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
             return 1;
         }
-        else {
-            return 0;
-        }
 
+        return 0;
     }
 
     private int getSlotWidth() {
-        int slotWidth = (getPreferredSize().width - X_INDENT)/divider;
-        return slotWidth;
+        if (divider == 0) {
+            return 0;
+        }
+        return getWorkspaceWidth()/divider;
     }
+
 
     @Override
     public void setStartIndex(int startIndex) {
-         if(slotPosition < startIndex) {
-            notifySlotListeners(startIndex - slotPosition);
+        int indexChange = startIndex - this.startIndex;
+        this.startIndex = startIndex;
+        if((isSlotInWorkspace() == -1) ) {
+            notifySlotListeners(startIndex - slotIndex);
+        }
+         if(slotIndex < startIndex) {
+            notifySlotListeners(startIndex - slotIndex);
          }
-         this.startIndex = startIndex;
+        if((isSlotInWorkspace() == 1) ) {
+            notifySlotListeners(indexChange);
+        }
+
+
     }
 
-    public void moveSlot(int slotPositionChange) {
-        slotPosition += slotPositionChange;
-        if(slotPosition < 0) {
-            slotPosition = 0;
+    private int getSlotMaxIndex () {
+        if (graphsData.length == 0) {
+            return 0;
         }
-        if(slotPosition < startIndex) {
-            startIndex = slotPosition;
+        else {
+            return graphsData[0].size();
+        }
+    }
+
+    public void moveSlot(int slotIndexChange) {
+        int newSlotIndex = slotIndex + slotIndexChange;
+        if (newSlotIndex < 0) {
+            newSlotIndex = 0;
+        }
+        if (newSlotIndex > getSlotMaxIndex()) {
+            newSlotIndex = getSlotMaxIndex();
+        }
+
+        slotIndex = newSlotIndex;
+
+        if((isSlotInWorkspace() == -1) ) {
+            startIndex = slotIndex;
+        }
+        if((isSlotInWorkspace() == 1) ) {
+            startIndex = slotIndex + getSlotWidth() - getWorkspaceWidth();
         }
         repaint();
     }
@@ -87,7 +114,7 @@ public class CompressedGraphPanel extends GraphPanel {
 
     private void paintSlot(Graphics g) {
         g.setColor(slotColor);
-        g.drawRect(slotPosition - startIndex, 0, getSlotWidth(), g.getClipBounds().height-Y_INDENT);
+        g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), g.getClipBounds().height-Y_INDENT);
     }
 
     @Override

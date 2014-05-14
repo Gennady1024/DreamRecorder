@@ -41,10 +41,15 @@ public class GraphViewer extends JFrame implements  SlotListener {
                 if (key == KeyEvent.VK_RIGHT) {
                     moveSlot(1);
                 }
+                if(compressedGraphPanels.get(0).isSlotInWorkspace() == 1) {
+                    Point viewPosition  = scrollPanel.getViewport().getViewPosition();
+                    Point newViewPosition = new Point(viewPosition.x+1, viewPosition.y);
+                    scrollPanel.getViewport().setViewPosition(newViewPosition);
+                }
 
                 if (key == KeyEvent.VK_LEFT) {
                     moveSlot(-1);
-                    if(compressedGraphPanels.get(0).checkSlotWorkspaceBounds() == -1) {
+                    if(compressedGraphPanels.get(0).isSlotInWorkspace() == -1) {
                         Point viewPosition  = scrollPanel.getViewport().getViewPosition();
                         Point newViewPosition = new Point(viewPosition.x-1, viewPosition.y);
                         scrollPanel.getViewport().setViewPosition(newViewPosition);
