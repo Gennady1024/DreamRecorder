@@ -74,9 +74,10 @@ public class GraphViewer extends JFrame implements  SlotListener {
 
 
     public void addData(int[] data) {
+
         int dataIndex = 0;
         for(GraphPanel panel: graphPanels) {
-             int graphAmount = panel.getGraphAmount();
+             int graphAmount = panel.getGraphsAmount();
             for(int j = 0; j < graphAmount; j++) {
                 if(dataIndex < data.length) {
                     panel.addData(j, data[dataIndex]);
@@ -89,7 +90,7 @@ public class GraphViewer extends JFrame implements  SlotListener {
     public void addCompressedData(int[] data) {
         int dataIndex = 0;
         for(CompressedGraphPanel panel: compressedGraphPanels) {
-            int graphAmount = panel.getGraphAmount();
+            int graphAmount = panel.getGraphsAmount();
             for(int j = 0; j < graphAmount; j++) {
                 if(dataIndex < data.length) {
                     panel.addData(j, data[dataIndex]);
