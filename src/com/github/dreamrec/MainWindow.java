@@ -77,10 +77,10 @@ public class MainWindow extends JFrame {
         mainPanel.add(Factory.getGComponentView(model, controller,slowDreamView));
 
         //Медленный график 2
-       // Filter<Integer> slowAccelerometerFilter = new SlowAccelerometerFilter(accelerometerPositionFilter, accelerometerDynamicFilter);
-        //GComponentView slowAccelerometerView = Factory.getGComponentView(model, controller,slowAccelerometerFilter);
-        //mainPanel.add(slowAccelerometerView);
-        //slowAccelerometerView.getComponentModel().centreX();
+       Filter<Integer> slowAccelerometerFilter = new SlowAccelerometerFilter(accelerometerPositionFilter, accelerometerDynamicFilter);
+       GComponentView slowAccelerometerView = Factory.getGComponentView(model, controller,slowAccelerometerFilter);
+       mainPanel.add(slowAccelerometerView);
+       slowAccelerometerView.getComponentModel().centreX();
 
         add(mainPanel, BorderLayout.CENTER);
         graphScrollBar = Factory.getSlowGraphScrollBar(model, controller);

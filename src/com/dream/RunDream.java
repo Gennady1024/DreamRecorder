@@ -14,11 +14,12 @@ public class RunDream {
       GraphViewer graphWindow = new GraphViewer(10, 120);
         graphWindow.addGraphPanel(1,1);
         graphWindow.addGraphPanel(2,2);
-        graphWindow.addBigScaledGraphPanel(1,1);
-        graphWindow.addBigScaledGraphPanel(2,2);
+        graphWindow.addCompressedGraphPanel(1, 1);
+        graphWindow.addCompressedGraphPanel(2, 2);
         graphWindow.start();
 
         Controller controller = new Controller(graphWindow);
         controller.sendData();
+
     }
 }
