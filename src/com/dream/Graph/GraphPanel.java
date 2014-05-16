@@ -17,22 +17,20 @@ import java.awt.geom.AffineTransform;
  */
 public class GraphPanel extends JPanel {
     protected Stock<Integer>[] graphs = new Stock[3];//panel can have a several graphs. Max 3 for simplicity
-
+    protected final int X_INDENT = 30;
+    protected final int Y_INDENT = 30;
+    protected final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
+    protected final double ZOOM_MINUS_CHANGE = 1 / ZOOM_PLUS_CHANGE; // similarly 2 clicks(rotations) down reduces zoom twice
     protected double zoom = 1;
-    protected final double dZoomPlus = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
-    protected final double dZoomMinus = 1 / dZoomPlus; // similarly 2 clicks(rotations) down reduces zoom twice
     protected boolean isAutoZoom;
     protected long startTime;
     protected final Color bgColor = Color.BLACK;
     protected final Color axisColor = Color.GREEN;
     protected int weight = 1;
-
-
     protected final Color graphColor = Color.YELLOW;
     protected int frequency = 0;
     protected int startIndex = 0;
-    protected static final int X_INDENT = 30;
-    protected static final int Y_INDENT = 30;
+
 
 
     public GraphPanel(int weight, int frequency) {
@@ -57,9 +55,9 @@ public class GraphPanel extends JPanel {
 
     private void zooming(int zoomDirection) {
         if (zoomDirection > 0) {
-            zoom = zoom * dZoomPlus;
+            zoom = zoom * ZOOM_PLUS_CHANGE;
         } else {
-            zoom = zoom * dZoomMinus;
+            zoom = zoom * ZOOM_MINUS_CHANGE;
         }
         repaint();
     }
@@ -75,6 +73,13 @@ public class GraphPanel extends JPanel {
         repaint();
     }
 
+    public int getFullWidth() {
+        return X_INDENT + getGraphsLength();
+    }
+
+    public Point getViewPosition() {
+        return new Point(X_INDENT + startIndex, 0);
+    }
 
     protected int getGraphsLength() {
         if (graphs[0] == null) {
@@ -89,9 +94,6 @@ public class GraphPanel extends JPanel {
         this.startIndex = startIndex;
     }
 
-    public int getStartIndex() {
-        return startIndex;
-    }
 
     public void setAutoZoom(boolean isAutoZoom) {
         this.isAutoZoom = isAutoZoom;

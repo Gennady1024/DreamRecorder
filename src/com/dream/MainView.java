@@ -1,5 +1,6 @@
 package com.dream;
 
+import com.dream.Data.Stock;
 import com.dream.Graph.GraphViewer;
 
 import javax.swing.*;
@@ -14,24 +15,30 @@ import java.awt.*;
  */
 public class MainView extends JFrame {
     private String title = "Dream Recorder";
-    private GraphViewer mainPanel;
+    private GraphViewer graphViewer;
 
-    public MainView() {
+    public MainView(int frequency, int divider) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(title);
-        addMenu();
-        addGraphViewer();
-        pack();
-        setVisible(true);
-    }
 
-    private void addGraphViewer() {
+        addMenu();
+
+        graphViewer = new GraphViewer(frequency, divider);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         int screenWidth = dimension.width-20;
         int screenHeight = dimension.height-200;
-        add(mainPanel, BorderLayout.CENTER);
+        graphViewer.addGraphPanel(1);
+        graphViewer.addGraphPanel(2);
+        graphViewer.addCompressedGraphPanel(1);
+        graphViewer.addCompressedGraphPanel(2);
+        add(graphViewer, BorderLayout.CENTER);
+        graphViewer.setPreferredSize(new Dimension(screenWidth, screenHeight));
+
+        pack();
+        setVisible(true);
     }
+
 
     private void addMenu() {
         JMenuBar mainMenu = new JMenuBar();
@@ -45,4 +52,13 @@ public class MainView extends JFrame {
         mainMenu.add(optionsMenu);
         add(mainMenu,BorderLayout.NORTH);
     }
+
+    public void addGraph(int panelNumber, Stock<Integer> graphData) {
+        graphViewer.addGraph(panelNumber, graphData);
+    }
+
+    public void addCompressedGraph(int panelNumber, Stock<Integer> graphData) {
+        graphViewer.addCompressedGraph(panelNumber, graphData);
+    }
+
 }

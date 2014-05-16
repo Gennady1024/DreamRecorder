@@ -38,7 +38,6 @@ public class GraphViewer extends JPanel implements SlotListener {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         add(mainPanel, BorderLayout.CENTER);
 
-        scrollablePanel.setPreferredSize(new Dimension(GraphPanel.X_INDENT, 0));
         scrollPanel.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
@@ -55,19 +54,9 @@ public class GraphViewer extends JPanel implements SlotListener {
                 if (key == KeyEvent.VK_RIGHT) {
                     moveSlot(1);
                 }
-                if (compressedGraphPanels.get(0).isSlotInWorkspace() == 1) {
-                    Point viewPosition = scrollPanel.getViewport().getViewPosition();
-                    Point newViewPosition = new Point(viewPosition.x + 1, viewPosition.y);
-                    scrollPanel.getViewport().setViewPosition(newViewPosition);
-                }
 
                 if (key == KeyEvent.VK_LEFT) {
                     moveSlot(-1);
-                    if (compressedGraphPanels.get(0).isSlotInWorkspace() == -1) {
-                        Point viewPosition = scrollPanel.getViewport().getViewPosition();
-                        Point newViewPosition = new Point(viewPosition.x - 1, viewPosition.y);
-                        scrollPanel.getViewport().setViewPosition(newViewPosition);
-                    }
                 }
             }
         });
@@ -75,13 +64,18 @@ public class GraphViewer extends JPanel implements SlotListener {
 
 
     public void addGraphPanel(int weight) {
-        graphPanels.add(new GraphPanel(weight, frequency));
+        GraphPanel panel = new GraphPanel(weight, frequency);
+        graphPanels.add(panel);
+        mainPanel.add(panel);
+        //adjustSizes();
     }
 
     public void addCompressedGraphPanel(int weight) {
         CompressedGraphPanel panel = new CompressedGraphPanel(weight, frequency / divider, divider);
         panel.addSlotListener(this);
         compressedGraphPanels.add(panel);
+        mainPanel.add(panel);
+        //adjustSizes();
     }
 
     public void addGraph(int panelNumber, Stock<Integer> graphData) {
@@ -94,19 +88,21 @@ public class GraphViewer extends JPanel implements SlotListener {
         if (panelNumber < compressedGraphPanels.size()) {
             compressedGraphPanels.get(panelNumber).addGraph(graphData);
         }
-
-        Dimension oldDimension = scrollablePanel.getPreferredSize();
-        scrollablePanel.setPreferredSize(new Dimension(oldDimension.width + 1, oldDimension.height));
-        //scrollPanel.getViewport().setViewPosition(new Point(50, 0));
-        scrollablePanel.revalidate(); // we always have to call component.revalidate() after changing it "directly"(outside the GUI)
-        scrollPanel.repaint();
     }
 
+    private void adjustScroll() {
+        if(compressedGraphPanels.size() > 0) {
+            CompressedGraphPanel panel = compressedGraphPanels.get(0);
+            scrollablePanel.setPreferredSize(new Dimension(panel.getFullWidth(), 0));
+            scrollPanel.getViewport().setViewPosition(panel.getViewPosition());
+            scrollablePanel.revalidate(); // we always have to call component.revalidate() after changing it "directly"(outside the GUI)
+            scrollPanel.repaint();
+        }
+    }
 
-
-    @Override
-    public void setPreferredSize(Dimension d) {
-        super.setPreferredSize(d);
+    private void adjustSizes(Dimension d) {
+        int width = d.width;
+        int height = d.height - scrollPanel.getPreferredSize().height;
         int sumWeight = 0;
         for (GraphPanel panel : graphPanels) {
             sumWeight += panel.getWeight();
@@ -116,11 +112,26 @@ public class GraphViewer extends JPanel implements SlotListener {
         }
 
         for (GraphPanel panel : graphPanels) {
-            panel.setPreferredSize(new Dimension(d.width, d.height * panel.getWeight() / sumWeight));
+            panel.setPreferredSize(new Dimension(width, height * panel.getWeight() / sumWeight));
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setPreferredSize(new Dimension(d.width, d.height * panel.getWeight() / sumWeight));
+            panel.setPreferredSize(new Dimension(width, height * panel.getWeight() / sumWeight));
         }
+    }
+
+    @Override
+    public void setPreferredSize(Dimension d) {
+        //super.setPreferredSize(d);
+        System.out.println("Panel setPreferredSize");
+        adjustSizes(d);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+       // adjustSizes();
+       // adjustScroll();
+        //revalidate();
     }
 
     private void setGraphStartIndex(int startIndex) {
@@ -139,6 +150,7 @@ public class GraphViewer extends JPanel implements SlotListener {
 
     private void moveScroll(int scrollPosition) {
         setCompressedGraphStartIndex(scrollPosition);
+        adjustScroll();
     }
 
     private void setAutoZoom(boolean isAutoZoom) {

@@ -11,14 +11,11 @@ import com.dream.Graph.GraphViewer;
  */
 public class RunDream {
     public static void main(String[] args) {
-      GraphViewer graphWindow = new GraphViewer(10, 120);
-        graphWindow.addGraphPanel(1);
-        graphWindow.addGraphPanel(2);
-        graphWindow.addCompressedGraphPanel(1);
-        graphWindow.addCompressedGraphPanel(2);
-        graphWindow.start();
+      MainView mainWindow = new MainView(10, 120);
 
-        Controller controller = new Controller(graphWindow);
+
+
+        Controller controller = new Controller(mainWindow);
         controller.sendData();
 
     }
