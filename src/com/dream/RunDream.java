@@ -12,10 +12,10 @@ import com.dream.Graph.GraphViewer;
 public class RunDream {
     public static void main(String[] args) {
       GraphViewer graphWindow = new GraphViewer(10, 120);
-        graphWindow.addGraphPanel(1,1);
-        graphWindow.addGraphPanel(2,2);
-        graphWindow.addCompressedGraphPanel(1, 1);
-        graphWindow.addCompressedGraphPanel(2, 2);
+        graphWindow.addGraphPanel(1);
+        graphWindow.addGraphPanel(2);
+        graphWindow.addCompressedGraphPanel(1);
+        graphWindow.addCompressedGraphPanel(2);
         graphWindow.start();
 
         Controller controller = new Controller(graphWindow);

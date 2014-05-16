@@ -1,6 +1,9 @@
 package com.dream;
 
+import com.dream.Data.DataList;
 import com.dream.Graph.GraphViewer;
+
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,24 +20,29 @@ public class Controller {
     }
 
     public void sendData() {
-        for(int x = 0; x < 2000; x++) {
-            int[] data = new int[3];
+        DataList<Integer> data1 = new DataList<Integer>();
+        DataList<Integer> data2 = new DataList<Integer>();
+        DataList<Integer> data3 = new DataList<Integer>();
+        graphViewer.addGraph(0, data1);
+        graphViewer.addGraph(1, data2);
+        graphViewer.addGraph(1, data3);
+        graphViewer.addCompressedGraph(0, data1);
+        graphViewer.addCompressedGraph(1, data2);
+        graphViewer.addCompressedGraph(1, data3);
 
-            data[0] = x%25;
-            data[1] = x%50;
-            data[2] = x%100;
-            graphViewer.addData(data);
-            graphViewer.addCompressedData(data);
+        for(int x = 0; x < 2000; x++) {
+
+            data1.add(x%25);
+            data2.add(x%50);
+            data3.add(x%100);
+
         }
 
         for(int x = 0; x < 10; x++) {
-            int[] data = new int[3];
+            data1.add(20);
+            data2.add(20);
+            data3.add(20);
 
-            data[0] = 20;
-            data[1] = 20;
-            data[2] = 20;
-            graphViewer.addData(data);
-            graphViewer.addCompressedData(data);
         }
 
     }
