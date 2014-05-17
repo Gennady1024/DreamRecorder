@@ -118,13 +118,15 @@ public class CompressedGraphPanel extends GraphPanel {
     private void paintSlot(Graphics g) {
         if(getSlotWidth() > 0) {
             g.setColor(slotColor);
-            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), getWorkspaceHeight());
+            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), g.getClipBounds().height - Y_INDENT);
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
+        transformCoordinate(g);
         paintSlot(g);
+        restoreCoordinate(g);
     }
 }

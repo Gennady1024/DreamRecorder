@@ -43,7 +43,7 @@ public class Controller {
             data1.add(20);
             data2.add(20);
             data3.add(20);
-            mainView.repaint();
+
 
         }
 
