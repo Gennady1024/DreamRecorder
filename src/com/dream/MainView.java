@@ -1,11 +1,10 @@
 package com.dream;
 
-import com.dream.Data.Stock;
+import com.dream.Data.StreamData;
 import com.dream.Graph.GraphViewer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -66,13 +65,13 @@ public class MainView extends JFrame {
         add(menu,BorderLayout.NORTH);
     }
 
-    public void addGraph(int panelNumber, Stock<Integer> graphData) {
+    public void addGraph(int panelNumber, StreamData<Integer> graphData) {
         graphViewer.addGraph(panelNumber, graphData);
     }
 
 
 
-    public void addCompressedGraph(int panelNumber, Stock<Integer> graphData) {
+    public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
         graphViewer.addCompressedGraph(panelNumber, graphData);
     }
 

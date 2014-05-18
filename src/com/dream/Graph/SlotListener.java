@@ -9,5 +9,5 @@ package com.dream.Graph;
  */
 public interface SlotListener {
 
-    public void moveSlot(int slotPosition);
+    public void moveSlot(int newSlotIndex);
 }

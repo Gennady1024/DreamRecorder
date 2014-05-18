@@ -25,12 +25,13 @@ public class CompressedGraphPanel extends GraphPanel {
         super(weight, frequency);
         this.divider = divider;
 
+        //MouseListener to move Slot
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 int newSlotIndex = e.getX() - X_INDENT + startIndex ;
-                notifySlotListeners(newSlotIndex - slotIndex);
+                notifySlotListeners(newSlotIndex);
             }
         });
     }
@@ -52,7 +53,7 @@ public class CompressedGraphPanel extends GraphPanel {
             return 0;
         }
         int slotWidth = getWorkspaceWidth()/divider;
-        if(slotWidth > getGraphsLength()) {
+        if(slotWidth > getDataSize()) {
             return 0;
         }
         else {
@@ -64,11 +65,14 @@ public class CompressedGraphPanel extends GraphPanel {
         if(getSlotWidth() == 0) {
             return 0;
         }
-        return getGraphsLength() - getSlotWidth();
+        return getDataSize() - getSlotWidth();
     }
 
-    public void moveSlot(int slotIndexChange) {
-        int newSlotIndex = slotIndex + slotIndexChange;
+    public int getSlotIndex() {
+        return slotIndex;
+    }
+
+    public void moveSlot(int newSlotIndex) {
         if (newSlotIndex < 0) {
             newSlotIndex = 0;
         }
@@ -88,29 +92,25 @@ public class CompressedGraphPanel extends GraphPanel {
     }
 
     @Override
-    public void setStartIndex(int startIndex) {
-        int indexChange = startIndex - this.startIndex;
-        this.startIndex = startIndex;
+    public void moveGraphs(int newStartIndex) {
+        startIndex = newStartIndex;
         if((isSlotInWorkspace() == -1) ) {
-            notifySlotListeners(startIndex - slotIndex);
+            int newSlotIndex = startIndex;
+            notifySlotListeners(newSlotIndex);
         }
-         if(slotIndex < startIndex) {
-            notifySlotListeners(startIndex - slotIndex);
-         }
         if((isSlotInWorkspace() == 1) ) {
-            notifySlotListeners(indexChange);
+            int newSlotIndex = startIndex  + getWorkspaceWidth() -  getSlotWidth();
+            notifySlotListeners(newSlotIndex);
         }
-
-
     }
 
     public void addSlotListener(SlotListener slotListener) {
           slotListeners.add(slotListener);
     }
 
-    private void notifySlotListeners(int slotPosition) {
+    private void notifySlotListeners(int newSlotPosition) {
         for (SlotListener listener: slotListeners) {
-            listener.moveSlot(slotPosition);
+            listener.moveSlot(newSlotPosition);
 
         }
     }

@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  *
  */
-public class Controller {
+public class  Controller {
 
     private Timer repaintTimer;
     private Model model;

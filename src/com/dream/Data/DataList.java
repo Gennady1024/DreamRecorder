@@ -7,5 +7,5 @@ package com.dream.Data;
  * Time: 4:07
  * To change this template use File | Settings | File Templates.
  */
-public class DataList<E> extends java.util.ArrayList<E> implements Stock<E> {
+public class DataList<E> extends java.util.ArrayList<E> implements StreamData<E> {
 }

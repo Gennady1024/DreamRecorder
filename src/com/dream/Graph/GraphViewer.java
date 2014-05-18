@@ -1,6 +1,6 @@
 package com.dream.Graph;
 
-import com.dream.Data.Stock;
+import com.dream.Data.StreamData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 public class GraphViewer extends JPanel implements SlotListener {
 
+    private boolean isAutoScroll = true;
     private int frequency;
     private int divider;
     private long startTime;
@@ -46,18 +47,20 @@ public class GraphViewer extends JPanel implements SlotListener {
         });
         add(scrollPanel, BorderLayout.SOUTH);
 
-        setFocusable(true);
+        setFocusable(true); //only that way KeyListeners work
+
+        // Key Listener to move Slot
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_RIGHT) {
-                    moveSlot(1);
+                    moveSlot(getSlotIndex() + 1);
                 }
 
                 if (key == KeyEvent.VK_LEFT) {
-                    moveSlot(-1);
+                    moveSlot(getSlotIndex() - 1);
                 }
             }
         });
@@ -79,13 +82,13 @@ public class GraphViewer extends JPanel implements SlotListener {
         setPanelsPreferredSizes();
     }
 
-    public void addGraph(int panelNumber, Stock<Integer> graphData) {
+    public void addGraph(int panelNumber, StreamData<Integer> graphData) {
         if (panelNumber < graphPanels.size()) {
             graphPanels.get(panelNumber).addGraph(graphData);
         }
     }
 
-    public void addCompressedGraph(int panelNumber, Stock<Integer> graphData) {
+    public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
         if (panelNumber < compressedGraphPanels.size()) {
             compressedGraphPanels.get(panelNumber).addGraph(graphData);
         }
@@ -135,22 +138,32 @@ public class GraphViewer extends JPanel implements SlotListener {
         super.repaint();
     }
 
-    private void setGraphStartIndex(int startIndex) {
+    private int getSlotIndex() {
+        if (compressedGraphPanels == null){
+            return 0;
+        }
+        if (compressedGraphPanels.size() == 0) {
+            return 0;
+        }
+        return compressedGraphPanels.get(0).getSlotIndex();
+    }
+
+    private void moveGraphs(int newStartIndex) {
         for (GraphPanel panel : graphPanels) {
-            panel.setStartIndex(startIndex);
+            panel.moveGraphs(newStartIndex);
             panel.repaint();
         }
     }
 
-    private void setCompressedGraphStartIndex(int startIndex) {
+    private void moveCompressedGraphs(int newStartIndex) {
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setStartIndex(startIndex);
+            panel.moveGraphs(newStartIndex);
             panel.repaint();
         }
     }
 
-    private void moveScroll(int scrollPosition) {
-        setCompressedGraphStartIndex(scrollPosition);
+    private void moveScroll(int newScrollPosition) {
+        moveCompressedGraphs(newScrollPosition);
     }
 
     private void setAutoZoom(boolean isAutoZoom) {
@@ -163,9 +176,10 @@ public class GraphViewer extends JPanel implements SlotListener {
         }
     }
 
-    public void moveSlot(int slotPositionChange) {
+    public void moveSlot(int newSlotIndex) {
+
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.moveSlot(slotPositionChange);
+            panel.moveSlot(newSlotIndex);
         }
         adjustScroll();
     }

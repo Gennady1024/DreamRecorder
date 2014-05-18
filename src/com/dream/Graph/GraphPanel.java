@@ -1,6 +1,6 @@
 package com.dream.Graph;
 
-import com.dream.Data.Stock;
+import com.dream.Data.StreamData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +16,7 @@ import java.awt.geom.AffineTransform;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphPanel extends JPanel {
-    protected Stock<Integer>[] graphs = new Stock[3];//panel can have a several graphs. Max 3 for simplicity
+    protected StreamData<Integer>[] graphs = new StreamData[3];//panel can have a several graphs. Max 3 for simplicity
     protected final int X_INDENT = 30;
     protected final int Y_INDENT = 30;
     protected final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
@@ -32,11 +32,11 @@ public class GraphPanel extends JPanel {
     protected int startIndex = 0;
 
 
-
     public GraphPanel(int weight, int frequency) {
         this.weight = weight;
         this.frequency = frequency;
         setBackground(bgColor);
+        // MouseListener to zoom Y_Axes
         addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 zooming(e.getWheelRotation());
@@ -44,6 +44,9 @@ public class GraphPanel extends JPanel {
         });
     }
 
+    public int getWeight() {
+        return weight;
+    }
 
     protected int getWorkspaceWidth() {
         return (getSize().width - X_INDENT);
@@ -53,6 +56,9 @@ public class GraphPanel extends JPanel {
         return (getSize().height - Y_INDENT);
     }
 
+    public int getFullWidth() {
+        return X_INDENT + getDataSize();
+    }
 
     private void zooming(int zoomDirection) {
         if (zoomDirection > 0) {
@@ -63,34 +69,30 @@ public class GraphPanel extends JPanel {
         repaint();
     }
 
-    public void addGraph(Stock<Integer> graphData) {
+    public void addGraph(StreamData<Integer> graphData) {
         int count = 0;
         while (graphs[count] != null) {
             count++;
         }
-        if(count < graphs.length) {
+        if (count < graphs.length) {
             graphs[count] = graphData;
         }
         repaint();
     }
 
-    public int getFullWidth() {
-        return X_INDENT + getGraphsLength();
-    }
 
-
-    protected int getGraphsLength() {
+    protected int getDataSize() {
         if (graphs[0] == null) {
             return 0;
-        }
-        else {
+        } else {
             return graphs[0].size();
         }
     }
 
-    public void setStartIndex(int startIndex) {
-        this.startIndex = startIndex;
+    public void moveGraphs(int newStartIndex) {
+        startIndex = newStartIndex;
     }
+
 
     public int getStartIndex() {
         return startIndex;
@@ -131,8 +133,8 @@ public class GraphPanel extends JPanel {
         paintAxisX(g);
         paintAxisY(g);
         g.setColor(graphColor);
-        for(Stock<Integer> graph : graphs) {
-            if(graph != null) {
+        for (StreamData<Integer> graph : graphs) {
+            if (graph != null) {
                 int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
                 //int endIndex = Math.min(g.getClipBounds().width - X_INDENT, (graph.size() - startIndex));
                 for (int x = 0; x < endIndex; x++) {
@@ -143,9 +145,5 @@ public class GraphPanel extends JPanel {
 
         }
         restoreCoordinate(g);
-    }
-
-    public int getWeight() {
-        return weight;
     }
 }
