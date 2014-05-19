@@ -1,11 +1,12 @@
 package com.dream.Graph;
 
+import com.dream.Data.StreamData;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.util.ArrayList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,33 +15,29 @@ import java.util.ArrayList;
  * Time: 14:25
  * To change this template use File | Settings | File Templates.
  */
-public class GraphPanel extends JPanel {
-    protected ArrayList<Integer>[] graphsData; // panel can have a several graphs
-    protected double zoom = 1;
-    protected final double dZoomPlus = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
-    protected final double dZoomMinus = 1 / dZoomPlus; // similarly 2 clicks(rotations) down reduces zoom twice
-    protected boolean isAutoZoom;
-    protected long startTime;
-    protected final Color bgColor = Color.BLACK;
-    protected final Color axisColor = Color.GREEN;
-
-
-    protected final Color graphColor = Color.YELLOW;
-    protected int frequency = 0;
-    protected int startIndex = 0;
+class GraphPanel extends JPanel {
+    protected StreamData<Integer>[] graphs = new StreamData[3];//panel can have a several graphs. Max 3 for simplicity
     protected static final int X_INDENT = 30;
     protected static final int Y_INDENT = 30;
+    protected static final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
+    protected static final double ZOOM_MINUS_CHANGE = 1 / ZOOM_PLUS_CHANGE; // similarly 2 clicks(rotations) down reduces zoom twice
+    protected static final Color bgColor = Color.BLACK;
+    protected static final Color axisColor = Color.GREEN;
+    protected static final Color graphColor = Color.YELLOW;
+
+    protected double zoom = 1;
+    protected boolean isAutoZoom;
+    protected long startTime;
+    protected int weight = 1;
+    protected int frequency = 0;
+    protected int startIndex = 0;
 
 
-    public GraphPanel(int graphAmount, int frequency) {
-        graphsData = new ArrayList[graphAmount];
+    GraphPanel(int weight, int frequency) {
+        this.weight = weight;
         this.frequency = frequency;
-        for (int i = 0; i < graphAmount; i++) {
-            graphsData[i] = new ArrayList<Integer>();
-        }
         setBackground(bgColor);
-        setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.DARK_GRAY));
-
+        // MouseListener to zoom Y_Axes
         addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 zooming(e.getWheelRotation());
@@ -49,57 +46,63 @@ public class GraphPanel extends JPanel {
     }
 
 
-    protected int getWorkspaceWidth() {
-        return (getPreferredSize().width - X_INDENT);
-    }
-
-    protected int getWorkspaceHeight() {
-        return (getPreferredSize().height - Y_INDENT);
-    }
-
-
-    private void zooming(int zoomDirection) {
-        if (zoomDirection > 0) {
-            zoom = zoom * dZoomPlus;
-        } else {
-            zoom = zoom * dZoomMinus;
-        }
-        repaint();
-    }
-
-    public void addData(int graphNumber, int data) {
-        if (graphNumber < graphsData.length) {
-            graphsData[graphNumber].add(data);
-        }
-        repaint();
-    }
-
-    public int getGraphsAmount() {
-        return graphsData.length;
-    }
-
-    protected int getGraphsLength() {
-        if (graphsData.length == 0) {
-            return 0;
-        }
-        else {
-            return graphsData[0].size();
-        }
-    }
-
-    public void setStartIndex(int startIndex) {
-        this.startIndex = startIndex;
-    }
-
-    public int getStartIndex() {
+    int getStartIndex() {
         return startIndex;
     }
 
-    public void setAutoZoom(boolean isAutoZoom) {
-        this.isAutoZoom = isAutoZoom;
+    void setStartIndex(int startIndex) {
+        this.startIndex = startIndex;
+    }
+
+    protected int getWeight() {
+        return weight;
+    }
+
+    protected int getWorkspaceWidth() {
+        return (getSize().width - X_INDENT);
+    }
+
+    protected int getWorkspaceHeight() {
+        return (getSize().height - Y_INDENT);
+    }
+
+    protected int getFullWidth() {
+        return X_INDENT + getGraphsSize();
+    }
+
+    protected void zooming(int zoomDirection) {
+        if (zoomDirection > 0) {
+            zoom = zoom * ZOOM_PLUS_CHANGE;
+        } else {
+            zoom = zoom * ZOOM_MINUS_CHANGE;
+        }
         repaint();
     }
 
+    protected void addGraph(StreamData<Integer> graphData) {
+        int count = 0;
+        while (graphs[count] != null) {
+            count++;
+        }
+        if (count < graphs.length) {
+            graphs[count] = graphData;
+        }
+        repaint();
+    }
+
+
+    protected int getGraphsSize() {
+        if (graphs[0] == null) {
+            return 0;
+        } else {
+            return graphs[0].size();
+        }
+    }
+
+    protected void setAutoZoom(boolean isAutoZoom) {
+        this.isAutoZoom = isAutoZoom;
+        repaint();
+    }
 
     protected void paintAxisX(Graphics g) {
         g.setColor(axisColor);
@@ -111,23 +114,35 @@ public class GraphPanel extends JPanel {
         g.drawLine(0, 0, 0, g.getClipBounds().height);
     }
 
+    protected void transformCoordinate(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.translate(X_INDENT, getWorkspaceHeight()); // move XY origin to the left bottom point
+        g2d.transform(AffineTransform.getScaleInstance(1, -1)); // flip Y-axis
+    }
+
+    protected void restoreCoordinate(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.translate(-X_INDENT, getWorkspaceHeight()); // move XY origin to the left top point
+        g2d.transform(AffineTransform.getScaleInstance(1, -1)); // flip Y-axis and zoom it
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.translate(X_INDENT, g.getClipBounds().height - Y_INDENT); // move XY origin to the left bottom point
-        g2d.transform(AffineTransform.getScaleInstance(1, -1 * zoom)); // flip Y-axis and zoom it
-
+        transformCoordinate(g);
         paintAxisX(g);
         paintAxisY(g);
-        g2d.setColor(graphColor);
-        for (int i = 0; i < getGraphsAmount(); i++) {
-            int endIndex = Math.min(g2d.getClipBounds().width - X_INDENT, (graphsData[i].size() - startIndex));
-            for (int j = 0; j < endIndex; j++) {
-                int x = j;
-                int y = graphsData[i].get(j + startIndex);
-                g.drawLine(x, y, x, y);
+        g.setColor(graphColor);
+        for (StreamData<Integer> graph : graphs) {
+            if (graph != null) {
+                int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
+                for (int x = 0; x < endIndex; x++) {
+                    int y = graph.get(x + startIndex);
+                    g.drawLine(x, y, x, y);
+                }
             }
+
         }
+        restoreCoordinate(g);
     }
 }

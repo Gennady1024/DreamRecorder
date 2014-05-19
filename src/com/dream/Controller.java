@@ -1,6 +1,7 @@
 package com.dream;
 
-import com.dream.Graph.GraphViewer;
+import com.dream.Data.DataList;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,31 +11,48 @@ import com.dream.Graph.GraphViewer;
  * To change this template use File | Settings | File Templates.
  */
 public class Controller {
-    private GraphViewer graphViewer;
+    private MainView mainView;
 
-    public Controller(GraphViewer graphViewer) {
-        this.graphViewer = graphViewer;
+    public Controller(MainView mainView) {
+        this.mainView = mainView;
     }
 
     public void sendData() {
-        for(int x = 0; x < 2000; x++) {
-            int[] data = new int[3];
+        DataList<Integer> data1 = new DataList<Integer>();
+        DataList<Integer> data2 = new DataList<Integer>();
+        DataList<Integer> data3 = new DataList<Integer>();
+        mainView.addGraph(0, data1);
+        mainView.addGraph(1, data2);
 
-            data[0] = x%25;
-            data[1] = x%50;
-            data[2] = x%100;
-            graphViewer.addData(data);
-            graphViewer.addCompressedData(data);
+        mainView.addCompressedGraph(0, data3);
+        mainView.addCompressedGraph(1, data3);
+
+        int count = 0;
+        for(int x = 0; x < 20000; x++) {
+            try {
+                Thread.sleep(5);
+
+            } catch (InterruptedException ex) {
+
+            }
+
+            data1.add(x%25);
+            data2.add(x%50);
+
+            if (count%12 ==0) {
+                data3.add(50);
+            }
+            count++;
+            mainView.syncView();
+
         }
 
         for(int x = 0; x < 10; x++) {
-            int[] data = new int[3];
+            data1.add(20);
+            data2.add(20);
+            data3.add(20);
+            mainView.syncView();
 
-            data[0] = 20;
-            data[1] = 20;
-            data[2] = 20;
-            graphViewer.addData(data);
-            graphViewer.addCompressedData(data);
         }
 
     }

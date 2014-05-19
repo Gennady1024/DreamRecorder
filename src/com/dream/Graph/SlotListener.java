@@ -7,7 +7,7 @@ package com.dream.Graph;
  * Time: 20:29
  * To change this template use File | Settings | File Templates.
  */
-public interface SlotListener {
+interface SlotListener {
 
-    public void moveSlot(int slotPosition);
+      void moveSlot(int newSlotIndex);
 }

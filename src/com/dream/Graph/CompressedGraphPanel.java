@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Time: 21:32
  * To change this template use File | Settings | File Templates.
  */
-public class CompressedGraphPanel extends GraphPanel {
+class CompressedGraphPanel extends GraphPanel {
 
 
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
@@ -21,96 +21,43 @@ public class CompressedGraphPanel extends GraphPanel {
     private Color slotColor = Color.MAGENTA;
 
 
-    public CompressedGraphPanel(int graphAmount, int frequency, int divider) {
-        super(graphAmount, frequency);
+    CompressedGraphPanel(int weight, int frequency, int divider) {
+        super(weight, frequency);
         this.divider = divider;
 
+        //MouseListener to move Slot
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 int newSlotIndex = e.getX() - X_INDENT + startIndex ;
-                notifySlotListeners(newSlotIndex - slotIndex);
+                notifySlotListeners(newSlotIndex);
             }
         });
     }
 
-    public int isSlotInWorkspace() {
-        int slotWorkspacePosition = slotIndex - startIndex;
-        if ( slotWorkspacePosition <= 0 ) {
-            return -1;
-        }
-        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
-            return 1;
-        }
-
-        return 0;
+    int getSlotIndex() {
+        return slotIndex;
     }
 
-    private int getSlotWidth() {
+    void setSlotIndex(int slotIndex) {
+        this.slotIndex = slotIndex;
+    }
+
+    int getSlotWidth() {
         if (divider == 0) {
             return 0;
         }
-        int slotWidth = getWorkspaceWidth()/divider;
-        if(slotWidth > getGraphsLength()) {
-            return 0;
-        }
-        else {
-            return slotWidth;
-        }
-    }
-
-    private int getSlotMaxIndex () {
-        if(getSlotWidth() == 0) {
-            return 0;
-        }
-        return getGraphsLength() - getSlotWidth();
-    }
-
-    public void moveSlot(int slotIndexChange) {
-        int newSlotIndex = slotIndex + slotIndexChange;
-        if (newSlotIndex < 0) {
-            newSlotIndex = 0;
-        }
-        if (newSlotIndex > getSlotMaxIndex()) {
-            newSlotIndex = getSlotMaxIndex();
-        }
-
-        slotIndex = newSlotIndex;
-
-        if((isSlotInWorkspace() == -1) ) {
-            startIndex = slotIndex;
-        }
-        if((isSlotInWorkspace() == 1) ) {
-            startIndex = slotIndex + getSlotWidth() - getWorkspaceWidth();
-        }
-        repaint();
-    }
-
-    @Override
-    public void setStartIndex(int startIndex) {
-        int indexChange = startIndex - this.startIndex;
-        this.startIndex = startIndex;
-        if((isSlotInWorkspace() == -1) ) {
-            notifySlotListeners(startIndex - slotIndex);
-        }
-         if(slotIndex < startIndex) {
-            notifySlotListeners(startIndex - slotIndex);
-         }
-        if((isSlotInWorkspace() == 1) ) {
-            notifySlotListeners(indexChange);
-        }
-
-
+        return  getWorkspaceWidth()/divider;
     }
 
     public void addSlotListener(SlotListener slotListener) {
           slotListeners.add(slotListener);
     }
 
-    private void notifySlotListeners(int slotPosition) {
+    private void notifySlotListeners(int newSlotPosition) {
         for (SlotListener listener: slotListeners) {
-            listener.moveSlot(slotPosition);
+            listener.moveSlot(newSlotPosition);
 
         }
     }
@@ -118,13 +65,15 @@ public class CompressedGraphPanel extends GraphPanel {
     private void paintSlot(Graphics g) {
         if(getSlotWidth() > 0) {
             g.setColor(slotColor);
-            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), getWorkspaceHeight());
+            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), g.getClipBounds().height - Y_INDENT);
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
+        transformCoordinate(g);
         paintSlot(g);
+        restoreCoordinate(g);
     }
 }
