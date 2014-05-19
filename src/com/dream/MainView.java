@@ -1,7 +1,7 @@
 package com.dream;
 
 import com.dream.Data.StreamData;
-import com.dream.Graph.GraphViewer;
+import com.dream.Graph.GraphsViewer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class MainView extends JFrame {
     private String title = "Dream Recorder";
-    private GraphViewer graphViewer;
+    private GraphsViewer graphsViewer;
     private  JMenuBar menu = new JMenuBar();
 
     public MainView(int frequency, int divider) {
@@ -24,23 +24,21 @@ public class MainView extends JFrame {
 
         formMenu();
 
-        graphViewer = new GraphViewer(frequency, divider);
-        graphViewer.setPreferredSize(getWorkspaceDimention());
-        graphViewer.addGraphPanel(1);
-        graphViewer.addGraphPanel(2);
-        graphViewer.addCompressedGraphPanel(1);
-        graphViewer.addCompressedGraphPanel(2);
-        add(graphViewer, BorderLayout.CENTER);
+        graphsViewer = new GraphsViewer(frequency, divider);
+        graphsViewer.setPreferredSize(getWorkspaceDimention());
+        graphsViewer.addGraphPanel(1);
+        graphsViewer.addGraphPanel(2);
+        graphsViewer.addCompressedGraphPanel(1);
+        graphsViewer.addCompressedGraphPanel(2);
+        add(graphsViewer, BorderLayout.CENTER);
 
 
         pack();
         setVisible(true);
     }
 
-    @Override
-    public void repaint() {
-        graphViewer.repaint();
-        super.repaint();
+    public void syncView() {
+        graphsViewer.syncView();
     }
 
 
@@ -66,13 +64,13 @@ public class MainView extends JFrame {
     }
 
     public void addGraph(int panelNumber, StreamData<Integer> graphData) {
-        graphViewer.addGraph(panelNumber, graphData);
+        graphsViewer.addGraph(panelNumber, graphData);
     }
 
 
 
     public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
-        graphViewer.addCompressedGraph(panelNumber, graphData);
+        graphsViewer.addCompressedGraph(panelNumber, graphData);
     }
 
 }

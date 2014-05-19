@@ -1,7 +1,5 @@
 package com.dream;
 
-import com.dream.Graph.GraphViewer;
-
 /**
  * Created with IntelliJ IDEA.
  * User: GENA
@@ -11,7 +9,7 @@ import com.dream.Graph.GraphViewer;
  */
 public class RunDream {
     public static void main(String[] args) {
-      MainView mainWindow = new MainView(10, 120);
+      MainView mainWindow = new MainView(10, 12);
 
 
 

@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Time: 21:32
  * To change this template use File | Settings | File Templates.
  */
-public class CompressedGraphPanel extends GraphPanel {
+class CompressedGraphPanel extends GraphPanel {
 
 
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
@@ -21,7 +21,7 @@ public class CompressedGraphPanel extends GraphPanel {
     private Color slotColor = Color.MAGENTA;
 
 
-    public CompressedGraphPanel(int weight, int frequency, int divider) {
+    CompressedGraphPanel(int weight, int frequency, int divider) {
         super(weight, frequency);
         this.divider = divider;
 
@@ -36,72 +36,19 @@ public class CompressedGraphPanel extends GraphPanel {
         });
     }
 
-    public int isSlotInWorkspace() {
-        int slotWorkspacePosition = slotIndex - startIndex;
-        if ( slotWorkspacePosition <= 0 ) {
-            return -1;
-        }
-        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    private int getSlotWidth() {
-        if (divider == 0) {
-            return 0;
-        }
-        int slotWidth = getWorkspaceWidth()/divider;
-        if(slotWidth > getDataSize()) {
-            return 0;
-        }
-        else {
-            return slotWidth;
-        }
-    }
-
-    private int getSlotMaxIndex () {
-        if(getSlotWidth() == 0) {
-            return 0;
-        }
-        return getDataSize() - getSlotWidth();
-    }
-
-    public int getSlotIndex() {
+    int getSlotIndex() {
         return slotIndex;
     }
 
-    public void moveSlot(int newSlotIndex) {
-        if (newSlotIndex < 0) {
-            newSlotIndex = 0;
-        }
-        if (newSlotIndex > getSlotMaxIndex()) {
-            newSlotIndex = getSlotMaxIndex();
-        }
-
-        slotIndex = newSlotIndex;
-
-        if((isSlotInWorkspace() == -1) ) {
-            startIndex = slotIndex;
-        }
-        if((isSlotInWorkspace() == 1) ) {
-            startIndex = slotIndex + getSlotWidth() - getWorkspaceWidth();
-        }
-        repaint();
+    void setSlotIndex(int slotIndex) {
+        this.slotIndex = slotIndex;
     }
 
-    @Override
-    public void moveGraphs(int newStartIndex) {
-        startIndex = newStartIndex;
-        if((isSlotInWorkspace() == -1) ) {
-            int newSlotIndex = startIndex;
-            notifySlotListeners(newSlotIndex);
+    int getSlotWidth() {
+        if (divider == 0) {
+            return 0;
         }
-        if((isSlotInWorkspace() == 1) ) {
-            int newSlotIndex = startIndex  + getWorkspaceWidth() -  getSlotWidth();
-            notifySlotListeners(newSlotIndex);
-        }
+        return  getWorkspaceWidth()/divider;
     }
 
     public void addSlotListener(SlotListener slotListener) {

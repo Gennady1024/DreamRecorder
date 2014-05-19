@@ -1,8 +1,6 @@
 package com.dream;
 
 import com.dream.Data.DataList;
-import com.dream.Graph.GraphViewer;
-
 
 
 /**
@@ -25,17 +23,27 @@ public class Controller {
         DataList<Integer> data3 = new DataList<Integer>();
         mainView.addGraph(0, data1);
         mainView.addGraph(1, data2);
-        mainView.addGraph(1, data3);
-        mainView.addCompressedGraph(0, data1);
-        mainView.addCompressedGraph(1, data2);
+
+        mainView.addCompressedGraph(0, data3);
         mainView.addCompressedGraph(1, data3);
 
-        for(int x = 0; x < 2000; x++) {
+        int count = 0;
+        for(int x = 0; x < 20000; x++) {
+            try {
+                Thread.sleep(5);
+
+            } catch (InterruptedException ex) {
+
+            }
 
             data1.add(x%25);
             data2.add(x%50);
-            data3.add(x%100);
-            mainView.repaint();
+
+            if (count%12 ==0) {
+                data3.add(50);
+            }
+            count++;
+            mainView.syncView();
 
         }
 
@@ -43,7 +51,7 @@ public class Controller {
             data1.add(20);
             data2.add(20);
             data3.add(20);
-
+            mainView.syncView();
 
         }
 

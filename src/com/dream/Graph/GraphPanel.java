@@ -15,24 +15,25 @@ import java.awt.geom.AffineTransform;
  * Time: 14:25
  * To change this template use File | Settings | File Templates.
  */
-public class GraphPanel extends JPanel {
+class GraphPanel extends JPanel {
     protected StreamData<Integer>[] graphs = new StreamData[3];//panel can have a several graphs. Max 3 for simplicity
-    protected final int X_INDENT = 30;
-    protected final int Y_INDENT = 30;
-    protected final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
-    protected final double ZOOM_MINUS_CHANGE = 1 / ZOOM_PLUS_CHANGE; // similarly 2 clicks(rotations) down reduces zoom twice
+    protected static final int X_INDENT = 30;
+    protected static final int Y_INDENT = 30;
+    protected static final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
+    protected static final double ZOOM_MINUS_CHANGE = 1 / ZOOM_PLUS_CHANGE; // similarly 2 clicks(rotations) down reduces zoom twice
+    protected static final Color bgColor = Color.BLACK;
+    protected static final Color axisColor = Color.GREEN;
+    protected static final Color graphColor = Color.YELLOW;
+
     protected double zoom = 1;
     protected boolean isAutoZoom;
     protected long startTime;
-    protected final Color bgColor = Color.BLACK;
-    protected final Color axisColor = Color.GREEN;
     protected int weight = 1;
-    protected final Color graphColor = Color.YELLOW;
     protected int frequency = 0;
     protected int startIndex = 0;
 
 
-    public GraphPanel(int weight, int frequency) {
+    GraphPanel(int weight, int frequency) {
         this.weight = weight;
         this.frequency = frequency;
         setBackground(bgColor);
@@ -44,7 +45,16 @@ public class GraphPanel extends JPanel {
         });
     }
 
-    public int getWeight() {
+
+    int getStartIndex() {
+        return startIndex;
+    }
+
+    void setStartIndex(int startIndex) {
+        this.startIndex = startIndex;
+    }
+
+    protected int getWeight() {
         return weight;
     }
 
@@ -56,11 +66,11 @@ public class GraphPanel extends JPanel {
         return (getSize().height - Y_INDENT);
     }
 
-    public int getFullWidth() {
-        return X_INDENT + getDataSize();
+    protected int getFullWidth() {
+        return X_INDENT + getGraphsSize();
     }
 
-    private void zooming(int zoomDirection) {
+    protected void zooming(int zoomDirection) {
         if (zoomDirection > 0) {
             zoom = zoom * ZOOM_PLUS_CHANGE;
         } else {
@@ -69,7 +79,7 @@ public class GraphPanel extends JPanel {
         repaint();
     }
 
-    public void addGraph(StreamData<Integer> graphData) {
+    protected void addGraph(StreamData<Integer> graphData) {
         int count = 0;
         while (graphs[count] != null) {
             count++;
@@ -81,7 +91,7 @@ public class GraphPanel extends JPanel {
     }
 
 
-    protected int getDataSize() {
+    protected int getGraphsSize() {
         if (graphs[0] == null) {
             return 0;
         } else {
@@ -89,20 +99,10 @@ public class GraphPanel extends JPanel {
         }
     }
 
-    public void moveGraphs(int newStartIndex) {
-        startIndex = newStartIndex;
-    }
-
-
-    public int getStartIndex() {
-        return startIndex;
-    }
-
-    public void setAutoZoom(boolean isAutoZoom) {
+    protected void setAutoZoom(boolean isAutoZoom) {
         this.isAutoZoom = isAutoZoom;
         repaint();
     }
-
 
     protected void paintAxisX(Graphics g) {
         g.setColor(axisColor);
@@ -136,7 +136,6 @@ public class GraphPanel extends JPanel {
         for (StreamData<Integer> graph : graphs) {
             if (graph != null) {
                 int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
-                //int endIndex = Math.min(g.getClipBounds().width - X_INDENT, (graph.size() - startIndex));
                 for (int x = 0; x < endIndex; x++) {
                     int y = graph.get(x + startIndex);
                     g.drawLine(x, y, x, y);
