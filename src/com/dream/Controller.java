@@ -22,6 +22,7 @@ public class Controller {
         DataList<Integer> data2 = new DataList<Integer>();
         DataList<Integer> data3 = new DataList<Integer>();
         mainView.addGraph(0, data1);
+        mainView.addGraph(0, data2);
         mainView.addGraph(1, data2);
 
         mainView.addCompressedGraph(0, data3);

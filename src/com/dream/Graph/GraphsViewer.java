@@ -105,6 +105,9 @@ public class GraphsViewer extends JPanel {
         viewController.autoScroll();
     }
 
+
+
+
     private void setPanelsPreferredSizes() {
         Dimension d = getPreferredSize();
         int width = d.width;
