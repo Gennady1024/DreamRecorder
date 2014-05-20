@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphsViewer extends JPanel implements SlotListener {
-
+    private static final int AUTO_SCROLL_GAP = 2;
     private int frequency;
     private int divider;
     private long startTime;
@@ -41,7 +41,9 @@ public class GraphsViewer extends JPanel implements SlotListener {
         scrollPanel.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (e.getValueIsAdjusting()) {  // fire only when scroll was dragged by user
                 moveScroll(e.getValue());
+                }
             }
         });
         add(scrollPanel, BorderLayout.SOUTH);
@@ -59,7 +61,12 @@ public class GraphsViewer extends JPanel implements SlotListener {
                 }
 
                 if (key == KeyEvent.VK_LEFT) {
-                    moveSlot(getSlotIndex() - 1);
+                    if (isAutoScroll(getSlotMaxIndex(), getSlotIndex())) {
+                        moveSlot(getSlotIndex() - AUTO_SCROLL_GAP - 1); //to stop autoScroll
+                    }
+                    else {
+                        moveSlot(getSlotIndex() - 1);
+                    }
                 }
             }
         });
@@ -106,13 +113,7 @@ public class GraphsViewer extends JPanel implements SlotListener {
 
 
     public void moveSlot(int newSlotIndex) {
-        int slotMaxIndex;
-        if (getSlotWidth() == 0) {
-            slotMaxIndex = 0;
-        }
-        else {
-            slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();;
-        }
+        int slotMaxIndex = getSlotMaxIndex();
 
         if (newSlotIndex < 0) {
             newSlotIndex = 0;
@@ -145,7 +146,32 @@ public class GraphsViewer extends JPanel implements SlotListener {
         syncScroll();
     }
 
+    int isSlotInWorkspace(int slotIndex, int startIndex) {
+        int slotWorkspacePosition = slotIndex - startIndex;
+        if ( slotWorkspacePosition <= 0 ) {
+            return -1;
+        }
+        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
+            return 1;
+        }
 
+        return 0;
+    }
+
+    private int getSlotMaxIndex() {
+        int slotMaxIndex;
+        if (getSlotWidth() == 0) {
+            slotMaxIndex = 0;
+        }
+        else {
+            slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();
+        }
+        return slotMaxIndex;
+    }
+
+    private boolean isAutoScroll(int slotMaxIndex, int slotIndex) {
+        return (slotMaxIndex <= (slotIndex + AUTO_SCROLL_GAP));
+    }
 
     private void autoScroll () {
         int graphsMaxStartIndex = getGraphsSize() - getWorkspaceWidth();
@@ -154,22 +180,30 @@ public class GraphsViewer extends JPanel implements SlotListener {
         }
 
         int slotMaxIndex;
-        if (getSlotWidth() == 0) {
+        if( divider == 0) {
             slotMaxIndex = 0;
         }
         else {
             slotMaxIndex = graphsMaxStartIndex/divider;
         }
-
         int slotIndex = getSlotIndex();
-        if (slotMaxIndex == slotIndex) {
+
+        if (isAutoScroll(slotMaxIndex, slotIndex)) {
             for (GraphPanel panel : graphPanels) {
                 panel.setStartIndex(graphsMaxStartIndex);
                 panel.repaint();
             }
-        }
-        if (slotMaxIndex == (slotIndex + 1)) {
-            moveSlot(slotMaxIndex);
+            if (slotMaxIndex > slotIndex) {
+                int compressedGraphsMaxStartIndex = slotMaxIndex + getSlotWidth() - getWorkspaceWidth();
+                if(compressedGraphsMaxStartIndex < 0) {
+                    compressedGraphsMaxStartIndex = 0;
+                }
+                for (CompressedGraphPanel panel : compressedGraphPanels) {
+                    panel.setSlotIndex(slotMaxIndex);
+                    panel.setStartIndex(compressedGraphsMaxStartIndex);
+                    panel.repaint();
+                }
+            }
         }
         syncScroll();
     }
@@ -233,17 +267,6 @@ public class GraphsViewer extends JPanel implements SlotListener {
         moveCompressedGraphs(newScrollPosition);
     }
 
-    int isSlotInWorkspace(int slotIndex, int startIndex) {
-        int slotWorkspacePosition = slotIndex - startIndex;
-        if ( slotWorkspacePosition <= 0 ) {
-            return -1;
-        }
-        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
-            return 1;
-        }
-
-        return 0;
-    }
 
     private int getSlotWidth() {
         if (compressedGraphPanels == null){
