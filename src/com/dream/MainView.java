@@ -32,7 +32,6 @@ public class MainView extends JFrame {
         graphsViewer.addCompressedGraphPanel(2);
         add(graphsViewer, BorderLayout.CENTER);
 
-
         pack();
         setVisible(true);
     }
@@ -66,7 +65,6 @@ public class MainView extends JFrame {
     public void addGraph(int panelNumber, StreamData<Integer> graphData) {
         graphsViewer.addGraph(panelNumber, graphData);
     }
-
 
 
     public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
