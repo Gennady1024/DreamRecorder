@@ -7,11 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: GENA
- * Date: 16.05.14
- * Time: 13:05
- * To change this template use File | Settings | File Templates.
+ * Main Window of our program...
  */
 public class MainView extends JFrame {
     private String title = "Dream Recorder";
@@ -32,14 +28,26 @@ public class MainView extends JFrame {
         graphsViewer.addCompressedGraphPanel(2);
         add(graphsViewer, BorderLayout.CENTER);
 
-
         pack();
         setVisible(true);
+    }
+
+    /**
+     *
+     */
+    public void addGraph(int panelNumber, StreamData<Integer> graphData) {
+        graphsViewer.addGraph(panelNumber, graphData);
+    }
+
+
+    public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
+        graphsViewer.addCompressedGraph(panelNumber, graphData);
     }
 
     public void syncView() {
         graphsViewer.syncView();
     }
+
 
 
     private Dimension getWorkspaceDimention() {
@@ -62,15 +70,4 @@ public class MainView extends JFrame {
         menu.add(optionsMenu);
         add(menu,BorderLayout.NORTH);
     }
-
-    public void addGraph(int panelNumber, StreamData<Integer> graphData) {
-        graphsViewer.addGraph(panelNumber, graphData);
-    }
-
-
-
-    public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
-        graphsViewer.addCompressedGraph(panelNumber, graphData);
-    }
-
 }

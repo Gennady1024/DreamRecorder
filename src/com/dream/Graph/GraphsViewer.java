@@ -17,8 +17,7 @@ import java.util.ArrayList;
  * Time: 15:04
  * To change this template use File | Settings | File Templates.
  */
-public class GraphsViewer extends JPanel implements SlotListener {
-
+public class GraphsViewer extends JPanel {
     private int frequency;
     private int divider;
     private long startTime;
@@ -29,6 +28,7 @@ public class GraphsViewer extends JPanel implements SlotListener {
     private JPanel PaintingPanel = new JPanel();
     private JPanel scrollablePanel = new JPanel();
     private JScrollPane scrollPanel = new JScrollPane(scrollablePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+    private ViewController viewController = new ViewController();
 
     public GraphsViewer(int frequency, int divider) {
         this.frequency = frequency;
@@ -41,7 +41,9 @@ public class GraphsViewer extends JPanel implements SlotListener {
         scrollPanel.getHorizontalScrollBar().addAdjustmentListener(new AdjustmentListener() {
             @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
-                moveScroll(e.getValue());
+                if (e.getValueIsAdjusting()) {  // fire only when scroll was dragged by user
+                    viewController.moveScroll(e.getValue());
+                }
             }
         });
         add(scrollPanel, BorderLayout.SOUTH);
@@ -55,11 +57,11 @@ public class GraphsViewer extends JPanel implements SlotListener {
                 super.keyPressed(e);
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_RIGHT) {
-                    moveSlot(getSlotIndex() + 1);
+                    viewController.moveSlotForward();
                 }
 
                 if (key == KeyEvent.VK_LEFT) {
-                    moveSlot(getSlotIndex() - 1);
+                    viewController.moveSlotBackward();
                 }
             }
         });
@@ -75,7 +77,7 @@ public class GraphsViewer extends JPanel implements SlotListener {
 
     public void addCompressedGraphPanel(int weight) {
         CompressedGraphPanel panel = new CompressedGraphPanel(weight, frequency / divider, divider);
-        panel.addSlotListener(this);
+        panel.addSlotListener(viewController);
         compressedGraphPanels.add(panel);
         PaintingPanel.add(panel);
         setPanelsPreferredSizes();
@@ -99,93 +101,12 @@ public class GraphsViewer extends JPanel implements SlotListener {
         setPanelsPreferredSizes();
     }
 
-    public void syncView(){
-        autoScroll();
-        repaint();
-    }
-
-
-    public void moveSlot(int newSlotIndex) {
-        int slotMaxIndex;
-        if (getSlotWidth() == 0) {
-            slotMaxIndex = 0;
-        }
-        else {
-            slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();;
-        }
-
-        if (newSlotIndex < 0) {
-            newSlotIndex = 0;
-        }
-        if (newSlotIndex > slotMaxIndex) {
-            newSlotIndex = slotMaxIndex;
-        }
-
-        int compressedGraphsNewStartIndex = getCompressedGraphsStartIndex();
-
-        if((isSlotInWorkspace(newSlotIndex, compressedGraphsNewStartIndex) == -1) ) {
-            compressedGraphsNewStartIndex = newSlotIndex;
-        }
-        if((isSlotInWorkspace(newSlotIndex, compressedGraphsNewStartIndex) == 1) ) {
-            compressedGraphsNewStartIndex = newSlotIndex + getSlotWidth() - getWorkspaceWidth();
-        }
-
-        for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setSlotIndex(newSlotIndex);
-            panel.setStartIndex(compressedGraphsNewStartIndex);
-            panel.repaint();
-        }
-
-        int GraphsNewStartIndex = newSlotIndex * divider;
-        for (GraphPanel panel : graphPanels) {
-            panel.setStartIndex(GraphsNewStartIndex);
-            panel.repaint();
-        }
-
-        syncScroll();
+    public void syncView() {
+        viewController.autoScroll();
     }
 
 
 
-    private void autoScroll () {
-        int graphsMaxStartIndex = getGraphsSize() - getWorkspaceWidth();
-        if(graphsMaxStartIndex < 0) {
-            graphsMaxStartIndex = 0;
-        }
-
-        int slotMaxIndex;
-        if (getSlotWidth() == 0) {
-            slotMaxIndex = 0;
-        }
-        else {
-            slotMaxIndex = graphsMaxStartIndex/divider;
-        }
-
-        int slotIndex = getSlotIndex();
-        if (slotMaxIndex == slotIndex) {
-            for (GraphPanel panel : graphPanels) {
-                panel.setStartIndex(graphsMaxStartIndex);
-                panel.repaint();
-            }
-        }
-        if (slotMaxIndex == (slotIndex + 1)) {
-            moveSlot(slotMaxIndex);
-        }
-        syncScroll();
-    }
-
-
-    private void syncScroll() {
-        if (compressedGraphPanels != null) {
-            if (compressedGraphPanels.size() > 0) {
-                CompressedGraphPanel panel = compressedGraphPanels.get(0);
-                scrollablePanel.setPreferredSize(new Dimension(panel.getFullWidth(), 0));
-                scrollPanel.getViewport().setViewPosition(new Point(panel.getStartIndex(), 0));
-                scrollablePanel.revalidate(); // we always have to call component.revalidate() after changing it "directly"(outside the GUI)
-                scrollPanel.repaint();
-            }
-        }
-    }
 
     private void setPanelsPreferredSizes() {
         Dimension d = getPreferredSize();
@@ -207,109 +128,214 @@ public class GraphsViewer extends JPanel implements SlotListener {
         }
     }
 
-    private void moveCompressedGraphs(int newStartIndex) {
-        int newSlotIndex = getSlotIndex();
-        if((isSlotInWorkspace(newSlotIndex, newStartIndex) == -1) ) {
-            newSlotIndex = newStartIndex;
-        }
-        if((isSlotInWorkspace(newSlotIndex, newStartIndex) == 1) ) {
-            newSlotIndex = newStartIndex  + getWorkspaceWidth() -  getSlotWidth();
+
+    class ViewController implements SlotListener {
+        private static final int AUTO_SCROLL_GAP = 10; // bigger GAP - less precision need slot to start autoscroll
+
+        @Override
+        public void moveSlot(int newSlotIndex) {
+            int slotMaxIndex = getSlotMaxIndex();
+
+            if (newSlotIndex < 0) {
+                newSlotIndex = 0;
+            }
+            if (newSlotIndex > slotMaxIndex) {
+                newSlotIndex = slotMaxIndex;
+            }
+
+            int compressedGraphsNewStartIndex = getCompressedGraphsStartIndex();
+
+            if ((isSlotInWorkspace(newSlotIndex, compressedGraphsNewStartIndex) == -1)) {
+                compressedGraphsNewStartIndex = newSlotIndex;
+            }
+            if ((isSlotInWorkspace(newSlotIndex, compressedGraphsNewStartIndex) == 1)) {
+                compressedGraphsNewStartIndex = newSlotIndex + getSlotWidth() - getWorkspaceWidth();
+            }
+
+            for (CompressedGraphPanel panel : compressedGraphPanels) {
+                panel.setSlotIndex(newSlotIndex);
+                panel.setStartIndex(compressedGraphsNewStartIndex);
+                panel.repaint();
+            }
+
+            int GraphsNewStartIndex = newSlotIndex * divider;
+            for (GraphPanel panel : graphPanels) {
+                panel.setStartIndex(GraphsNewStartIndex);
+                panel.repaint();
+            }
+
+            syncScroll();
         }
 
-        for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setSlotIndex(newSlotIndex);
-            panel.setStartIndex(newStartIndex);
-            panel.repaint();
+
+        int isSlotInWorkspace(int slotIndex, int startIndex) {
+            int slotWorkspacePosition = slotIndex - startIndex;
+            if (slotWorkspacePosition <= 0) {
+                return -1;
+            }
+            if (slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth())) {
+                return 1;
+            }
+
+            return 0;
         }
 
-        int GraphsNewStartIndex = newSlotIndex * divider;
-        for (GraphPanel panel : graphPanels) {
-            panel.setStartIndex(GraphsNewStartIndex);
-            panel.repaint();
+        public void moveSlotForward() {
+            moveSlot(getSlotIndex() + 1);
         }
+
+        public void moveSlotBackward() {
+            if (isAutoScroll(getSlotMaxIndex(), getSlotIndex())) {
+                moveSlot(getSlotIndex() - AUTO_SCROLL_GAP - 1); //to stop autoScroll
+            } else {
+                moveSlot(getSlotIndex() - 1);
+            }
+        }
+
+
+        private int getSlotMaxIndex() {
+            int slotMaxIndex;
+            if (getSlotWidth() == 0) {
+                slotMaxIndex = 0;
+            } else {
+                slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();
+            }
+            return slotMaxIndex;
+        }
+
+        private boolean isAutoScroll(int slotMaxIndex, int slotIndex) {
+            return (slotMaxIndex <= (slotIndex + AUTO_SCROLL_GAP));
+        }
+
+        private void autoScroll() {
+            int graphsMaxStartIndex = getGraphsSize() - getWorkspaceWidth();
+            if (graphsMaxStartIndex < 0) {
+                graphsMaxStartIndex = 0;
+            }
+
+            int slotMaxIndex;
+            if (divider == 0) {
+                slotMaxIndex = 0;
+            } else {
+                slotMaxIndex = graphsMaxStartIndex / divider;
+            }
+            int slotIndex = getSlotIndex();
+
+            if (isAutoScroll(slotMaxIndex, slotIndex)) {
+                for (GraphPanel panel : graphPanels) {
+                    panel.setStartIndex(graphsMaxStartIndex);
+                }
+                if (slotMaxIndex > slotIndex) {
+                    int compressedGraphsMaxStartIndex = slotMaxIndex + getSlotWidth() - getWorkspaceWidth();
+                    if (compressedGraphsMaxStartIndex < 0) {
+                        compressedGraphsMaxStartIndex = 0;
+                    }
+                    for (CompressedGraphPanel panel : compressedGraphPanels) {
+                        panel.setSlotIndex(slotMaxIndex);
+                        panel.setStartIndex(compressedGraphsMaxStartIndex);
+                    }
+                }
+            }
+            syncScroll();
+            repaint();
+        }
+
+
+        private void syncScroll() {
+            if (compressedGraphPanels != null) {
+                if (compressedGraphPanels.size() > 0) {
+                    CompressedGraphPanel panel = compressedGraphPanels.get(0);
+                    scrollablePanel.setPreferredSize(new Dimension(panel.getFullWidth(), 0));
+                    scrollPanel.getViewport().setViewPosition(new Point(panel.getStartIndex(), 0));
+                    scrollablePanel.revalidate(); // we always have to call component.revalidate() after changing it "directly"(outside the GUI)
+                    scrollPanel.repaint();
+                }
+            }
+        }
+
+        private void moveCompressedGraphs(int newStartIndex) {
+            int newSlotIndex = getSlotIndex();
+            if ((isSlotInWorkspace(newSlotIndex, newStartIndex) == -1)) {
+                newSlotIndex = newStartIndex;
+            }
+            if ((isSlotInWorkspace(newSlotIndex, newStartIndex) == 1)) {
+                newSlotIndex = newStartIndex + getWorkspaceWidth() - getSlotWidth();
+            }
+
+            for (CompressedGraphPanel panel : compressedGraphPanels) {
+                panel.setSlotIndex(newSlotIndex);
+                panel.setStartIndex(newStartIndex);
+                panel.repaint();
+            }
+
+            int GraphsNewStartIndex = newSlotIndex * divider;
+            for (GraphPanel panel : graphPanels) {
+                panel.setStartIndex(GraphsNewStartIndex);
+                panel.repaint();
+            }
+        }
+
+        private void moveScroll(int newScrollPosition) {
+            moveCompressedGraphs(newScrollPosition);
+        }
+
+
+        private int getSlotWidth() {
+            if (compressedGraphPanels == null) {
+                return 0;
+            }
+            if (compressedGraphPanels.size() == 0) {
+                return 0;
+            }
+            return compressedGraphPanels.get(0).getSlotWidth();
+        }
+
+
+        private int getSlotIndex() {
+            if (compressedGraphPanels == null) {
+                return 0;
+            }
+            if (compressedGraphPanels.size() == 0) {
+                return 0;
+            }
+            return compressedGraphPanels.get(0).getSlotIndex();
+        }
+
+        private int getGraphsSize() {
+            if (graphPanels == null) {
+                return 0;
+            }
+            if (graphPanels.size() == 0) {
+                return 0;
+            }
+            return graphPanels.get(0).getGraphsSize();
+        }
+
+        private int getCompressedGraphsSize() {
+            if (compressedGraphPanels == null) {
+                return 0;
+            }
+            if (compressedGraphPanels.size() == 0) {
+                return 0;
+            }
+            return compressedGraphPanels.get(0).getGraphsSize();
+        }
+
+
+        private int getCompressedGraphsStartIndex() {
+            if (compressedGraphPanels == null) {
+                return 0;
+            }
+            if (compressedGraphPanels.size() == 0) {
+                return 0;
+            }
+            return compressedGraphPanels.get(0).getStartIndex();
+        }
+
+
+        protected int getWorkspaceWidth() {
+            return (getSize().width - GraphPanel.X_INDENT);
+        }
+
     }
-
-    private void moveScroll(int newScrollPosition) {
-        moveCompressedGraphs(newScrollPosition);
-    }
-
-    int isSlotInWorkspace(int slotIndex, int startIndex) {
-        int slotWorkspacePosition = slotIndex - startIndex;
-        if ( slotWorkspacePosition <= 0 ) {
-            return -1;
-        }
-        if ( slotWorkspacePosition >= (getWorkspaceWidth() - getSlotWidth()) ) {
-            return 1;
-        }
-
-        return 0;
-    }
-
-    private int getSlotWidth() {
-        if (compressedGraphPanels == null){
-            return 0;
-        }
-        if (compressedGraphPanels.size() == 0) {
-            return 0;
-        }
-        return compressedGraphPanels.get(0).getSlotWidth();
-    }
-
-
-    private int getSlotIndex() {
-        if (compressedGraphPanels == null){
-            return 0;
-        }
-        if (compressedGraphPanels.size() == 0) {
-            return 0;
-        }
-        return compressedGraphPanels.get(0).getSlotIndex();
-    }
-
-    private int getGraphsSize() {
-        if (graphPanels == null){
-            return 0;
-        }
-        if (graphPanels.size() == 0) {
-            return 0;
-        }
-        return graphPanels.get(0).getGraphsSize();
-    }
-
-    private int getCompressedGraphsSize() {
-        if (compressedGraphPanels == null){
-            return 0;
-        }
-        if (compressedGraphPanels.size() == 0) {
-            return 0;
-        }
-        return compressedGraphPanels.get(0).getGraphsSize();
-    }
-
-    private int getGraphsStartIndex() {
-        if (graphPanels == null){
-            return 0;
-        }
-        if (graphPanels.size() == 0) {
-            return 0;
-        }
-        return graphPanels.get(0).getStartIndex();
-    }
-
-    private int getCompressedGraphsStartIndex() {
-        if (compressedGraphPanels == null){
-            return 0;
-        }
-        if (compressedGraphPanels.size() == 0) {
-            return 0;
-        }
-        return compressedGraphPanels.get(0).getStartIndex();
-    }
-
-
-    protected int getWorkspaceWidth() {
-        return (getSize().width - GraphPanel.X_INDENT);
-    }
-
-
 }
