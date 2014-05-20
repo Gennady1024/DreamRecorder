@@ -37,7 +37,7 @@ public class Controller {
 
             }
 
-            data1.add(x%25);
+            data1.add(x%33);
             data2.add(x%50);
 
             if (count%12 ==0) {

@@ -21,8 +21,8 @@ class CompressedGraphPanel extends GraphPanel {
     private Color slotColor = Color.MAGENTA;
 
 
-    CompressedGraphPanel(int weight, int frequency, int divider) {
-        super(weight, frequency);
+    CompressedGraphPanel(int weight, int divider) {
+        super(weight);
         this.divider = divider;
 
         //MouseListener to move Slot

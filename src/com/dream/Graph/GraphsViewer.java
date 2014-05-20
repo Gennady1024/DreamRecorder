@@ -18,9 +18,9 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphsViewer extends JPanel {
-    private int frequency;
     private int divider;
-    private long startTime;
+    private int frequency = 0;
+    private int startTime = 0;
 
     private ArrayList<GraphPanel> graphPanels = new ArrayList<GraphPanel>();
     private ArrayList<CompressedGraphPanel> compressedGraphPanels = new ArrayList<CompressedGraphPanel>();
@@ -30,8 +30,7 @@ public class GraphsViewer extends JPanel {
     private JScrollPane scrollPanel = new JScrollPane(scrollablePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     private ViewController viewController = new ViewController();
 
-    public GraphsViewer(int frequency, int divider) {
-        this.frequency = frequency;
+    public GraphsViewer(int divider) {
         this.divider = divider;
         setLayout(new BorderLayout());
 
@@ -67,16 +66,27 @@ public class GraphsViewer extends JPanel {
         });
     }
 
+    public void setStart(long starTime, int frequency) {
+        for (GraphPanel panel : graphPanels) {
+            panel.setStart(startTime, frequency);
+        }
+        for (CompressedGraphPanel panel : compressedGraphPanels) {
+            panel.setStart(startTime, frequency);
+        }
+
+    }
 
     public void addGraphPanel(int weight) {
-        GraphPanel panel = new GraphPanel(weight, frequency);
+        GraphPanel panel = new GraphPanel(weight);
+        panel.setStart(startTime, frequency);
         graphPanels.add(panel);
         PaintingPanel.add(panel);
         setPanelsPreferredSizes();
     }
 
     public void addCompressedGraphPanel(int weight) {
-        CompressedGraphPanel panel = new CompressedGraphPanel(weight, frequency / divider, divider);
+        CompressedGraphPanel panel = new CompressedGraphPanel(weight, divider);
+        panel.setStart(startTime, frequency / divider);
         panel.addSlotListener(viewController);
         compressedGraphPanels.add(panel);
         PaintingPanel.add(panel);
@@ -309,6 +319,16 @@ public class GraphsViewer extends JPanel {
                 return 0;
             }
             return graphPanels.get(0).getGraphsSize();
+        }
+
+        private int getGraphsStartIndex() {
+            if (graphPanels == null) {
+                return 0;
+            }
+            if (graphPanels.size() == 0) {
+                return 0;
+            }
+            return graphPanels.get(0).getStartIndex();
         }
 
         private int getCompressedGraphsSize() {

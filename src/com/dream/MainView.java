@@ -14,13 +14,13 @@ public class MainView extends JFrame {
     private GraphsViewer graphsViewer;
     private  JMenuBar menu = new JMenuBar();
 
-    public MainView(int frequency, int divider) {
+    public MainView(int divider) {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(title);
 
         formMenu();
 
-        graphsViewer = new GraphsViewer(frequency, divider);
+        graphsViewer = new GraphsViewer(divider);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
         graphsViewer.addGraphPanel(1);
         graphsViewer.addGraphPanel(2);

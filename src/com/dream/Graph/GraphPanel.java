@@ -25,15 +25,15 @@ class GraphPanel extends JPanel {
     protected static final Color axisColor = Color.GREEN;
     protected static final Color graphColor = Color.YELLOW;
 
+    protected int startIndex = 0;
     protected double zoom = 1;
     protected boolean isAutoZoom;
-    protected long startTime;
+    protected long startTime = 0;
     protected int weight = 1;
     protected int frequency = 0;
-    protected int startIndex = 0;
 
 
-    GraphPanel(int weight, int frequency) {
+    GraphPanel(int weight) {
         this.weight = weight;
         this.frequency = frequency;
         setBackground(bgColor);
@@ -46,11 +46,17 @@ class GraphPanel extends JPanel {
     }
 
 
-    int getStartIndex() {
+    protected void setStart(long starTime, int frequency) {
+            this.startTime = starTime;
+            this.frequency = frequency;
+    }
+
+
+    protected int getStartIndex() {
         return startIndex;
     }
 
-    void setStartIndex(int startIndex) {
+    protected void setStartIndex(int startIndex) {
         this.startIndex = startIndex;
     }
 
