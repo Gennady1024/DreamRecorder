@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,11 +76,11 @@ class CompressedGraphPanel extends GraphPanel {
     @Override
     protected void paintAxisX(Graphics g) {
         int MINUTE_STEP = (int)(60*frequency);  // graph points per minute
-        int TWO_MINUTES_STEP = (int)(2 * 60 * frequency);
-        int TEN_MINUTES_STEP = (int)(10 * 60 * frequency);
-        int THIRTY_MINUTES_STEP = (int)(30 * 60*frequency);
+        int MINUTES_2_STEP = (int)(2 * 60 * frequency);
+        int MINUTES_10_STEP = (int)(10 * 60 * frequency);
+        int MINUTES_30_STEP = (int)(30 * 60*frequency);
 
-        int THIRTY_MINUTES = 30 * 60 * 1000;//milliseconds
+        int MINUTES_30 = 30 * 60 * 1000;//milliseconds
 
         g.setColor(axisColor);
         Graphics2D g2d = (Graphics2D) g;
@@ -90,43 +89,28 @@ class CompressedGraphPanel extends GraphPanel {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            int position_minute = i*MINUTE_STEP;
-            int position_two_minutes = i*TWO_MINUTES_STEP;
-            int position_ten_minutes = i*TEN_MINUTES_STEP;
-            int position_thirty_minutes = i*THIRTY_MINUTES_STEP;
-
-            if(position_minute < getWorkspaceWidth()){
-                //paintPoint
-                g.drawLine(position_minute, 0, position_minute, 0);
-            }
-
-            if(position_two_minutes < getWorkspaceWidth()){
-                //paint T
-                g.drawLine(position_two_minutes - 1, 0, position_two_minutes + 1, 0);
-                g.drawLine(position_two_minutes, 0, position_two_minutes, 5);
-            }
-
-            if(position_ten_minutes < getWorkspaceWidth()){
+            if((i % MINUTES_10_STEP) == 0){
                 // Paint Triangle
-                GeneralPath triangle = new GeneralPath();
-                triangle.moveTo(position_ten_minutes - 3, 0);
-                triangle.lineTo(position_ten_minutes + 3, 0);
-                triangle.lineTo(position_ten_minutes, 6);
-                triangle.lineTo(position_ten_minutes - 3, 0);
-                g2d.fill(triangle);
+                g.fillPolygon(new int[]{i - 3, i + 3, i}, new int[]{0, 0, 6}, 3);
+            }
+            else if((i % MINUTES_2_STEP) == 0){
+                //paint T
+                g.drawLine(i - 1, 0, i + 1, 0);
+                g.drawLine(i, 0, i, 5);
+            }
+            else if((i % MINUTE_STEP) == 0){
+                // Paint Point
+                g.drawLine(i, 0, i, 0);
             }
 
-            if(position_thirty_minutes < getWorkspaceWidth()){
-                String timeStamp = dateFormat.format(new Date(startTime + i*THIRTY_MINUTES)) ;
+            if(((i % MINUTES_30_STEP) == 0)){
+                String timeStamp = dateFormat.format(new Date(startTime + i* MINUTES_30)) ;
                 // Paint Time Stamp
-                g.drawString(timeStamp, position_thirty_minutes - 15, +18);
+                g.drawString(timeStamp, i - 15, +18);
             }
         }
-
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
-
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {

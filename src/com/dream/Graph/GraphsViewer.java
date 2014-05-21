@@ -115,9 +115,6 @@ public class GraphsViewer extends JPanel {
         viewController.autoScroll();
     }
 
-
-
-
     private void setPanelsPreferredSizes() {
         Dimension d = getPreferredSize();
         int width = d.width;
@@ -137,7 +134,6 @@ public class GraphsViewer extends JPanel {
             panel.setPreferredSize(new Dimension(width, height * panel.getWeight() / sumWeight));
         }
     }
-
 
     class ViewController implements SlotListener {
         private static final int AUTO_SCROLL_GAP = 10; // bigger GAP - less precision need slot to start autoscroll

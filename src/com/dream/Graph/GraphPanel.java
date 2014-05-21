@@ -7,7 +7,6 @@ import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,7 +31,8 @@ class GraphPanel extends JPanel {
     protected int startIndex = 0;
     protected double zoom = 0.5;
     protected boolean isAutoZoom;
-    protected long startTime = System.currentTimeMillis();
+    protected boolean isXCentered;
+    protected long startTime = 0;
     protected int weight = 1;
     protected double frequency = 1;
 
@@ -137,9 +137,9 @@ class GraphPanel extends JPanel {
     }
 
     protected void paintAxisX(Graphics g) {
-        int HALF_SECOND_STEP = (int) frequency/2;  // graph points per half-second
+        int SECOND_HALF_STEP = (int) frequency/2;  // graph points per half-second
         int SECOND_STEP = (int) frequency;  // graph points per second
-        int TEN_SECONDS_STEP = (int) (10*frequency);
+        int SECONDS_10_STEP = (int) (10*frequency);
         int MINUTE_STEP = (int) (60*frequency);
 
         int MINUTE = 60*1000;//milliseconds
@@ -149,32 +149,24 @@ class GraphPanel extends JPanel {
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
 
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            int position_half_second = i*HALF_SECOND_STEP;
-            int position_second = i*SECOND_STEP;
-            int position_ten_seconds = i*TEN_SECONDS_STEP;
-            int position_minute = i*MINUTE_STEP;
-
-            if(position_half_second < getWorkspaceWidth()){
-                // Paint Point
-                g.drawLine(position_half_second, 0, position_half_second, 0);
-            }
-
-            if(position_second < getWorkspaceWidth()){
-                // Paint Stroke
-                g.drawLine(position_second, -2, position_second, +2);
-            }
-
-            if(position_ten_seconds < getWorkspaceWidth()){
+            if((i % SECONDS_10_STEP) == 0){
                 // Paint Rectangle
-                g.fillRect(position_ten_seconds-1, -4, 3, 9);
+                g.fillRect(i - 1, -4, 3, 9);
+            }
+            else if((i % SECOND_STEP) == 0){
+                // Paint Stroke
+                g.drawLine(i, -2, i, +2);
+            }
+            else if((i % SECOND_HALF_STEP) == 0){
+                // Paint Point
+                g.drawLine(i, 0, i, 0);
             }
 
-            if(position_minute < getWorkspaceWidth()){
+            if((i % MINUTE_STEP) == 0){
                 String timeStamp = dateFormat.format(new Date(startTime + i*MINUTE)) ;
                 // Paint Time Stamp
-                g.drawString(timeStamp, position_minute - 15, +18);
+                g.drawString(timeStamp, i - 15, +18);
             }
 
         }
