@@ -9,7 +9,7 @@ package com.dream;
  */
 public class RunDream {
     public static void main(String[] args) {
-      MainView mainWindow = new MainView(12);
+      MainView mainWindow = new MainView(120);
 
 
 

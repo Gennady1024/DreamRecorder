@@ -18,8 +18,8 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphsViewer extends JPanel {
-    private int divider;
-    private int frequency = 0;
+    private int divider = 120;
+    private double frequency = 10;
     private int startTime = 0;
 
     private ArrayList<GraphPanel> graphPanels = new ArrayList<GraphPanel>();
@@ -66,7 +66,7 @@ public class GraphsViewer extends JPanel {
         });
     }
 
-    public void setStart(long starTime, int frequency) {
+    public void setStart(long starTime, double frequency) {
         for (GraphPanel panel : graphPanels) {
             panel.setStart(startTime, frequency);
         }

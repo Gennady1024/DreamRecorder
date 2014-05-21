@@ -35,7 +35,7 @@ public class Controller {
             data1.add(x%33);
             data2.add((int)(Math.sin(x/20.0)*100));
 
-            if (count%12 ==0) {
+            if (count%120 ==0) {
                 data3.add(50);
             }
             count++;
@@ -54,7 +54,7 @@ public class Controller {
             data1.add(x%33);
             data2.add((int)(Math.sin(x/20.0)*100));
 
-            if (count%12 ==0) {
+            if (count%120 ==0) {
                 data3.add(50);
             }
             count++;

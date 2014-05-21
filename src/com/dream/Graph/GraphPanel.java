@@ -34,7 +34,7 @@ class GraphPanel extends JPanel {
     protected boolean isAutoZoom;
     protected long startTime = System.currentTimeMillis();
     protected int weight = 1;
-    protected int frequency = 10;
+    protected double frequency = 1;
 
 
     GraphPanel(int weight) {
@@ -49,9 +49,9 @@ class GraphPanel extends JPanel {
     }
 
 
-    protected void setStart(long starTime, int frequency) {
+    protected void setStart(long starTime, double frequency) {
             this.startTime = starTime;
-          //  this.frequency = frequency;
+            this.frequency = frequency;
     }
 
 
@@ -113,9 +113,6 @@ class GraphPanel extends JPanel {
         repaint();
     }
 
-
-
-
     protected void paintAxisY(Graphics g) {
 
         int minValueStep = 50;  //default value between two labels
@@ -138,6 +135,54 @@ class GraphPanel extends JPanel {
         }
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
     }
+
+    protected void paintAxisX(Graphics g) {
+        int HALF_SECOND_STEP = (int) frequency/2;  // graph points per half-second
+        int SECOND_STEP = (int) frequency;  // graph points per second
+        int TEN_SECONDS_STEP = (int) (10*frequency);
+        int MINUTE_STEP = (int) (60*frequency);
+
+        int MINUTE = 60*1000;//milliseconds
+
+        g.setColor(axisColor);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
+
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+
+        for (int i = 0; i  < getWorkspaceWidth(); i++) {
+            int position_half_second = i*HALF_SECOND_STEP;
+            int position_second = i*SECOND_STEP;
+            int position_ten_seconds = i*TEN_SECONDS_STEP;
+            int position_minute = i*MINUTE_STEP;
+
+            if(position_half_second < getWorkspaceWidth()){
+                // Paint Point
+                g.drawLine(position_half_second, 0, position_half_second, 0);
+            }
+
+            if(position_second < getWorkspaceWidth()){
+                // Paint Stroke
+                g.drawLine(position_second, -2, position_second, +2);
+            }
+
+            if(position_ten_seconds < getWorkspaceWidth()){
+                // Paint Rectangle
+                g.fillRect(position_ten_seconds-1, -4, 3, 9);
+            }
+
+            if(position_minute < getWorkspaceWidth()){
+                String timeStamp = dateFormat.format(new Date(startTime + i*MINUTE)) ;
+                // Paint Time Stamp
+                g.drawString(timeStamp, position_minute - 15, +18);
+            }
+
+        }
+
+        g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
+
+    }
+
 
     protected void transformCoordinate(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -197,79 +242,6 @@ class GraphPanel extends JPanel {
             }
         }
     }
-
-    protected void paintAxisX(Graphics g) {
-
-        int HALF_SECOND_STEP = frequency/2;  // graph points per half-second
-        int SECOND_STEP = frequency;
-        int TEN_SECONDS_STEP = 10*frequency;
-        int MINUTE_STEP = 60*frequency;
-        int TEN_MINUTES_STEP = 600*frequency;
-        int THIRTY_MINUTES_STEP = 30 * 60*frequency;
-
-        int MINUTE = 60*1000;//milliseconds
-
-        g.setColor(axisColor);
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
-
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-
-
-        int i = 1;
-        int position;
-        while ((position = i*HALF_SECOND_STEP)  < getWorkspaceWidth()) {
-            //paintPoint
-            g.drawLine(position, 0, position, 0);
-            i++;
-        }
-
-        i = 1;
-        while ((position = i*SECOND_STEP)  < getWorkspaceWidth()) {
-            //paintStroke
-            g.drawLine(position, -2, position, +2);
-            i++;
-        }
-
-        i = 1;
-        while ((position = i*TEN_SECONDS_STEP) < getWorkspaceWidth()) {
-            //paintRectangle
-            g.fillRect(position-1, -4, 3, 9);
-            i++;
-        }
-
-        i = 1;
-        while ((position = i*MINUTE_STEP) < getWorkspaceWidth()) {
-            String timeStamp = dateFormat.format(new Date(startTime + i*MINUTE)) ;
-            //paintTimeStamp
-            g.drawString(timeStamp, position - 15, +18);
-            i++;
-        }
-        g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
-
-    }
-
-
-    protected void paintT(Graphics g, int position) {
-        g.drawLine(position - 1, 0, position + 1, 0);
-        g.drawLine(position, 0, position, 5);
-    }
-
-    protected void paintTriangle(Graphics g, int position) {
-        Graphics2D g2d = (Graphics2D) g;
-        GeneralPath triangle = new GeneralPath();
-        triangle.moveTo(position - 3, 0);
-        triangle.lineTo(position + 3, 0);
-        triangle.lineTo(position, 6);
-        triangle.lineTo(position - 3, 0);
-        g2d.fill(triangle);
-    }
-
-
-
-
-
-
 }
 
 
