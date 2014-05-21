@@ -29,16 +29,30 @@ public class Controller {
         mainView.addCompressedGraph(1, data3);
 
         int count = 0;
-        for(int x = 0; x < 20000; x++) {
+        for(int x = 0; x < 2000; x++) {
+
+
+            data1.add(x%33);
+            data2.add((int)(Math.sin(x/20.0)*100));
+
+            if (count%12 ==0) {
+                data3.add(50);
+            }
+            count++;
+            mainView.syncView();
+
+        }
+
+        for(int x = 2000; x < 200000; x++) {
             try {
-                Thread.sleep(5);
+                Thread.sleep(1000);
 
             } catch (InterruptedException ex) {
 
             }
 
             data1.add(x%33);
-            data2.add(x%50);
+            data2.add((int)(Math.sin(x/20.0)*100));
 
             if (count%12 ==0) {
                 data3.add(50);
