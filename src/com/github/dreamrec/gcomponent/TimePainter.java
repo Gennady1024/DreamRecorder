@@ -22,6 +22,7 @@ public class TimePainter {
 
     protected void drawMarks(Graphics2D g, int step, IPainter<PositionedLabel> markPainter, ITimePainterModel timePainterModel) {
         long markTime = (timePainterModel.getStartGraphTime() / step + 1) * step;
+        long startTime = timePainterModel.getStartGraphTime();
         while (markPosition(markTime,timePainterModel) < timePainterModel.getXSize()) {
             int position =  markPosition(markTime, timePainterModel);
             String label = dateFormat.format(new Date(markTime)) ;

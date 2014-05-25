@@ -147,34 +147,38 @@ class GraphPanel extends JPanel {
     }
 
     protected void paintAxisX(Graphics g) {
-        int SECOND_HALF_STEP = (int) frequency/2;  // graph points per half-second
-        int SECOND_STEP = (int) frequency;  // graph points per second
-        int SECONDS_10_STEP = (int) (10*frequency);
-        int MINUTE_STEP = (int) (60*frequency);
 
-        int MINUTE = 60*1000;//milliseconds
+        int SECOND_HALF = 500; //milliseconds
+        int SECOND = 1000; //milliseconds
+        int SECONDS_10 = 10 * SECOND; //milliseconds
+        int MINUTE = 60*SECOND;//milliseconds
+
+        int POINT = 100;
 
         g.setColor(axisColor);
         Graphics2D g2d = (Graphics2D) g;
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
 
+
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        long newStartTime = (startTime/POINT)*POINT + POINT;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            if((i % SECONDS_10_STEP) == 0){
+            long iTime = newStartTime + (long)((startIndex + i) * POINT);
+            if((iTime % SECONDS_10) == 0){
                 // Paint Rectangle
                 g.fillRect(i - 1, -4, 3, 9);
             }
-            else if((i % SECOND_STEP) == 0){
+            else if((iTime % SECOND) == 0){
                 // Paint Stroke
                 g.drawLine(i, -2, i, +2);
             }
-            else if((i % SECOND_HALF_STEP) == 0){
+            else if((iTime % SECOND_HALF) == 0){
                 // Paint Point
                 g.drawLine(i, 0, i, 0);
             }
 
-            if((i % MINUTE_STEP) == 0){
-                String timeStamp = dateFormat.format(new Date(startTime + (startIndex+i)*MINUTE/MINUTE_STEP)) ;
+            if((iTime % MINUTE) == 0){
+                String timeStamp = dateFormat.format(new Date(iTime)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
             }

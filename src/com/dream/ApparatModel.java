@@ -13,6 +13,7 @@ import com.dream.Data.StreamData;
 public class ApparatModel {
     public static final int FREQUENCY = 10; //frequency Hz of the incoming data (for fast graphics)
     public static final int DIVIDER = 120; //frequency divider for big-scaled graphs
+    public final int PERIOD = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
 
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data

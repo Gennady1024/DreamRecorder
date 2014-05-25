@@ -75,36 +75,48 @@ class CompressedGraphPanel extends GraphPanel {
 
     @Override
     protected void paintAxisX(Graphics g) {
-        int MINUTE_STEP = (int)(60*frequency);  // graph points per minute
+    /*    int MINUTE_STEP = (int)(60*frequency);  // graph points per minute
         int MINUTES_2_STEP = (int)(2 * 60 * frequency);
         int MINUTES_10_STEP = (int)(10 * 60 * frequency);
-        int MINUTES_30_STEP = (int)(30 * 60*frequency);
+        int MINUTES_30_STEP = (int)(30 * 60*frequency);  */
 
-        int MINUTES_30 = 30 * 60 * 1000;//milliseconds
+        int MINUTE = 60 * 1000;//milliseconds
+        int MINUTES_2 = 2 * MINUTE;
+        int MINUTES_10 = 10 * MINUTE;
+        int MINUTES_30 = 30 * MINUTE;//milliseconds
+
+        int POINT = 12000;
 
         g.setColor(axisColor);
         Graphics2D g2d = (Graphics2D) g;
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
 
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-
+        if(startTime == 0 ) {
+            startTime = System.currentTimeMillis();
+        }
+        System.out.println("StartTime ms = " + startTime);
+        System.out.println("StartTime = " + dateFormat.format(new Date(startTime)));
+        long newStartTime = (startTime/POINT)*POINT + POINT;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            if((i % MINUTES_10_STEP) == 0){
+
+            long iTime = newStartTime + (long)((startIndex + i) * 12000);
+            if((iTime % MINUTES_10) == 0){
                 // Paint Triangle
                 g.fillPolygon(new int[]{i - 3, i + 3, i}, new int[]{0, 0, 6}, 3);
             }
-            else if((i % MINUTES_2_STEP) == 0){
+            else if((iTime % MINUTES_2) == 0){
                 //paint T
                 g.drawLine(i - 1, 0, i + 1, 0);
                 g.drawLine(i, 0, i, 5);
             }
-            else if((i % MINUTE_STEP) == 0){
+            else if((iTime % MINUTE) == 0){
                 // Paint Point
                 g.drawLine(i, 0, i, 0);
             }
 
-            if(((i % MINUTES_30_STEP) == 0)){
-                String timeStamp = dateFormat.format(new Date(startTime + (startIndex+i)*MINUTES_30/MINUTES_30_STEP)) ;
+            if(((iTime % MINUTES_30) == 0)){
+                String timeStamp = dateFormat.format(new Date(iTime)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
             }
