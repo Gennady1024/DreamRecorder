@@ -9,12 +9,10 @@ package com.dream;
  */
 public class RunDream {
     public static void main(String[] args) {
-      MainView mainWindow = new MainView(120);
-
-
-
-        Controller controller = new Controller(mainWindow);
-        controller.sendData();
+      ApparatModel model = new ApparatModel();
+      Controller controller = new Controller(model);
+      MainView mainWindow = new MainView(model, controller);
+      controller.setView(mainWindow);
 
     }
 }

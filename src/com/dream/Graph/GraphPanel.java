@@ -31,14 +31,15 @@ class GraphPanel extends JPanel {
     protected int startIndex = 0;
     protected double zoom = 0.5;
     protected boolean isAutoZoom;
-    protected boolean isXCentered;
+    protected boolean isXCentered = true;
     protected long startTime = 0;
     protected int weight = 1;
     protected double frequency = 1;
 
 
-    GraphPanel(int weight) {
+    GraphPanel(int weight, boolean isXCentered) {
         this.weight = weight;
+        this.isXCentered = isXCentered;
         setBackground(bgColor);
         // MouseListener to zoom Y_Axes
         addMouseWheelListener(new MouseWheelListener() {
@@ -49,9 +50,11 @@ class GraphPanel extends JPanel {
     }
 
 
-    protected void setStart(long starTime, double frequency) {
-            this.startTime = starTime;
+    protected void setStart(long startTime, double frequency) {
+            this.startTime = startTime;
             this.frequency = frequency;
+        System.out.println("frequency = " + frequency);
+        System.out.println("startTime = " + startTime);
     }
 
 
@@ -71,9 +74,6 @@ class GraphPanel extends JPanel {
         return (getSize().width - X_INDENT);
     }
 
-    protected int getWorkspaceHeight() {
-        return (getSize().height - Y_INDENT);
-    }
 
     protected int getFullWidth() {
         return X_INDENT + getGraphsSize();
@@ -89,6 +89,7 @@ class GraphPanel extends JPanel {
     }
 
     protected void addGraph(StreamData<Integer> graphData) {
+        System.out.println("add Graph ");
         int count = 0;
         while (graphs[count] != null) {
             count++;
@@ -122,7 +123,7 @@ class GraphPanel extends JPanel {
         g.setColor(axisColor);
 
         int valueStep = (int)(minPointStep/(zoom*minValueStep)+1)*minValueStep;
-        int numberOfColumns = (int)(getWorkspaceHeight()/(zoom*valueStep));
+        int numberOfColumns = (int)(getMaxY()/(zoom*valueStep));
         Graphics2D g2d = (Graphics2D) g;
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
 
@@ -133,6 +134,15 @@ class GraphPanel extends JPanel {
             String valueText = String.valueOf(gridValue);
             g.drawString(valueText, -25, -position+5);
         }
+
+        if(isXCentered) {
+            for (int i = 1; i < numberOfColumns+1; i++) {
+                long gridValue = (minValue/valueStep)*valueStep + i*valueStep;
+                int position = -(int)Math.round(zoom*(gridValue - minValue));
+                g.drawLine(12, -position, +18, -position);
+            }
+        }
+
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
     }
 
@@ -164,7 +174,7 @@ class GraphPanel extends JPanel {
             }
 
             if((i % MINUTE_STEP) == 0){
-                String timeStamp = dateFormat.format(new Date(startTime + i*MINUTE)) ;
+                String timeStamp = dateFormat.format(new Date(startTime + (startIndex+i)*MINUTE/MINUTE_STEP)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
             }
@@ -175,16 +185,23 @@ class GraphPanel extends JPanel {
 
     }
 
+    protected int getMaxY() {
+        if(isXCentered) {
+            return getSize().height/2;
+        }
+        return (getSize().height - Y_INDENT);
+    }
+
 
     protected void transformCoordinate(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.translate(X_INDENT, getWorkspaceHeight()); // move XY origin to the left bottom point
+        g2d.translate(X_INDENT, getMaxY()); // move XY origin to the left bottom point
         g2d.transform(AffineTransform.getScaleInstance(1, -1)); // flip Y-axis
     }
 
     protected void restoreCoordinate(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.translate(-X_INDENT, getWorkspaceHeight()); // move XY origin to the left top point
+        g2d.translate(-X_INDENT, getMaxY()); // move XY origin to the left top point
         g2d.transform(AffineTransform.getScaleInstance(1, -1)); // flip Y-axis and zoom it
     }
 

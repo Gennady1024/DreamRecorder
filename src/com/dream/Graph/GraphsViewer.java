@@ -66,26 +66,26 @@ public class GraphsViewer extends JPanel {
         });
     }
 
-    public void setStart(long starTime, double frequency) {
+    public void setStart(long startTime, double frequency) {
         for (GraphPanel panel : graphPanels) {
             panel.setStart(startTime, frequency);
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setStart(startTime, frequency);
+            panel.setStart(startTime, frequency/divider);
         }
 
     }
 
-    public void addGraphPanel(int weight) {
-        GraphPanel panel = new GraphPanel(weight);
+    public void addGraphPanel(int weight, boolean isXCentered) {
+        GraphPanel panel = new GraphPanel(weight, isXCentered);
         panel.setStart(startTime, frequency);
         graphPanels.add(panel);
         PaintingPanel.add(panel);
         setPanelsPreferredSizes();
     }
 
-    public void addCompressedGraphPanel(int weight) {
-        CompressedGraphPanel panel = new CompressedGraphPanel(weight, divider);
+    public void addCompressedGraphPanel(int weight, boolean isXCentered) {
+        CompressedGraphPanel panel = new CompressedGraphPanel(weight, divider, isXCentered);
         panel.setStart(startTime, frequency / divider);
         panel.addSlotListener(viewController);
         compressedGraphPanels.add(panel);
@@ -113,6 +113,10 @@ public class GraphsViewer extends JPanel {
 
     public void syncView() {
         viewController.autoScroll();
+        for(GraphPanel panel : graphPanels ) {
+            panel.repaint();
+            System.out.println("sysnc panel repaint");
+        }
     }
 
     private void setPanelsPreferredSizes() {

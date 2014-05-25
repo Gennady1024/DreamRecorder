@@ -25,8 +25,8 @@ class CompressedGraphPanel extends GraphPanel {
     private Color slotColor = Color.MAGENTA;
 
 
-    CompressedGraphPanel(int weight, int divider) {
-        super(weight);
+    CompressedGraphPanel(int weight, int divider, boolean isXCentered ) {
+        super(weight, isXCentered);
         this.divider = divider;
 
         //MouseListener to move Slot
@@ -69,7 +69,7 @@ class CompressedGraphPanel extends GraphPanel {
     private void paintSlot(Graphics g) {
         if(getSlotWidth() > 0) {
             g.setColor(slotColor);
-            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), g.getClipBounds().height - Y_INDENT);
+            g.drawRect(slotIndex - startIndex, 0, getSlotWidth(), getMaxY());
         }
     }
 
@@ -104,7 +104,7 @@ class CompressedGraphPanel extends GraphPanel {
             }
 
             if(((i % MINUTES_30_STEP) == 0)){
-                String timeStamp = dateFormat.format(new Date(startTime + i* MINUTES_30)) ;
+                String timeStamp = dateFormat.format(new Date(startTime + (startIndex+i)*MINUTES_30/MINUTES_30_STEP)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
             }
