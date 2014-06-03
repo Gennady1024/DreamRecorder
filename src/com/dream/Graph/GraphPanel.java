@@ -20,6 +20,7 @@ import java.util.Date;
  */
 class GraphPanel extends JPanel {
     protected StreamData<Integer>[] graphs = new StreamData[3];//panel can have a several graphs. Max 3 for simplicity
+
     protected static final int X_INDENT = 50;
     protected static final int Y_INDENT = 20;
     protected static final double ZOOM_PLUS_CHANGE = Math.sqrt(2.0);// 2 clicks(rotations) up increase zoom twice
@@ -34,7 +35,7 @@ class GraphPanel extends JPanel {
     protected boolean isXCentered = true;
     protected long startTime = 0;
     protected int weight = 1;
-    protected double frequency = 1;
+    protected int period_msec = 0; //milliseconds!!!  period of the incoming data
 
 
     GraphPanel(int weight, boolean isXCentered) {
@@ -50,11 +51,9 @@ class GraphPanel extends JPanel {
     }
 
 
-    protected void setStart(long startTime, double frequency) {
+    protected void setStart(long startTime, int period_msec) {
             this.startTime = startTime;
-            this.frequency = frequency;
-        System.out.println("frequency = " + frequency);
-        System.out.println("startTime = " + startTime);
+            this.period_msec = period_msec;
     }
 
 
@@ -153,7 +152,6 @@ class GraphPanel extends JPanel {
         int SECONDS_10 = 10 * SECOND; //milliseconds
         int MINUTE = 60*SECOND;//milliseconds
 
-        int POINT = 100;
 
         g.setColor(axisColor);
         Graphics2D g2d = (Graphics2D) g;
@@ -161,9 +159,9 @@ class GraphPanel extends JPanel {
 
 
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        long newStartTime = (startTime/POINT)*POINT + POINT;
+        long newStartTime = (startTime/period_msec)*period_msec + period_msec;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            long iTime = newStartTime + (long)((startIndex + i) * POINT);
+            long iTime = newStartTime + (long)((startIndex + i) * period_msec);
             if((iTime % SECONDS_10) == 0){
                 // Paint Rectangle
                 g.fillRect(i - 1, -4, 3, 9);
@@ -209,27 +207,43 @@ class GraphPanel extends JPanel {
         g2d.transform(AffineTransform.getScaleInstance(1, -1)); // flip Y-axis and zoom it
     }
 
+    protected void paintGraphs(Graphics g) {
+
+        for (StreamData<Integer> graph : graphs) {
+            if (graph != null) {
+                int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
+                VerticalLine vLine = new VerticalLine();
+                for (int x = 0; x < endIndex; x++) {
+                    int value = graph.get(x + startIndex);
+                    if(value == Integer.MAX_VALUE) {
+                        g.setColor(Color.RED);
+                        g.drawLine(x, 0, x, getMaxY()/4);
+                    }
+                    else{
+                        g.setColor(graphColor);
+                        int y = (int) Math.round(zoom * value);
+                        drawVerticalLine(g, x, y, vLine);
+                    }
+
+                }
+            }
+        }
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
         g.setColor(graphColor);
         transformCoordinate(g);
 
-        paintAxisX(g);
         paintAxisY(g);
 
-        g.setColor(graphColor);
-        for (StreamData<Integer> graph : graphs) {
-            if (graph != null) {
-                int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
-                VerticalLine vLine = new VerticalLine();
-                for (int x = 0; x < endIndex; x++) {
-                    int y = (int) Math.round(zoom * graph.get(x + startIndex));
-                    drawVerticalLine(g, x, y, vLine);
-                }
-            }
-
+        if(period_msec != 0) {
+            paintAxisX(g);
         }
+
+        paintGraphs(g);
+
         restoreCoordinate(g);
     }
 

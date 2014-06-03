@@ -42,7 +42,7 @@ public class FileIOManager {
 
     private void saveStateToStream(DataOutputStream outStream, ApparatModel model) throws IOException {
         outStream.writeLong(model.getStartTime());
-        outStream.writeDouble(model.FREQUENCY);
+        outStream.writeDouble(1000.0 / model.PERIOD_MSEC );
         for (int i = 0; i < model.getDataSize(); i++) {
             outStream.writeInt(model.getCh1DataList().get(i));
             outStream.writeInt(model.getCh2DataList().get(i));

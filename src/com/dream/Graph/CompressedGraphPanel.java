@@ -18,16 +18,15 @@ import java.util.Date;
  */
 class CompressedGraphPanel extends GraphPanel {
 
-
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
     private int slotIndex = 0;  // according to the beginning of Data arrays
-    private int divider = 1;
+    private int compression = 0;
     private Color slotColor = Color.MAGENTA;
 
 
-    CompressedGraphPanel(int weight, int divider, boolean isXCentered ) {
+    CompressedGraphPanel(int weight, int compression, boolean isXCentered ) {
         super(weight, isXCentered);
-        this.divider = divider;
+        this.compression = compression;
 
         //MouseListener to move Slot
         addMouseListener(new MouseAdapter() {
@@ -49,10 +48,7 @@ class CompressedGraphPanel extends GraphPanel {
     }
 
     int getSlotWidth() {
-        if (divider == 0) {
-            return 0;
-        }
-        return  getWorkspaceWidth()/divider;
+        return  getWorkspaceWidth() / compression;
     }
 
     public void addSlotListener(SlotListener slotListener) {
@@ -75,17 +71,11 @@ class CompressedGraphPanel extends GraphPanel {
 
     @Override
     protected void paintAxisX(Graphics g) {
-    /*    int MINUTE_STEP = (int)(60*frequency);  // graph points per minute
-        int MINUTES_2_STEP = (int)(2 * 60 * frequency);
-        int MINUTES_10_STEP = (int)(10 * 60 * frequency);
-        int MINUTES_30_STEP = (int)(30 * 60*frequency);  */
-
         int MINUTE = 60 * 1000;//milliseconds
         int MINUTES_2 = 2 * MINUTE;
         int MINUTES_10 = 10 * MINUTE;
         int MINUTES_30 = 30 * MINUTE;//milliseconds
 
-        int POINT = 12000;
 
         g.setColor(axisColor);
         Graphics2D g2d = (Graphics2D) g;
@@ -95,12 +85,11 @@ class CompressedGraphPanel extends GraphPanel {
         if(startTime == 0 ) {
             startTime = System.currentTimeMillis();
         }
-        System.out.println("StartTime ms = " + startTime);
-        System.out.println("StartTime = " + dateFormat.format(new Date(startTime)));
-        long newStartTime = (startTime/POINT)*POINT + POINT;
+
+        long newStartTime = (startTime/period_msec)*period_msec + period_msec;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
 
-            long iTime = newStartTime + (long)((startIndex + i) * 12000);
+            long iTime = newStartTime + (long)((startIndex + i) * period_msec);
             if((iTime % MINUTES_10) == 0){
                 // Paint Triangle
                 g.fillPolygon(new int[]{i - 3, i + 3, i}, new int[]{0, 0, 6}, 3);

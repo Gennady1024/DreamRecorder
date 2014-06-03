@@ -3,6 +3,7 @@ package com.dream;
 import com.dream.Data.StreamData;
 import com.dream.Filters.DreamOverviewFilter;
 import com.dream.Filters.HiPassFilter;
+import com.dream.Filters.StreamDataAdapter;
 import com.dream.Graph.GraphsViewer;
 
 import javax.swing.*;
@@ -28,15 +29,27 @@ public class MainView extends JFrame {
 
         formMenu();
 
-        graphsViewer = new GraphsViewer(model.DIVIDER);
+        graphsViewer = new GraphsViewer(model.COMPRESSION);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
 
-        graphsViewer.addGraph(1, new HiPassFilter(model.getCh1DataList(), 50));
-        graphsViewer.addCompressedGraph(0, new DreamOverviewFilter(model.getCh1DataList(), model.DIVIDER));
+        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getAccGraphData(index);
+            }
+        });
+        graphsViewer.addGraph(1, new StreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getHiPassData(index);
+            }
+        });
+
+        graphsViewer.addCompressedGraph(0, new DreamOverviewFilter(model.getCh1DataList(), model.COMPRESSION));
 
         add(graphsViewer, BorderLayout.CENTER);
 
@@ -54,8 +67,8 @@ public class MainView extends JFrame {
         JOptionPane.showMessageDialog(this, s);
     }
 
-    public void setStart(long starTime, double frequency) {
-        graphsViewer.setStart(starTime, frequency);
+    public void setStart(long starTime, int period_msec) {
+        graphsViewer.setStart(starTime, period_msec);
     }
 
     private Dimension getWorkspaceDimention() {

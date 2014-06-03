@@ -11,7 +11,7 @@ import com.dream.Data.StreamData;
  */
 public abstract class AbstractFilter<T> implements StreamData {
     protected final StreamData<T> inputData;
-    protected int divider = 1;
+    protected int compression = 1;
 
     public AbstractFilter(StreamData<T> inputData) {
         this.inputData = inputData;
@@ -19,7 +19,7 @@ public abstract class AbstractFilter<T> implements StreamData {
 
 
     public final int size() {
-        return inputData.size()/divider;
+        return inputData.size()/compression;
     }
 
 

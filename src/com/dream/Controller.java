@@ -36,7 +36,7 @@ public class Controller {
             int fileChooserState = fileChooser.showOpenDialog(mainWindow);
             if (fileChooserState == JFileChooser.APPROVE_OPTION) {
                 new FileIOManager().readFromFile(fileChooser.getSelectedFile(), model);
-                mainWindow.setStart(model.getStartTime(), model.FREQUENCY);
+                mainWindow.setStart(model.getStartTime(), model.PERIOD_MSEC);
             }
         } catch (ApplicationException e) {
             mainWindow.showMessage(e.getMessage());

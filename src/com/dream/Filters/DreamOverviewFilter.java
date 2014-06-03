@@ -11,9 +11,9 @@ import com.dream.Data.StreamData;
  */
 public class DreamOverviewFilter extends AbstractFilter<Integer> {
 
-    public DreamOverviewFilter(StreamData<Integer> inputData, int divider) {
+    public DreamOverviewFilter(StreamData<Integer> inputData, int compression) {
         super(inputData);
-        this.divider = divider;
+        this.compression = compression;
     }
 
     @Override
@@ -21,11 +21,11 @@ public class DreamOverviewFilter extends AbstractFilter<Integer> {
         if(index == 0) return 0;
         int sum = 0;
 
-        for (int i = 0; i < divider; i++) {
-            sum += Math.abs(Math.abs(inputData.get(index*divider + i) - inputData.get(index*divider + i - 1)));
+        for (int i = 0; i < compression; i++) {
+            sum += Math.abs(Math.abs(inputData.get(index*compression + i) - inputData.get(index*compression + i - 1)));
 
         }
-        return sum/divider;
+        return sum/compression;
 
 
     }

@@ -18,9 +18,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphsViewer extends JPanel {
-    private int divider = 120;
-    private double frequency = 10;
-    private int startTime = 0;
+    private int compression = 120;
 
     private ArrayList<GraphPanel> graphPanels = new ArrayList<GraphPanel>();
     private ArrayList<CompressedGraphPanel> compressedGraphPanels = new ArrayList<CompressedGraphPanel>();
@@ -30,8 +28,8 @@ public class GraphsViewer extends JPanel {
     private JScrollPane scrollPanel = new JScrollPane(scrollablePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     private ViewController viewController = new ViewController();
 
-    public GraphsViewer(int divider) {
-        this.divider = divider;
+    public GraphsViewer(int compression) {
+        this.compression = compression;
         setLayout(new BorderLayout());
 
         PaintingPanel.setLayout(new BoxLayout(PaintingPanel, BoxLayout.Y_AXIS));
@@ -66,27 +64,25 @@ public class GraphsViewer extends JPanel {
         });
     }
 
-    public void setStart(long startTime, double frequency) {
+    public void setStart(long startTime, int period_msec) {
         for (GraphPanel panel : graphPanels) {
-            panel.setStart(startTime, frequency);
+            panel.setStart(startTime, period_msec);
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setStart(startTime, frequency/divider);
+            panel.setStart(startTime, period_msec * compression);
         }
 
     }
 
     public void addGraphPanel(int weight, boolean isXCentered) {
         GraphPanel panel = new GraphPanel(weight, isXCentered);
-        panel.setStart(startTime, frequency);
         graphPanels.add(panel);
         PaintingPanel.add(panel);
         setPanelsPreferredSizes();
     }
 
     public void addCompressedGraphPanel(int weight, boolean isXCentered) {
-        CompressedGraphPanel panel = new CompressedGraphPanel(weight, divider, isXCentered);
-        panel.setStart(startTime, frequency / divider);
+        CompressedGraphPanel panel = new CompressedGraphPanel(weight, compression, isXCentered);
         panel.addSlotListener(viewController);
         compressedGraphPanels.add(panel);
         PaintingPanel.add(panel);
@@ -168,7 +164,7 @@ public class GraphsViewer extends JPanel {
                 panel.repaint();
             }
 
-            int GraphsNewStartIndex = newSlotIndex * divider;
+            int GraphsNewStartIndex = newSlotIndex * compression;
             for (GraphPanel panel : graphPanels) {
                 panel.setStartIndex(GraphsNewStartIndex);
                 panel.repaint();
@@ -224,11 +220,7 @@ public class GraphsViewer extends JPanel {
             }
 
             int slotMaxIndex;
-            if (divider == 0) {
-                slotMaxIndex = 0;
-            } else {
-                slotMaxIndex = graphsMaxStartIndex / divider;
-            }
+            slotMaxIndex = graphsMaxStartIndex / compression;
             int slotIndex = getSlotIndex();
 
             if (isAutoScroll(slotMaxIndex, slotIndex)) {
@@ -278,7 +270,7 @@ public class GraphsViewer extends JPanel {
                 panel.repaint();
             }
 
-            int GraphsNewStartIndex = newSlotIndex * divider;
+            int GraphsNewStartIndex = newSlotIndex * compression;
             for (GraphPanel panel : graphPanels) {
                 panel.setStartIndex(GraphsNewStartIndex);
                 panel.repaint();

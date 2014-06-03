@@ -13,6 +13,5 @@ public class RunDream {
       Controller controller = new Controller(model);
       MainView mainWindow = new MainView(model, controller);
       controller.setView(mainWindow);
-
     }
 }
