@@ -1,7 +1,6 @@
 package com.dream;
 
 import com.dream.Data.DataList;
-import com.dream.Data.StreamData;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,10 +21,21 @@ public class ApparatModel {
     private final int ACC_X_NULL = -1088;
     private final int ACC_Y_NULL =  1630;
     private final int ACC_Z_NULL =  4500;
-    private int MOVEMENT_MAX = 3;
+    private double movement_limit = 3;
+    private final double  MOVEMENT_LIMIT_CHANGE  = 1.05;
+    private final int FALLING_ASLEEP_TIME_MIN = 60; // seconds
+
 
     private long startTime; //time when data recording was started
 
+
+    public void movementLimitUp() {
+           movement_limit *= MOVEMENT_LIMIT_CHANGE;
+    }
+
+    public void movementLimitDown() {
+        movement_limit /= MOVEMENT_LIMIT_CHANGE;
+    }
 
     /**
      *  Определяем величину пропорциональную движению головы
@@ -53,7 +63,16 @@ public class ApparatModel {
 
 
     private boolean isSleep(int index) {
-        return (getAccMovement(index) < MOVEMENT_MAX);
+        int data_number = FALLING_ASLEEP_TIME_MIN * 1000 / PERIOD_MSEC;
+        for(int i=0; i< data_number; i++) {
+             if( (index - i) >= 0 ){
+                 if(getAccMovement(index - i) > movement_limit) {
+                     return false;
+                 }
+             }
+
+        }
+        return true;
     }
 
     public int getHiPassData(int index) {
@@ -86,6 +105,35 @@ public class ApparatModel {
                 return out;
     }
 
+    public int getAccLimitData() {
+        int  INT_SCALE = 50;
+        int out;
+        int dXYZ = (int)(movement_limit*INT_SCALE);
+
+        if (dXYZ <= 0) out = dXYZ / 2;
+        else
+        if (dXYZ >= 100) out = dXYZ / 10 + 100;
+        else
+            out = dXYZ;
+
+        return out;
+    }
+
+
+    public int getCompressedDreamGraph(int index) {
+        if(index == 0) return 0;
+        int sum = 0;
+
+        for (int i = 0; i < COMPRESSION; i++) {
+            if(!isSleep(index*COMPRESSION + i)) {
+                return Integer.MAX_VALUE;
+            }
+            else{
+                sum += Math.abs(Math.abs(chanel_1_data.get(index*COMPRESSION + i) - chanel_1_data.get(index*COMPRESSION + i - 1)));
+            }
+        }
+        return sum/COMPRESSION;
+    }
 
     private int getNormalizedDataAcc1(int index) {
         return (acc_1_data.get(index) - ACC_X_NULL);
@@ -105,6 +153,10 @@ public class ApparatModel {
 
     public int getDataSize() {
         return chanel_1_data.size();
+    }
+
+    public int getCompressedDataSize() {
+        return chanel_1_data.size()/COMPRESSION;
     }
 
     public long getStartTime() {

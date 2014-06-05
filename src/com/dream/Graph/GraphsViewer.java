@@ -45,7 +45,7 @@ public class GraphsViewer extends JPanel {
         });
         add(scrollPanel, BorderLayout.SOUTH);
 
-        setFocusable(true); //only that way KeyListeners work
+        //setFocusable(true); //only that way KeyListeners work
 
         // Key Listener to move Slot
         addKeyListener(new KeyAdapter() {
@@ -111,7 +111,6 @@ public class GraphsViewer extends JPanel {
         viewController.autoScroll();
         for(GraphPanel panel : graphPanels ) {
             panel.repaint();
-            System.out.println("sysnc panel repaint");
         }
     }
 

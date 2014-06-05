@@ -88,7 +88,6 @@ class GraphPanel extends JPanel {
     }
 
     protected void addGraph(StreamData<Integer> graphData) {
-        System.out.println("add Graph ");
         int count = 0;
         while (graphs[count] != null) {
             count++;

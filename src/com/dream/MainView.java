@@ -1,6 +1,7 @@
 package com.dream;
 
 import com.dream.Data.StreamData;
+import com.dream.Filters.CompressedStreamDataAdapter;
 import com.dream.Filters.DreamOverviewFilter;
 import com.dream.Filters.HiPassFilter;
 import com.dream.Filters.StreamDataAdapter;
@@ -10,6 +11,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 /**
  * Main Window of our program...
@@ -18,16 +21,34 @@ public class MainView extends JFrame {
     private String title = "Dream Recorder";
     private GraphsViewer graphsViewer;
     private  JMenuBar menu = new JMenuBar();
-    private ApparatModel model;
+    private  ApparatModel model;
     private Controller controller;
 
-    public MainView(ApparatModel model, Controller controller) {
-        this.model = model;
+    public MainView(ApparatModel apparatModel, Controller controller) {
+        model = apparatModel;
         this.controller = controller;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle(title);
 
         formMenu();
+
+        // Key Listener to change MovementLimit in model
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                int key = e.getKeyCode();
+                if (key == KeyEvent.VK_UP) {
+                    model.movementLimitUp();
+                    graphsViewer.syncView();
+                }
+
+                if (key == KeyEvent.VK_DOWN) {
+                    model.movementLimitDown();
+                    graphsViewer.syncView();
+                }
+            }
+        });
 
         graphsViewer = new GraphsViewer(model.COMPRESSION);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
@@ -42,6 +63,14 @@ public class MainView extends JFrame {
                 return getModel().getAccGraphData(index);
             }
         });
+
+        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getAccLimitData();
+            }
+        });
+
         graphsViewer.addGraph(1, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
@@ -49,7 +78,13 @@ public class MainView extends JFrame {
             }
         });
 
-        graphsViewer.addCompressedGraph(0, new DreamOverviewFilter(model.getCh1DataList(), model.COMPRESSION));
+
+        graphsViewer.addCompressedGraph(0, new CompressedStreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getCompressedDreamGraph(index);
+            }
+        });
 
         add(graphsViewer, BorderLayout.CENTER);
 
