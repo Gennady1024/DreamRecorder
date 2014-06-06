@@ -10,6 +10,7 @@ import com.dream.Data.DataList;
  * To change this template use File | Settings | File Templates.
  */
 public class ApparatModel {
+
     public static final int COMPRESSION = 120; //compression for big-scaled graphs
     public static final int PERIOD_MSEC = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
@@ -37,17 +38,7 @@ public class ApparatModel {
         movement_limit *= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
         for(int i=0; i < getDataSize(); i++){
-            if (isMoved(i)) {
-                sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
-            }
-            if (sleepTimer > 0) {
-                sleep_data.set(i, 0);
-                sleepTimer--;
-            }
-            else {
-                sleep_data.set(i, 1);
-            }
-
+            setSleepData(i);
         }
     }
 
@@ -55,17 +46,25 @@ public class ApparatModel {
         movement_limit /= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
         for(int i=0; i < getDataSize(); i++){
-            if (isMoved(i)) {
-                sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
-            }
-            if (sleepTimer > 0) {
-                sleep_data.set(i, 0);
-                sleepTimer--;
-            }
-            else {
-                sleep_data.set(i, 1);
-            }
+          setSleepData(i);
+        }
+    }
 
+    private void setSleepData(int index) {
+        if (isMoved(index)) {
+            sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
+        }
+        int isSleep = 1;
+        if (sleepTimer > 0) {
+            isSleep = 0;
+            sleepTimer--;
+        }
+
+        if(index < sleep_data.size()){
+            sleep_data.set(index, isSleep);
+        }
+        else {
+            sleep_data.add(isSleep);
         }
     }
 
@@ -111,19 +110,6 @@ public class ApparatModel {
     }
 
 
-    private void addSleepData() {
-        if (isMoved(getDataSize()-1)) {
-            sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
-        }
-        if (sleepTimer > 0) {
-            sleep_data.add(0);
-            sleepTimer--;
-        }
-        else {
-            sleep_data.add(1);
-        }
-
-    }
 
     public int getHiPassData(int index) {
         int bufferSize = 50;
@@ -243,45 +229,33 @@ public class ApparatModel {
         return acc_3_data;
     }
 
-    public void addCh1Data(int data) {
+    private void addData(int data, DataList<Integer> dataStore) {
         int size = getDataSize();
-        chanel_1_data.add(data);
+        dataStore.add(data);
         if (getDataSize() > size) {
-            addSleepData();
+            setSleepData(getDataSize()-1);     // add SleepData
         }
+    }
+
+    public void addCh1Data(int data) {
+        addData(data, chanel_1_data);
     }
 
     public void addCh2Data(int data) {
-        int size = getDataSize();
-        chanel_2_data.add(data);
-        if (getDataSize() > size) {
-            addSleepData();
-        }
+        addData(data, chanel_2_data);
     }
 
     public void addAcc1Data(int data) {
-        int size = getDataSize();
-        acc_1_data.add(data);
-        if (getDataSize() > size) {
-            addSleepData();
-        }
+        addData(data, acc_1_data);
     }
 
 
     public void addAcc2Data(int data) {
-        int size = getDataSize();
-        acc_2_data.add(data);
-        if (getDataSize() > size) {
-            addSleepData();
-        }
+        addData(data, acc_2_data);
 
     }
 
     public void addAcc3Data(int data) {
-        int size = getDataSize();
-        acc_3_data.add(data);
-        if (getDataSize() > size) {
-            addSleepData();
-        }
+        addData(data, acc_3_data);
     }
 }
