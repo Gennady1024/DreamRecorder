@@ -45,7 +45,7 @@ public class GraphsViewer extends JPanel {
         });
         add(scrollPanel, BorderLayout.SOUTH);
 
-        //setFocusable(true); //only that way KeyListeners work
+        setFocusable(true); //only that way KeyListeners work
 
         // Key Listener to move Slot
         addKeyListener(new KeyAdapter() {
@@ -200,12 +200,8 @@ public class GraphsViewer extends JPanel {
 
         private int getSlotMaxIndex() {
             int slotMaxIndex;
-            if (getSlotWidth() == 0) {
-                slotMaxIndex = 0;
-            } else {
-                slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();
-            }
-            return slotMaxIndex;
+            slotMaxIndex = getCompressedGraphsSize() - getSlotWidth();
+            return Math.max(0,slotMaxIndex);
         }
 
         private boolean isAutoScroll(int slotMaxIndex, int slotIndex) {

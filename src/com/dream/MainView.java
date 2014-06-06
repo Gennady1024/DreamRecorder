@@ -1,9 +1,6 @@
 package com.dream;
 
-import com.dream.Data.StreamData;
 import com.dream.Filters.CompressedStreamDataAdapter;
-import com.dream.Filters.DreamOverviewFilter;
-import com.dream.Filters.HiPassFilter;
 import com.dream.Filters.StreamDataAdapter;
 import com.dream.Graph.GraphsViewer;
 
@@ -61,21 +58,28 @@ public class MainView extends JFrame {
         graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
-                return getModel().getAccGraphData(index);
+                return getModel().getAccGraphData(index, false);
             }
         });
 
         graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
-                return getModel().getAccLimitData();
+                return getModel().getAccGraphData(index, true);
+            }
+        });
+
+        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getAccPosition(index);
             }
         });
 
         graphsViewer.addGraph(1, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
-                return getModel().getHiPassData(index);
+                return getModel().getHiPassedData(index);
             }
         });
 
@@ -87,9 +91,25 @@ public class MainView extends JFrame {
             }
         });
 
+        graphsViewer.addCompressedGraph(1, new CompressedStreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getCompressedAccPosition(index);
+            }
+        });
+
+        graphsViewer.addCompressedGraph(1, new CompressedStreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getCompressedAccMovement(index);
+            }
+        });
+
+
         add(graphsViewer, BorderLayout.CENTER);
 
         pack();
+        setFocusable(true);
         setVisible(true);
     }
 

@@ -26,7 +26,8 @@ public class SlowAccelerometerFilter extends AbstractFilter<Integer> {
         int sum = 0;
         int incomingDataIndex = index*divider - 1;
         for (int i = 0; i < divider; i++) {
-            sum += (inputData.get(incomingDataIndex - i)) + accelerometerDynamicFilter.get(incomingDataIndex - i);
+           // sum += (inputData.get(incomingDataIndex - i)) + accelerometerDynamicFilter.get(incomingDataIndex - i);
+            sum += inputData.get(incomingDataIndex - i);
         }
         return sum/divider;
     }

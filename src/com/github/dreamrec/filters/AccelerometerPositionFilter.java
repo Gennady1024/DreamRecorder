@@ -1,8 +1,5 @@
 package com.github.dreamrec.filters;
 
-import com.github.dreamrec.filters.AbstractFilter;
-import com.github.dreamrec.filters.Filter;
-
 /**
  *  Вычисляет угол поворота головы. Модуль с акселерометром расположен на макушке.
  *  Ноль - когда лежим на спине, лищо вверх.
@@ -15,9 +12,9 @@ public class AccelerometerPositionFilter extends AbstractFilter<Integer> {
     protected int divider = 1;
     protected final Filter<Integer> yData;
     protected final Filter<Integer> zData;
-    private final int data_mod = 16000;
-    private       int X_data_mod  = data_mod, Y_data_mod = data_mod, Z_data_mod = data_mod;
-    private final int data_Sin_45 = data_mod *3363/4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
+    private final int DATA_SIN_90 = 16000;
+    private       int X_data_mod  = DATA_SIN_90, Y_data_mod = DATA_SIN_90, Z_data_mod = DATA_SIN_90;
+    private final int data_Sin_45 = DATA_SIN_90 *3363/4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
 
     private final int Sin_90 = 1800/4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
     private int X_mod = Sin_90, Y_mod = Sin_90, Z_mod = 90;

@@ -27,7 +27,7 @@ class GraphPanel extends JPanel {
     protected static final double ZOOM_MINUS_CHANGE = 1 / ZOOM_PLUS_CHANGE; // similarly 2 clicks(rotations) down reduces zoom twice
     protected static final Color bgColor = Color.BLACK;
     protected static final Color axisColor = Color.GREEN;
-    protected static final Color graphColor = Color.YELLOW;
+    protected static final Color graphColors[] = {Color.YELLOW, Color.RED, Color.CYAN};
 
     protected int startIndex = 0;
     protected double zoom = 0.5;
@@ -207,8 +207,10 @@ class GraphPanel extends JPanel {
     }
 
     protected void paintGraphs(Graphics g) {
-
+        int graph_number = 0;
         for (StreamData<Integer> graph : graphs) {
+            Color graphColor = graphColors[graph_number];
+            graph_number++;
             if (graph != null) {
                 int endIndex = Math.min(getWorkspaceWidth(), (graph.size() - startIndex));
                 VerticalLine vLine = new VerticalLine();
@@ -232,7 +234,6 @@ class GraphPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);    //To change body of overridden methods use File | Settings | File Templates.
-        g.setColor(graphColor);
         transformCoordinate(g);
 
         paintAxisY(g);
