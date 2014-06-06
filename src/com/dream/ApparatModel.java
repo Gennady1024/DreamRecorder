@@ -15,26 +15,58 @@ public class ApparatModel {
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
     private DataList<Integer> acc_1_data = new DataList<Integer>();   //list with accelerometer 1 chanel data
-    private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 1 chanel data
-    private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 1 chanel data
+    private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 2 chanel data
+    private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
+    private DataList<Integer> sleep_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
+
+    private int sleepTimer = 0;
 
     private final int ACC_X_NULL = -1088;
     private final int ACC_Y_NULL =  1630;
     private final int ACC_Z_NULL =  4500;
     private double movement_limit = 3;
     private final double  MOVEMENT_LIMIT_CHANGE  = 1.05;
-    private final int FALLING_ASLEEP_TIME_MIN = 60; // seconds
+    private final int FALLING_ASLEEP_TIME = 60; // seconds
 
 
     private long startTime; //time when data recording was started
 
 
+
     public void movementLimitUp() {
-           movement_limit *= MOVEMENT_LIMIT_CHANGE;
+        movement_limit *= MOVEMENT_LIMIT_CHANGE;
+        sleepTimer = 0;
+        for(int i=0; i < getDataSize(); i++){
+            if (isMoved(i)) {
+                sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
+            }
+            if (sleepTimer > 0) {
+                sleep_data.set(i, 0);
+                sleepTimer--;
+            }
+            else {
+                sleep_data.set(i, 1);
+            }
+
+        }
     }
 
     public void movementLimitDown() {
         movement_limit /= MOVEMENT_LIMIT_CHANGE;
+        sleepTimer = 0;
+        for(int i=0; i < getDataSize(); i++){
+            if (isMoved(i)) {
+                sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
+            }
+            if (sleepTimer > 0) {
+                sleep_data.set(i, 0);
+                sleepTimer--;
+            }
+            else {
+                sleep_data.set(i, 1);
+            }
+
+        }
     }
 
     /**
@@ -63,16 +95,34 @@ public class ApparatModel {
 
 
     private boolean isSleep(int index) {
-        int data_number = FALLING_ASLEEP_TIME_MIN * 1000 / PERIOD_MSEC;
-        for(int i=0; i< data_number; i++) {
-             if( (index - i) >= 0 ){
-                 if(getAccMovement(index - i) > movement_limit) {
-                     return false;
-                 }
-             }
-
+        if(sleep_data.get(index)==1){
+            return true;
         }
-        return true;
+         return false;
+    }
+
+
+
+    private boolean isMoved(int index) {
+        if(getAccMovement(index) > movement_limit) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private void addSleepData() {
+        if (isMoved(getDataSize()-1)) {
+            sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
+        }
+        if (sleepTimer > 0) {
+            sleep_data.add(0);
+            sleepTimer--;
+        }
+        else {
+            sleep_data.add(1);
+        }
+
     }
 
     public int getHiPassData(int index) {
@@ -152,7 +202,13 @@ public class ApparatModel {
 
 
     public int getDataSize() {
-        return chanel_1_data.size();
+        int size = chanel_1_data.size();
+        size = Math.min(size,chanel_2_data.size());
+        size = Math.min(size,acc_1_data.size());
+        size = Math.min(size,acc_2_data.size());
+        size = Math.min(size,acc_3_data.size());
+
+        return size;
     }
 
     public int getCompressedDataSize() {
@@ -188,22 +244,44 @@ public class ApparatModel {
     }
 
     public void addCh1Data(int data) {
+        int size = getDataSize();
         chanel_1_data.add(data);
+        if (getDataSize() > size) {
+            addSleepData();
+        }
     }
 
     public void addCh2Data(int data) {
+        int size = getDataSize();
         chanel_2_data.add(data);
+        if (getDataSize() > size) {
+            addSleepData();
+        }
     }
 
     public void addAcc1Data(int data) {
+        int size = getDataSize();
         acc_1_data.add(data);
+        if (getDataSize() > size) {
+            addSleepData();
+        }
     }
 
+
     public void addAcc2Data(int data) {
+        int size = getDataSize();
         acc_2_data.add(data);
+        if (getDataSize() > size) {
+            addSleepData();
+        }
+
     }
 
     public void addAcc3Data(int data) {
+        int size = getDataSize();
         acc_3_data.add(data);
+        if (getDataSize() > size) {
+            addSleepData();
+        }
     }
 }

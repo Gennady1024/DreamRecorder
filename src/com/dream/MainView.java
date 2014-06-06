@@ -37,6 +37,7 @@ public class MainView extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 super.keyPressed(e);
+                graphsViewer.dispatchEvent(e); // send KeyEvent to graphsViewer
                 int key = e.getKeyCode();
                 if (key == KeyEvent.VK_UP) {
                     model.movementLimitUp();
