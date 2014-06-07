@@ -52,6 +52,7 @@ public class MainView extends JFrame {
         graphsViewer.setPreferredSize(getWorkspaceDimention());
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
+        graphsViewer.addGraphPanel(1, true);
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
 
@@ -69,19 +70,30 @@ public class MainView extends JFrame {
             }
         });
 
-        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
+      /*  graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
                 return getModel().getAccPosition(index);
             }
-        });
+        });  */
+
+
 
         graphsViewer.addGraph(1, new StreamDataAdapter<Integer>(model) {
             @Override
             public Integer get(int index) {
-                return getModel().getHiPassedData(index);
+                return getModel().getHiPassedData(index, 600);
             }
         });
+
+        graphsViewer.addGraph(2, new StreamDataAdapter<Integer>(model) {
+            @Override
+            public Integer get(int index) {
+                return getModel().getLowPassData(index);
+            }
+        });
+
+
 
 
         graphsViewer.addCompressedGraph(0, new CompressedStreamDataAdapter<Integer>(model) {

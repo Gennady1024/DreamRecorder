@@ -20,7 +20,7 @@ public class ApparatModel {
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
     private DataList<Integer> sleep_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
 
-    private final int SIN_90 = 1800/4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
+    private final int SIN_90 = 1800 / 4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
     private final int ACC_X_NULL = -1088;
     private final int ACC_Y_NULL = 1630;
     private final int ACC_Z_NULL = 4500;
@@ -52,31 +52,6 @@ public class ApparatModel {
             setSleepData(i);
         }
     }
-
- /*   private void setSleepData(int index) {
-        if (isMoved(index)) {
-            moveTimer = SHORT_MOVE_TIME * 1000 / PERIOD_MSEC;
-            sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
-        }
-
-        int isSleep = 1;
-
-        if ((sleepTimer > 0) && (moveTimer ==0)) {
-            isSleep = 0;
-            sleepTimer--;
-        }
-        if((sleepTimer > 0) && (moveTimer > 0)) {
-            moveTimer--;
-            sleepTimer--;
-        }
-
-        if (index < sleep_data.size()) {
-            sleep_data.set(index, isSleep);
-        } else {
-            sleep_data.add(isSleep);
-        }
-    } */
-
     private void setSleepData(int index) {
         if (isMoved(index)) {
             sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
@@ -103,18 +78,35 @@ public class ApparatModel {
      * Суммируем амплитуды движений по трем осям.
      * За ноль принят шумовой уровень.
      */
-    private double getAccMovement(int index) {
+
+    private int getAccMovement(int index) {
+        int step = 2;
         int dX, dY, dZ;
-        if (index > 0) {
-            dX = getNormalizedDataAcc1(index) - getNormalizedDataAcc1(index - 1);
-            dY = getNormalizedDataAcc2(index) - getNormalizedDataAcc2(index - 1);
-            dZ = getNormalizedDataAcc3(index) - getNormalizedDataAcc3(index - 1);
+        int maxX = Integer.MIN_VALUE;
+        int minX = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        if (index > step) {
+            for (int i = 0; i <= step; i++) {
+                maxX = Math.max(maxX, getNormalizedDataAcc1(index - i));
+                minX = Math.min(minX, getNormalizedDataAcc1(index - i));
+                maxY = Math.max(maxY, getNormalizedDataAcc2(index - i));
+                minY = Math.min(minY, getNormalizedDataAcc2(index - i));
+                maxZ = Math.max(maxZ, getNormalizedDataAcc3(index - i));
+                minZ = Math.min(minZ, getNormalizedDataAcc3(index - i));
+            }
+            dX = maxX - minX;
+            dY = maxY - minY;
+            dZ = maxZ - minZ;
         } else {
             dX = 0;
             dY = 0;
             dZ = 0;
         }
-        double dXYZ = (double) (Math.abs(dX) + Math.abs(dY) + Math.abs(dZ));
+
+        int dXYZ = Math.abs(dX) + Math.abs(dY) + Math.abs(dZ);
         return dXYZ;
     }
 
@@ -122,9 +114,9 @@ public class ApparatModel {
     public int getAccPosition(int index) {
         final int DATA_SIN_90 = 16000;
 
-        final int DATA_SIN_45 = DATA_SIN_90 *3363/4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
+        final int DATA_SIN_45 = DATA_SIN_90 * 3363 / 4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
 
-        final int X_data_mod  = DATA_SIN_90, Y_data_mod = DATA_SIN_90, Z_data_mod = DATA_SIN_90;
+        final int X_data_mod = DATA_SIN_90, Y_data_mod = DATA_SIN_90, Z_data_mod = DATA_SIN_90;
         final int X_mod = SIN_90, Y_mod = SIN_90;
 
 
@@ -133,19 +125,20 @@ public class ApparatModel {
         int data_Y = getNormalizedDataAcc2(index);
         int data_Z = getNormalizedDataAcc3(index);
 
-        if (data_Z > DATA_SIN_45){   // Если человек не лежит
-            Z_mod *= -1; return Z_mod;
+        if (data_Z > DATA_SIN_45) {   // Если человек не лежит
+            Z_mod *= -1;
+            return Z_mod;
         }
 
-        double Z = (double)data_Z / Z_data_mod;
+        double Z = (double) data_Z / Z_data_mod;
 
-        double ZZ = Z*Z;
-        double sec_Z = 1 + ZZ*0.43 + ZZ*ZZ*0.77;
+        double ZZ = Z * Z;
+        double sec_Z = 1 + ZZ * 0.43 + ZZ * ZZ * 0.77;
 
-        double double_X = ((double)data_X / X_data_mod)* sec_Z;
-        double double_Y = ((double)data_Y / Y_data_mod)* sec_Z;
-        int X = (int)(double_X * X_mod);
-        int Y = (int)(double_Y * Y_mod);
+        double double_X = ((double) data_X / X_data_mod) * sec_Z;
+        double double_Y = ((double) data_Y / Y_data_mod) * sec_Z;
+        int X = (int) (double_X * X_mod);
+        int Y = (int) (double_Y * Y_mod);
 
         XY_angle = angle(X, Y);
 
@@ -159,15 +152,18 @@ public class ApparatModel {
         // XY_angle = -1 + sin(x) + cos(x); if (X <  0 && Y >=0)
         // XY_angle = -3 - sin(x) + cos(x); if (X <  0 && Y < 0)
 
-        if (X >= 0 && Y >=0) { XY_angle =     SIN_90 + X - Y; }
-        else if (X >= 0 && Y < 0) { XY_angle =  3* SIN_90 - X - Y; }
+        if (X >= 0 && Y >= 0) {
+            XY_angle = SIN_90 + X - Y;
+        } else if (X >= 0 && Y < 0) {
+            XY_angle = 3 * SIN_90 - X - Y;
+        } else if (X < 0 && Y >= 0) {
+            XY_angle = -SIN_90 + X + Y;
+        } else if (X < 0 && Y < 0) {
+            XY_angle = -3 * SIN_90 - X + Y;
+        }
 
-        else if (X <  0 && Y >=0) { XY_angle =    -SIN_90 + X + Y; }
-        else if (X <  0 && Y < 0) { XY_angle = -3* SIN_90 - X + Y; }
-
-        return XY_angle/10;
+        return XY_angle / 10;
     }
-
 
 
     private boolean isMoved(int index) {
@@ -185,8 +181,7 @@ public class ApparatModel {
         return false;
     }
 
-    public int getHiPassedData(int index) {
-        int bufferSize = 50;
+    public int getHiPassedData(int index, int bufferSize) {
         if (!isSleep(index)) {
             return Integer.MAX_VALUE;
         }
@@ -201,50 +196,50 @@ public class ApparatModel {
         return chanel_1_data.get(index) - sum / bufferSize;
     }
 
-    public int getAccGraphData(int index, boolean isAccLimit) {
-        int NOISE_LEVEL_MIN = 500;// минимально возможный уровень шума когда человек находится в глубоком сне и не шевелится
-        int INT_SCALE = 50;
-        int dXYZ = (int)(((getAccMovement(index) - NOISE_LEVEL_MIN)/ NOISE_LEVEL_MIN )* INT_SCALE);
-        if (isAccLimit) {
-            dXYZ = (int)(((movement_limit - NOISE_LEVEL_MIN)/ NOISE_LEVEL_MIN )* INT_SCALE);
+
+    public int getLowPassData(int index) {
+        int bufferSize = 20;
+
+        if (index < bufferSize) {
+            return 0;
         }
-
-        int out;
-        if (dXYZ <= 0) out = dXYZ / 2;
-        else if (dXYZ >= 100) out = dXYZ / 10 + 100;
-        else
-            out = dXYZ;
-
-        return out;
+        int sum = 0;
+        for (int i = 0; i < bufferSize; i++) {
+            sum +=getHiPassedData(index - i, 600);
+        }
+        return sum / bufferSize;
     }
+
+
+    public int getAccGraphData(int index, boolean isAccLimit) {
+        int SCALE = 4;
+        int dXYZ = getAccMovement(index) * SCALE;
+        if (isAccLimit) {
+            dXYZ = (int) (movement_limit * SCALE);
+        }
+        return (int) Math.sqrt(dXYZ) - 50;
+    }
+
 
     public int getCompressedAccPosition(int index) {
         if (index == 0) return 0;
         int sum = 0;
         for (int i = 0; i < COMPRESSION; i++) {
-                sum += (getAccPosition(index * COMPRESSION + i));
+            sum += (getAccPosition(index * COMPRESSION + i));
         }
         return sum / COMPRESSION;
     }
 
     public int getCompressedAccMovement(int index) {
         if (index == 0) return 0;
-        double max=0;
+        int max = Integer.MIN_VALUE;
         for (int i = 0; i < COMPRESSION; i++) {
             max = Math.max(max, getAccMovement(index * COMPRESSION + i));
         }
 
-        int NOISE_LEVEL_MIN = 500;// минимально возможный уровень шума когда человек находится в глубоком сне и не шевелится
-        int INT_SCALE = 50;
-        int dXYZ = (int)((( max - NOISE_LEVEL_MIN)/ NOISE_LEVEL_MIN )* INT_SCALE);
-
-        int out;
-        if (dXYZ <= 0) out = dXYZ / 2;
-        else if (dXYZ >= 100) out = dXYZ / 10 + 100;
-        else
-            out = dXYZ;
-
-        return out;
+        int SCALE = 4;
+        int dXYZ = max * SCALE;
+        return (int) Math.sqrt(dXYZ) - 50;
     }
 
 
