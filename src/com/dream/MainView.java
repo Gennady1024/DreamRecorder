@@ -65,14 +65,13 @@ public class MainView extends JFrame {
         graphsViewer.addGraph(0, AccMovementLimitGraphData);    */
 
 
-        DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 600);
+        DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 300);
         DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
         graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
 
-        DataStream<Integer> eyeLowPassedData =  new FilterLowPass(eyeHiPassedData, 20);
-       // graphsViewer.addGraph(1, eyeLowPassedData);
-        graphsViewer.addGraph(1, model.getEyeDataStream());
+        DataStream<Integer> eyeDerivativeAvg = new FilterDerivativeAvgAbs(model.getCh1DataList(), 20);
+        graphsViewer.addGraph(1,eyeDerivativeAvg);
 
         DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getCh1DataList()));
         DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream());
@@ -81,7 +80,7 @@ public class MainView extends JFrame {
 
 
 
-        DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(model.getEyeDataStream());
+        DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(eyeDerivativeAvg);
         DataStream<Integer>  selectedCompressedSlowDreamGraph = new Multiplexer(compressedSlowDreamGraph, compressedNotSleepEvents);
 
         graphsViewer.addCompressedGraph(1, selectedCompressedSlowDreamGraph);

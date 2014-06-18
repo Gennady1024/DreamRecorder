@@ -19,10 +19,13 @@ public class FilterLowPass extends Filter<Integer> {
         if (index < bufferSize) {
             return 0;
         }
+        if (index > size()-bufferSize) {
+            return 0;
+        }
         int sum = 0;
         for (int i = 0; i < bufferSize; i++) {
-            sum += inputData.get(index - i);
+            sum += (inputData.get(index - i) + inputData.get(index + i));
         }
-        return  sum / bufferSize;
+        return  sum / (2*bufferSize);
     }
 }

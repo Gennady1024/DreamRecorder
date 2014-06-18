@@ -20,10 +20,10 @@ public class CompressorDerivating extends Filter<Integer> {
     protected Integer getData(int index) {
         if (index == 0) return 0;
         int bufferSize = 20;
-        int t = 1200;
+        int t = 300;
         int stepsNumber = t/bufferSize;
-        int  inputBegin = index*compression - t/2;
-        int  inputEnd = index*compression + t/2;
+        int  inputBegin = index*compression - t;
+        int  inputEnd = index*compression + t;
 
         if(inputBegin < 0) {
             return 0;
@@ -33,10 +33,10 @@ public class CompressorDerivating extends Filter<Integer> {
         }
 
         int sum = 0;
-        for( int i = 0; i < stepsNumber/2; i++) {
-            sum += (stepsNumber/2 -i)*(inputData.get(index * compression + bufferSize*i) + inputData.get(index * compression - bufferSize*i));
+        for( int i = 0; i < stepsNumber; i++) {
+            sum += (stepsNumber -i)*(inputData.get(index * compression + bufferSize*i) + inputData.get(index * compression - bufferSize*i));
 
         }
-        return sum - 983100;
+        return sum/(2*stepsNumber) - 400;
     }
 }

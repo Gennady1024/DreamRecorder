@@ -22,7 +22,6 @@ public class ApparatModel {
     private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 2 chanel data
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
     private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
-    private DataList<Integer>   eye_data = new DataList<Integer>();
 
     private long startTime; //time when data recording was started
 
@@ -36,39 +35,6 @@ public class ApparatModel {
     private final int ACC_Y_NULL = 1630;
     private final int ACC_Z_NULL = 4500;
     int Z_mod = 90;
-
-    private int getEyeData(int index) {
-      /*  int bufferSize = 15;
-        if (index < bufferSize) {
-            return 0;
-        }
-        int index_new = (index/bufferSize)*bufferSize;
-        int sum = 0;
-
-        for (int i = 0; i < bufferSize; i++) {
-            sum += chanel_1_data.get(index_new - i);
-        }
-        return  sum / bufferSize;  */
-
-        int bufferSize = 10;
-
-        if (index < bufferSize) {
-            return 0;
-        }
-
-        if (index > getDataSize()-bufferSize) {
-            return 0;
-        }
-
-        int sum1 = 0;
-        int sum2 = 0;
-
-        for (int i = 0; i < bufferSize; i++) {
-            sum1 += chanel_1_data.get(index + i);
-            sum2 += chanel_1_data.get(index - i);
-        }
-        return  Math.abs(sum2 - sum1);
-    }
 
     public void movementLimitUp() {
         movementLimit *= MOVEMENT_LIMIT_CHANGE;
@@ -152,15 +118,6 @@ public class ApparatModel {
         };
     }
 
-    public DataStream<Integer> getEyeDataStream() {
-        return new DataStreamAdapter<Integer>() {
-            @Override
-            protected Integer getData(int index) {
-                //return eye_data.get(index);
-                return getEyeData(index);
-            }
-        };
-    }
 
     public DataStream<Integer> getAccMovementLimitStream() {
         return new DataStreamAdapter<Integer>() {
@@ -314,7 +271,6 @@ public class ApparatModel {
         dataStore.add(data);
         if (getDataSize() > size) {
             setSleepData(getDataSize() - 1);     // add SleepData
-            eye_data.add(getEyeData(getDataSize() - 1));
         }
     }
 
