@@ -1,6 +1,6 @@
 package com.dream.Graph;
 
-import com.dream.Data.StreamData;
+import com.dream.Data.DataStream;
 
 import javax.swing.*;
 import java.awt.*;
@@ -89,13 +89,13 @@ public class GraphsViewer extends JPanel {
         setPanelsPreferredSizes();
     }
 
-    public void addGraph(int panelNumber, StreamData<Integer> graphData) {
+    public void addGraph(int panelNumber, DataStream<Integer> graphData) {
         if (panelNumber < graphPanels.size()) {
             graphPanels.get(panelNumber).addGraph(graphData);
         }
     }
 
-    public void addCompressedGraph(int panelNumber, StreamData<Integer> graphData) {
+    public void addCompressedGraph(int panelNumber, DataStream<Integer> graphData) {
         if (panelNumber < compressedGraphPanels.size()) {
             compressedGraphPanels.get(panelNumber).addGraph(graphData);
         }

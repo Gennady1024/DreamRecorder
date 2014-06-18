@@ -1,6 +1,6 @@
 package com.dream.Graph;
 
-import com.dream.Data.StreamData;
+import com.dream.Data.DataStream;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +19,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 class GraphPanel extends JPanel {
-    protected StreamData<Integer>[] graphs = new StreamData[3];//panel can have a several graphs. Max 3 for simplicity
+    protected DataStream<Integer>[] graphs = new DataStream[3];//panel can have a several graphs. Max 3 for simplicity
 
     protected static final int X_INDENT = 50;
     protected static final int Y_INDENT = 20;
@@ -87,7 +87,7 @@ class GraphPanel extends JPanel {
         repaint();
     }
 
-    protected void addGraph(StreamData<Integer> graphData) {
+    protected void addGraph(DataStream<Integer> graphData) {
         int count = 0;
         while (graphs[count] != null) {
             count++;
@@ -208,7 +208,7 @@ class GraphPanel extends JPanel {
 
     protected void paintGraphs(Graphics g) {
         int graph_number = 0;
-        for (StreamData<Integer> graph : graphs) {
+        for (DataStream<Integer> graph : graphs) {
             Color graphColor = graphColors[graph_number];
             graph_number++;
             if (graph != null) {

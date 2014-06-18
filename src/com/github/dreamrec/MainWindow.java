@@ -58,13 +58,13 @@ public class MainWindow extends JFrame {
         GComponentView eyeDataView = Factory.getGComponentView(model, controller,
                 new HiPassFilter(model.getEyeDataList(), 50)
  //               ,
- //               new HiPassFilter(model.getCh2DataList(), 50)
+ //               new FilterHiPass(model.getCh2DataList(), 50)
         );
         mainPanel.add(eyeDataView);
         eyeDataView.getComponentModel().centreX();
 
         // Панель движения глаз    Вторая панель для 2-го канала
-         //GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new HiPassFilter(model.getCh2DataList(), 50));
+         //GComponentView Channel2DataView = Factory.getGComponentView(model, controller, new FilterHiPass(model.getCh2DataList(), 50));
         //mainPanel.add(Channel2DataView);
         //Channel2DataView.getComponentModel().centreX();
 

@@ -1,7 +1,7 @@
 package com.dream;
 
-import com.dream.Filters.CompressedStreamDataAdapter;
-import com.dream.Filters.StreamDataAdapter;
+import com.dream.Data.DataStream;
+import com.dream.Filters.*;
 import com.dream.Graph.GraphsViewer;
 
 import javax.swing.*;
@@ -50,73 +50,51 @@ public class MainView extends JFrame {
 
         graphsViewer = new GraphsViewer(model.COMPRESSION);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
-        graphsViewer.addGraphPanel(1, true);
+       // graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addCompressedGraphPanel(1, false);
+        graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
 
-        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getAccGraphData(index, false);
-            }
-        });
+        /*
+        DataStream<Integer> AccGraphData =  new FilterScaling(model.getAccMovementStream());
+        DataStream<Integer> AccMovementLimitGraphData =  new FilterScaling(model.getAccMovementLimitStream());
 
-        graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getAccGraphData(index, true);
-            }
-        });
-
-      /*  graphsViewer.addGraph(0, new StreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getAccPosition(index);
-            }
-        });  */
+        graphsViewer.addGraph(0, AccGraphData);
+        graphsViewer.addGraph(0, AccMovementLimitGraphData);    */
 
 
+        DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 600);
+        DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
+        graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
-        graphsViewer.addGraph(1, new StreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getHiPassedData(index, 600);
-            }
-        });
 
-        graphsViewer.addGraph(2, new StreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getLowPassData(index);
-            }
-        });
+        DataStream<Integer> eyeLowPassedData =  new FilterLowPass(eyeHiPassedData, 20);
+       // graphsViewer.addGraph(1, eyeLowPassedData);
+        graphsViewer.addGraph(1, model.getEyeDataStream());
+
+        DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getCh1DataList()));
+        DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream());
+        DataStream<Integer>  selectedCompressedDreamGraph = new Multiplexer(compressedDreamGraph, compressedNotSleepEvents);
+        graphsViewer.addCompressedGraph(0, selectedCompressedDreamGraph);
+
+
+
+        DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(model.getEyeDataStream());
+        DataStream<Integer>  selectedCompressedSlowDreamGraph = new Multiplexer(compressedSlowDreamGraph, compressedNotSleepEvents);
+
+        graphsViewer.addCompressedGraph(1, selectedCompressedSlowDreamGraph);
 
 
 
 
-        graphsViewer.addCompressedGraph(0, new CompressedStreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getCompressedDreamGraph(index);
-            }
-        });
+        DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream());
+        graphsViewer.addCompressedGraph(2, compressedAccPosition);
 
-        graphsViewer.addCompressedGraph(1, new CompressedStreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getCompressedAccPosition(index);
-            }
-        });
-
-        graphsViewer.addCompressedGraph(1, new CompressedStreamDataAdapter<Integer>(model) {
-            @Override
-            public Integer get(int index) {
-                return getModel().getCompressedAccMovement(index);
-            }
-        });
-
+        DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream());
+        compressedAccMovement = new FilterScaling(compressedAccMovement); // scaling
+        graphsViewer.addCompressedGraph(2, compressedAccMovement);
 
         add(graphsViewer, BorderLayout.CENTER);
 

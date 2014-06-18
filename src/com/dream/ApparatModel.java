@@ -1,6 +1,9 @@
 package com.dream;
 
 import com.dream.Data.DataList;
+import com.dream.Data.DataStream;
+import com.dream.Filters.FilterHiPass;
+import com.dream.Filters.FilterLowPass;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,27 +21,57 @@ public class ApparatModel {
     private DataList<Integer> acc_1_data = new DataList<Integer>();   //list with accelerometer 1 chanel data
     private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 2 chanel data
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
-    private DataList<Integer> sleep_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
+    private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
+    private DataList<Integer>   eye_data = new DataList<Integer>();
+
+    private long startTime; //time when data recording was started
+
+    private int movementLimit = 2000;
+    private final double MOVEMENT_LIMIT_CHANGE = 1.05;
+    private final int FALLING_ASLEEP_TIME = 60; // seconds
+    private int sleepTimer = 0;
 
     private final int SIN_90 = 1800 / 4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
     private final int ACC_X_NULL = -1088;
     private final int ACC_Y_NULL = 1630;
     private final int ACC_Z_NULL = 4500;
-    private double movement_limit = 2000;
-    private final double MOVEMENT_LIMIT_CHANGE = 1.05;
-    private final int FALLING_ASLEEP_TIME = 60; // seconds
-    private final int SHORT_MOVE_TIME = 1;  //seconds
-    private int sleepTimer = 0;
-    private int moveTimer = 0;
-
     int Z_mod = 90;
 
+    private int getEyeData(int index) {
+      /*  int bufferSize = 15;
+        if (index < bufferSize) {
+            return 0;
+        }
+        int index_new = (index/bufferSize)*bufferSize;
+        int sum = 0;
 
-    private long startTime; //time when data recording was started
+        for (int i = 0; i < bufferSize; i++) {
+            sum += chanel_1_data.get(index_new - i);
+        }
+        return  sum / bufferSize;  */
 
+        int bufferSize = 10;
+
+        if (index < bufferSize) {
+            return 0;
+        }
+
+        if (index > getDataSize()-bufferSize) {
+            return 0;
+        }
+
+        int sum1 = 0;
+        int sum2 = 0;
+
+        for (int i = 0; i < bufferSize; i++) {
+            sum1 += chanel_1_data.get(index + i);
+            sum2 += chanel_1_data.get(index - i);
+        }
+        return  Math.abs(sum2 - sum1);
+    }
 
     public void movementLimitUp() {
-        movement_limit *= MOVEMENT_LIMIT_CHANGE;
+        movementLimit *= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
         for (int i = 0; i < getDataSize(); i++) {
             setSleepData(i);
@@ -46,7 +79,7 @@ public class ApparatModel {
     }
 
     public void movementLimitDown() {
-        movement_limit /= MOVEMENT_LIMIT_CHANGE;
+        movementLimit /= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
         for (int i = 0; i < getDataSize(); i++) {
             setSleepData(i);
@@ -57,10 +90,10 @@ public class ApparatModel {
             sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
         }
 
-        int isSleep = 1;
+        int isSleep = 0;
 
         if ((sleepTimer > 0)) {
-            isSleep = 0;
+            isSleep = 1;
             sleepTimer--;
         }
 
@@ -110,8 +143,55 @@ public class ApparatModel {
         return dXYZ;
     }
 
+    public DataStream<Integer> getAccMovementStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return getAccMovement(index);
+            }
+        };
+    }
 
-    public int getAccPosition(int index) {
+    public DataStream<Integer> getEyeDataStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                //return eye_data.get(index);
+                return getEyeData(index);
+            }
+        };
+    }
+
+    public DataStream<Integer> getAccMovementLimitStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return movementLimit;
+            }
+        };
+    }
+
+
+    public DataStream<Integer> getAccPositionStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return getAccPosition(index);
+            }
+        };
+    }
+
+    public DataStream<Integer> getNotSleepEventsStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return sleep_data.get(index);
+            }
+        };
+    }
+
+
+    private int getAccPosition(int index) {
         final int DATA_SIN_90 = 16000;
 
         final int DATA_SIN_45 = DATA_SIN_90 * 3363 / 4756; // sin(45) = sqrt(2)/2 ~= 3363/4756
@@ -167,95 +247,12 @@ public class ApparatModel {
 
 
     private boolean isMoved(int index) {
-        if (getAccMovement(index) > movement_limit) {
+        if (getAccMovement(index) > movementLimit) {
             return true;
         }
         return false;
     }
 
-
-    private boolean isSleep(int index) {
-        if (sleep_data.get(index) == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    public int getHiPassedData(int index, int bufferSize) {
-        if (!isSleep(index)) {
-            return Integer.MAX_VALUE;
-        }
-
-        if (index < bufferSize) {
-            return 0;
-        }
-        int sum = 0;
-        for (int i = 0; i < bufferSize; i++) {
-            sum += chanel_1_data.get(index - i);
-        }
-        return chanel_1_data.get(index) - sum / bufferSize;
-    }
-
-
-    public int getLowPassData(int index) {
-        int bufferSize = 20;
-
-        if (index < bufferSize) {
-            return 0;
-        }
-        int sum = 0;
-        for (int i = 0; i < bufferSize; i++) {
-            sum +=getHiPassedData(index - i, 600);
-        }
-        return sum / bufferSize;
-    }
-
-
-    public int getAccGraphData(int index, boolean isAccLimit) {
-        int SCALE = 4;
-        int dXYZ = getAccMovement(index) * SCALE;
-        if (isAccLimit) {
-            dXYZ = (int) (movement_limit * SCALE);
-        }
-        return (int) Math.sqrt(dXYZ) - 50;
-    }
-
-
-    public int getCompressedAccPosition(int index) {
-        if (index == 0) return 0;
-        int sum = 0;
-        for (int i = 0; i < COMPRESSION; i++) {
-            sum += (getAccPosition(index * COMPRESSION + i));
-        }
-        return sum / COMPRESSION;
-    }
-
-    public int getCompressedAccMovement(int index) {
-        if (index == 0) return 0;
-        int max = Integer.MIN_VALUE;
-        for (int i = 0; i < COMPRESSION; i++) {
-            max = Math.max(max, getAccMovement(index * COMPRESSION + i));
-        }
-
-        int SCALE = 4;
-        int dXYZ = max * SCALE;
-        return (int) Math.sqrt(dXYZ) - 50;
-    }
-
-
-    public int getCompressedDreamGraph(int index) {
-        if (index == 0) return 0;
-        int sum = 0;
-
-        for (int i = 0; i < COMPRESSION; i++) {
-            if (!isSleep(index * COMPRESSION + i)) {
-                return Integer.MAX_VALUE;
-            } else {
-                sum += Math.abs(Math.abs(chanel_1_data.get(index * COMPRESSION + i) - chanel_1_data.get(index * COMPRESSION + i - 1)));
-            }
-        }
-        return sum / COMPRESSION;
-    }
 
     private int getNormalizedDataAcc1(int index) {
         return (acc_1_data.get(index) - ACC_X_NULL);
@@ -282,9 +279,6 @@ public class ApparatModel {
         return size;
     }
 
-    public int getCompressedDataSize() {
-        return chanel_1_data.size() / COMPRESSION;
-    }
 
     public long getStartTime() {
         return startTime;
@@ -320,6 +314,7 @@ public class ApparatModel {
         dataStore.add(data);
         if (getDataSize() > size) {
             setSleepData(getDataSize() - 1);     // add SleepData
+            eye_data.add(getEyeData(getDataSize() - 1));
         }
     }
 
@@ -343,5 +338,27 @@ public class ApparatModel {
 
     public void addAcc3Data(int data) {
         addData(data, acc_3_data);
+    }
+
+
+    abstract class DataStreamAdapter<Integer> implements DataStream<Integer> {
+        protected abstract Integer getData(int index);
+
+        public final Integer get(int index) {
+            checkIndexBounds(index);
+            return getData(index);
+        }
+
+
+        private void checkIndexBounds(int index){
+            if(index > size() || index < 0 ){
+                throw  new IndexOutOfBoundsException("index:  "+index+", available:  "+size());
+            }
+        }
+
+        @Override
+        public int size() {
+            return getDataSize();
+        }
     }
 }

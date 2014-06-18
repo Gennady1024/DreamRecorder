@@ -8,7 +8,7 @@ package com.dream.Data;
  * To change this template use File | Settings | File Templates.
  */
 
-public interface StreamData<T> {
+public interface DataStream<T> {
     public int size();
     public T get(int index);
 }
