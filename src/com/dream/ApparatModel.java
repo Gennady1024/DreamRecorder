@@ -2,8 +2,6 @@ package com.dream;
 
 import com.dream.Data.DataList;
 import com.dream.Data.DataStream;
-import com.dream.Filters.FilterHiPass;
-import com.dream.Filters.FilterLowPass;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +12,9 @@ import com.dream.Filters.FilterLowPass;
  */
 public class ApparatModel {
 
-    public static final int COMPRESSION = 120; //compression for big-scaled graphs
+
+    public static final int COMPRESSION_120 = 120; //compression for big-scaled graphs
+    public static final int COMPRESSION_10 = 10; //compression for sleep patterns
     public static final int PERIOD_MSEC = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
@@ -23,10 +23,30 @@ public class ApparatModel {
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
     private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
 
+    private DataList<Integer> sleep_patterns = new DataList<Integer>();
+
+    public static final int UNKNOWN = Integer.MAX_VALUE - 400;
+    public static final int REM = Integer.MAX_VALUE - 300;
+    public static final int SLOW = Integer.MAX_VALUE - 200;
+    public static final int STAND = Integer.MAX_VALUE;
+    public static final int MOVE = Integer.MAX_VALUE -100;
+    public static final int GAP = 99;
+
+
     private long startTime; //time when data recording was started
 
     private int movementLimit = 2000;
     private final double MOVEMENT_LIMIT_CHANGE = 1.05;
+
+    public static int remLimit = 800;
+    private boolean isRem = false;
+    private int firstRemPeak = 0;
+    private int lastRemPeak = 0;
+
+    boolean isUp = false;
+    int peaksCounter =0;
+    int timer = 0;
+
     private final int FALLING_ASLEEP_TIME = 60; // seconds
     private int sleepTimer = 0;
 
@@ -35,6 +55,7 @@ public class ApparatModel {
     private final int ACC_Y_NULL = 1630;
     private final int ACC_Z_NULL = 4500;
     int Z_mod = 90;
+
 
     public void movementLimitUp() {
         movementLimit *= MOVEMENT_LIMIT_CHANGE;
@@ -51,22 +72,51 @@ public class ApparatModel {
             setSleepData(i);
         }
     }
-    private void setSleepData(int index) {
-        if (isMoved(index)) {
+
+    public void remLimitUp() {
+        remLimit *= MOVEMENT_LIMIT_CHANGE;
+    }
+
+    public void remLimitDown() {
+        remLimit /= MOVEMENT_LIMIT_CHANGE;
+    }
+
+    private boolean isStand(int index){
+        if (getAccPosition(index) == STAND) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isSleep(int index) {
+
+        if (isStand(index)) {
             sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
         }
+        if (isMoved(index)) {
+            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME / 6) * 1000 / PERIOD_MSEC);
+        }
 
-        int isSleep = 0;
+        boolean isSleep = false;
 
         if ((sleepTimer > 0)) {
-            isSleep = 1;
+            isSleep = true;
             sleepTimer--;
         }
 
+        return isSleep;
+    }
+
+    private void setSleepData(int index) {
+        int sleep = 0;
+        if(isSleep(index)) {
+            sleep = 1;
+        }
+
         if (index < sleep_data.size()) {
-            sleep_data.set(index, isSleep);
+            sleep_data.set(index, sleep);
         } else {
-            sleep_data.add(isSleep);
+            sleep_data.add(sleep);
         }
     }
 
@@ -108,6 +158,16 @@ public class ApparatModel {
         int dXYZ = Math.abs(dX) + Math.abs(dY) + Math.abs(dZ);
         return dXYZ;
     }
+
+    public DataStream<Integer> getSleepPatternsStream() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return sleep_patterns.get(index);
+            }
+        };
+    }
+
 
     public DataStream<Integer> getAccMovementStream() {
         return new DataStreamAdapter<Integer>() {
@@ -163,8 +223,7 @@ public class ApparatModel {
         int data_Z = getNormalizedDataAcc3(index);
 
         if (data_Z > DATA_SIN_45) {   // Если человек не лежит
-            Z_mod *= -1;
-            return Z_mod;
+            return STAND;
         }
 
         double Z = (double) data_Z / Z_data_mod;
@@ -209,6 +268,97 @@ public class ApparatModel {
         }
         return false;
     }
+
+    private int getDerivativeAbs(int index) {
+        if (index == 0) {
+            return 0;
+        }
+        return Math.abs(chanel_1_data.get(index) - chanel_1_data.get(index - 1));
+    }
+
+    private int getDerivativeMax(int index, int ticks) {
+       if(index < ticks) {
+           return 0;
+       }
+       int max = 0;
+       for (int i = 0; i < ticks; i++) {
+            max = Math.max(max, getDerivativeAbs(index - i));
+       }
+        return max;
+    }
+
+    private void calculatePeaks(int index){
+        if(getDerivativeAbs(index) > remLimit) {
+            if(!isUp) {
+                isUp = true;
+                peaksCounter ++;
+            }
+        }
+        if(getDerivativeAbs(index) < remLimit/3) {
+            if(isUp){
+                isUp = false;
+            }
+        }
+    }
+
+    private int getREMlevel (int index){
+        if (index == 0) return 0;
+        int time_3_peaks = 90; // ticks or 9 sec
+        int time_repose = 40;  // ticks or 4 sec
+
+
+
+        if(index < (time_3_peaks + time_repose)) {
+            return UNKNOWN;
+        }
+
+        if(!isRem){
+            if(firstRemPeak == 0) {
+                if((getDerivativeAbs(index) > remLimit) && (getDerivativeMax(index, time_repose) < remLimit/4)) {
+                    firstRemPeak = index;
+                    peaksCounter = 0;
+                    timer = 0;
+                    calculatePeaks(index);
+                    return UNKNOWN;
+                }
+            }
+            else {
+                timer++;
+                calculatePeaks(index);
+                if((peaksCounter>2) && (timer < time_3_peaks)){
+                    isRem = true;
+                    timer = 0;
+                    return REM;
+                }
+            }
+        }
+        else {
+            if(isMoved(index)) {
+                isRem = false;
+                return UNKNOWN;
+            }
+            if(timer < time_repose){
+                if(getDerivativeAbs(index) > remLimit/4){
+                    timer=0;
+                    lastRemPeak=index;
+                    return REM;
+                }
+                else{
+                    timer++;
+                    return REM;
+                }
+            }
+            else{
+                isRem=false;
+                return UNKNOWN;
+            }
+        }
+        return UNKNOWN;
+    }
+
+
+
+
 
 
     private int getNormalizedDataAcc1(int index) {
@@ -266,11 +416,22 @@ public class ApparatModel {
         return acc_3_data;
     }
 
+
     private void addData(int data, DataList<Integer> dataStore) {
         int size = getDataSize();
         dataStore.add(data);
-        if (getDataSize() > size) {
-            setSleepData(getDataSize() - 1);     // add SleepData
+        int sizeNew = getDataSize();
+        if (sizeNew > size) {
+            setSleepData(sizeNew - 1);     // add SleepData
+           if(getAccPosition(sizeNew-1) == STAND) {  // person is standing
+                 sleep_patterns.add(STAND);
+            }
+            else if (isMoved(sizeNew-1)) { // person is moving
+                sleep_patterns.add(MOVE);
+            }
+            else {
+                sleep_patterns.add(getREMlevel(sizeNew-1));
+            }
         }
     }
 

@@ -45,14 +45,25 @@ public class MainView extends JFrame {
                     model.movementLimitDown();
                     graphsViewer.syncView();
                 }
+
+                if (key == KeyEvent.VK_1) {
+                    model.remLimitUp();
+                    graphsViewer.syncView();
+                }
+
+                if (key == KeyEvent.VK_2) {
+                    model.remLimitDown();
+                    graphsViewer.syncView();
+                }
             }
         });
 
-        graphsViewer = new GraphsViewer(model.COMPRESSION);
+        graphsViewer = new GraphsViewer(model.COMPRESSION_120);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
        // graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
+        graphsViewer.addGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
@@ -70,8 +81,12 @@ public class MainView extends JFrame {
         graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
 
-        DataStream<Integer> eyeDerivativeAvg = new FilterDerivativeAvgAbs(model.getCh1DataList(), 20);
-        graphsViewer.addGraph(1,eyeDerivativeAvg);
+
+        //DataStream<Integer> eyeDerivative = new FilterDerivativeAvgAbs(model.getCh1DataList(),20);
+        DataStream<Integer> eyeDerivative = new FilterDerivative(model.getCh1DataList());
+        graphsViewer.addGraph(1,eyeDerivative);
+
+        graphsViewer.addGraph(2, model.getSleepPatternsStream());
 
         DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getCh1DataList()));
         DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream());
@@ -79,13 +94,16 @@ public class MainView extends JFrame {
         graphsViewer.addCompressedGraph(0, selectedCompressedDreamGraph);
 
 
-
+        DataStream<Integer> eyeDerivativeAvg = new FilterDerivativeAvgAbs(model.getCh1DataList(), 20);
         DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(eyeDerivativeAvg);
         DataStream<Integer>  selectedCompressedSlowDreamGraph = new Multiplexer(compressedSlowDreamGraph, compressedNotSleepEvents);
 
-        graphsViewer.addCompressedGraph(1, selectedCompressedSlowDreamGraph);
+        graphsViewer.addCompressedGraph(2, selectedCompressedSlowDreamGraph);
 
-
+        DataStream<Integer> eyeDerivativeAbs =  new FilterDerivativeAbs(model.getCh1DataList());
+        DataStream<Integer> compressedREMGraph = new CompressorREM(eyeDerivativeAbs);
+        DataStream<Integer>  selectedCompressedREMGraph = new Multiplexer(compressedREMGraph, compressedNotSleepEvents);
+        graphsViewer.addCompressedGraph(1, selectedCompressedREMGraph);
 
 
         DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream());

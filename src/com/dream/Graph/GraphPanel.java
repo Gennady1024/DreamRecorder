@@ -1,5 +1,6 @@
 package com.dream.Graph;
 
+import com.dream.ApparatModel;
 import com.dream.Data.DataStream;
 
 import javax.swing.*;
@@ -216,9 +217,20 @@ class GraphPanel extends JPanel {
                 VerticalLine vLine = new VerticalLine();
                 for (int x = 0; x < endIndex; x++) {
                     int value = graph.get(x + startIndex);
-                    if(value == Integer.MAX_VALUE) {
-                        g.setColor(Color.RED);
+                    if(value == ApparatModel.STAND) {
+                        g.setColor(Color.WHITE);
+                        g.drawLine(x, 0, x, getMaxY()/2);
+                    }
+                    else if(value == ApparatModel.MOVE) {
+                        g.setColor(Color.DARK_GRAY);
                         g.drawLine(x, 0, x, getMaxY()/4);
+                    }
+                    else if((value >= ApparatModel.REM) && (value <= ApparatModel.REM+ApparatModel.GAP) ) {
+                        g.setColor(Color.RED);
+                        g.drawLine(x, 0, x, getMaxY());
+                    }
+                    else if(value == ApparatModel.UNKNOWN) {
+
                     }
                     else{
                         g.setColor(graphColor);
