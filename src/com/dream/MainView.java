@@ -120,8 +120,6 @@ public class MainView extends JFrame {
         setVisible(true);
     }
 
-
-
     public void syncView() {
         graphsViewer.syncView();
     }

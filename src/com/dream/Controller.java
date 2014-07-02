@@ -35,7 +35,9 @@ public class Controller {
             fileChooser.setFileFilter(new ExtFileFilter("drm", "*.drm Dream records"));
             int fileChooserState = fileChooser.showOpenDialog(mainWindow);
             if (fileChooserState == JFileChooser.APPROVE_OPTION) {
-                new FileIOManager().readFromFile(fileChooser.getSelectedFile(), model);
+                File selectedFile =  fileChooser.getSelectedFile();
+                new FileIOManager().readFromFile(selectedFile, model);
+                mainWindow.setTitle(selectedFile.getName());
                 mainWindow.setStart(model.getStartTime(), model.PERIOD_MSEC);
             }
         } catch (ApplicationException e) {
