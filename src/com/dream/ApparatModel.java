@@ -97,10 +97,10 @@ public class ApparatModel {
             sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME / 6) * 1000 / PERIOD_MSEC);
         }
 
-        boolean isSleep = false;
+        boolean isSleep = true;
 
         if ((sleepTimer > 0)) {
-            isSleep = true;
+            isSleep = false;
             sleepTimer--;
         }
 
@@ -108,9 +108,9 @@ public class ApparatModel {
     }
 
     private void setSleepData(int index) {
-        int sleep = 0;
+        int sleep = 1;
         if(isSleep(index)) {
-            sleep = 1;
+            sleep = 0;
         }
 
         if (index < sleep_data.size()) {
@@ -287,11 +287,33 @@ public class ApparatModel {
         return max;
     }
 
-    private void calculatePeaks(int index){
-        if(getDerivativeAbs(index) > remLimit) {
+
+
+    private boolean isRemBegin(int index){
+        int time_3_peaks = 90; // ticks or 9 sec
+        if(!isSleep(index)) {
+            peaksCounter = 0;
+            return false;
+        }
+        if(getDerivativeAbs(index) > remLimit) {  //&& (getDerivativeMax(index, time_repose) < remLimit/4)
             if(!isUp) {
+                peaksCounter++;
                 isUp = true;
-                peaksCounter ++;
+                lastRemPeak = index;
+                if(peaksCounter == 1) {
+                    firstRemPeak = index;
+                }
+                if((index - firstRemPeak) > time_3_peaks) {
+                    firstRemPeak = index;
+                    peaksCounter = 1;
+                }
+                if(peaksCounter > 2) {
+                    for (int i = 0; i < (index-firstRemPeak); i++) {
+                        sleep_patterns.set(firstRemPeak+i, REM);
+                    }
+                    peaksCounter = 0;
+                    return true;
+                }
             }
         }
         if(getDerivativeAbs(index) < remLimit/3) {
@@ -299,65 +321,39 @@ public class ApparatModel {
                 isUp = false;
             }
         }
+        return false;
     }
 
-    private int getREMlevel (int index){
-        if (index == 0) return 0;
-        int time_3_peaks = 90; // ticks or 9 sec
-        int time_repose = 40;  // ticks or 4 sec
+    private boolean isRemEnd(int index) {
+        int time_repose = 40;
 
-
-
-        if(index < (time_3_peaks + time_repose)) {
-            return UNKNOWN;
+        if(!isSleep(index)) {
+            return true;
         }
 
-        if(!isRem){
-            if(firstRemPeak == 0) {
-                if((getDerivativeAbs(index) > remLimit) && (getDerivativeMax(index, time_repose) < remLimit/4)) {
-                    firstRemPeak = index;
-                    peaksCounter = 0;
-                    timer = 0;
-                    calculatePeaks(index);
-                    return UNKNOWN;
-                }
+        if (getDerivativeAbs(index) > remLimit/3) {
+            lastRemPeak = index;
+        }
+
+        if((index-lastRemPeak) > time_repose) {
+            for (int i = 0; i < (index-lastRemPeak); i++) {
+                sleep_patterns.set(lastRemPeak+i, UNKNOWN);
             }
-            else {
-                timer++;
-                calculatePeaks(index);
-                if((peaksCounter>2) && (timer < time_3_peaks)){
-                    isRem = true;
-                    timer = 0;
-                    return REM;
-                }
-            }
+            return true;
+        }
+        return false;
+    }
+
+
+    private boolean isRem(int index){
+        if(isRem) {
+            isRem = !isRemEnd(index);
         }
         else {
-            if(isMoved(index)) {
-                isRem = false;
-                return UNKNOWN;
-            }
-            if(timer < time_repose){
-                if(getDerivativeAbs(index) > remLimit/4){
-                    timer=0;
-                    lastRemPeak=index;
-                    return REM;
-                }
-                else{
-                    timer++;
-                    return REM;
-                }
-            }
-            else{
-                isRem=false;
-                return UNKNOWN;
-            }
+            isRem = isRemBegin(index);
         }
-        return UNKNOWN;
+        return isRem;
     }
-
-
-
 
 
 
@@ -429,8 +425,11 @@ public class ApparatModel {
             else if (isMoved(sizeNew-1)) { // person is moving
                 sleep_patterns.add(MOVE);
             }
+           else if (isRem(sizeNew-1)) { // person in REM
+               sleep_patterns.add(REM);
+           }
             else {
-                sleep_patterns.add(getREMlevel(sizeNew-1));
+                sleep_patterns.add(UNKNOWN);
             }
         }
     }

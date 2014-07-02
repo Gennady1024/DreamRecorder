@@ -222,7 +222,7 @@ class GraphPanel extends JPanel {
                         g.drawLine(x, 0, x, getMaxY()/2);
                     }
                     else if(value == ApparatModel.MOVE) {
-                        g.setColor(Color.DARK_GRAY);
+                        g.setColor(Color.BLUE);
                         g.drawLine(x, 0, x, getMaxY()/4);
                     }
                     else if((value >= ApparatModel.REM) && (value <= ApparatModel.REM+ApparatModel.GAP) ) {
