@@ -44,6 +44,7 @@ public class Controller {
             mainWindow.showMessage(e.getMessage());
         }
         mainWindow.syncView();
+        model.calculateRemMax();
     }
 
 

@@ -3,6 +3,12 @@ package com.dream;
 import com.dream.Data.DataList;
 import com.dream.Data.DataStream;
 
+import java.awt.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: GENA
@@ -22,6 +28,8 @@ public class ApparatModel {
     private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 2 chanel data
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
     private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
+    
+    private DataList<Integer>  peaks = new DataList<Integer>();
 
     private DataList<Integer> sleep_patterns = new DataList<Integer>();
 
@@ -29,8 +37,11 @@ public class ApparatModel {
     public static final int REM = Integer.MAX_VALUE - 300;
     public static final int SLOW = Integer.MAX_VALUE - 200;
     public static final int STAND = Integer.MAX_VALUE;
-    public static final int MOVE = Integer.MAX_VALUE -100;
+    public static final int MOVE = Integer.MAX_VALUE - 100;
     public static final int GAP = 99;
+    
+    private int derivativeMax = 0;
+    private int indexDerivativeMax=0;
 
 
     private long startTime; //time when data recording was started
@@ -38,7 +49,10 @@ public class ApparatModel {
     private int movementLimit = 2000;
     private final double MOVEMENT_LIMIT_CHANGE = 1.05;
 
-    public static int remLimit = 800;
+    public static int remLimit = 1000;
+    public static final int REM_LIMIT_MIN = 700;
+    boolean isUp1 = false;
+    
     private boolean isRem = false;
     private int firstRemPeak = 0;
     private int lastRemPeak = 0;
@@ -89,12 +103,14 @@ public class ApparatModel {
     }
 
     private boolean isSleep(int index) {
-
+        if(index < 18000) {   //выкидиваем первые полчаса от начала записи
+            return false;
+        }
         if (isStand(index)) {
-            sleepTimer = FALLING_ASLEEP_TIME * 1000 / PERIOD_MSEC;
+            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *5) / PERIOD_MSEC;
         }
         if (isMoved(index)) {
-            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME / 6) * 1000 / PERIOD_MSEC);
+            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / PERIOD_MSEC);
         }
 
         boolean isSleep = true;
@@ -276,26 +292,43 @@ public class ApparatModel {
         return Math.abs(chanel_1_data.get(index) - chanel_1_data.get(index - 1));
     }
 
-    private int getDerivativeMax(int index, int ticks) {
+    private int getDerivativeEvg(int index, int ticks) {
        if(index < ticks) {
            return 0;
        }
-       int max = 0;
+       int sum = 0;
+       int number = 1;
        for (int i = 0; i < ticks; i++) {
-            max = Math.max(max, getDerivativeAbs(index - i));
+           if(getDerivativeAbs(index - i) < remLimit/2) {
+               sum = sum + getDerivativeAbs(index - i);
+               number++;
+           }
        }
+        return sum/number;
+    }
+
+
+    private int getDerivativeMax(int index, int ticks) {
+        if(index < ticks) {
+            return 0;
+        }
+        int max = 0;
+        for (int i = 0; i < ticks; i++) {
+            if(getDerivativeAbs(index - i) < remLimit/3)
+                max = Math.max(max, getDerivativeAbs(index - i));
+        }
         return max;
     }
 
 
-
     private boolean isRemBegin(int index){
-        int time_3_peaks = 90; // ticks or 9 sec
+        int time_3_peaks = 90; // 90 ticks or 9 sec
         if(!isSleep(index)) {
             peaksCounter = 0;
             return false;
         }
-        if(getDerivativeAbs(index) > remLimit) {  //&& (getDerivativeMax(index, time_repose) < remLimit/4)
+
+        if(getDerivativeAbs(index) > remLimit) {
             if(!isUp) {
                 peaksCounter++;
                 isUp = true;
@@ -325,7 +358,7 @@ public class ApparatModel {
     }
 
     private boolean isRemEnd(int index) {
-        int time_repose = 40;
+        int time_repose = 40; // 40 ticks or 4 sec
 
         if(!isSleep(index)) {
             return true;
@@ -348,6 +381,14 @@ public class ApparatModel {
     private boolean isRem(int index){
         if(isRem) {
             isRem = !isRemEnd(index);
+            long time = startTime + (long)((indexDerivativeMax) * PERIOD_MSEC);
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+            String timeStamp = dateFormat.format(new Date(time)) ;
+           // System.out.println("Max/2: " + derivativeMax / 2);
+           // System.out.println("index: "+indexDerivativeMax);
+           // System.out.println("time: "+timeStamp);
+            //System.out.println("peaks number: "+peaks.size());
+
         }
         else {
             isRem = isRemBegin(index);
@@ -355,6 +396,45 @@ public class ApparatModel {
         return isRem;
     }
 
+    
+    private void calculatePeak(int index) {
+        if(isSleep(index)) {
+            int derivative = getDerivativeAbs(index);
+            if ( derivative > REM_LIMIT_MIN) {
+                if(!isUp1) {
+                    peaks.add( derivative);
+                    isUp1 = true;
+                }
+            }
+            if(derivative < REM_LIMIT_MIN/2) {
+                if(isUp1){
+                    isUp1 = false;
+                }
+            }
+        }
+
+
+      /*  if(isSleep(index)) {
+            int derivative = getDerivativeAbs(index);
+            if ( derivative > REM_LIMIT_MIN) {
+                peaks.add(derivative);
+            }
+        } */
+    }
+    
+    public int calculateRemMax() {
+        Integer peaks_arr[] =  new Integer[peaks.size()];
+        peaks.toArray(peaks_arr);
+        Arrays.sort(peaks_arr);
+        for(int i=0; i<peaks_arr.length; i++) {
+            System.out.println(i+" peak: "+peaks_arr[i]);
+        }
+        int indexMax = (int) (0.9 * peaks_arr.length);
+        int rem = peaks_arr[indexMax]/2;
+        System.out.println("peaks number: " + peaks.size());
+        System.out.println("RemLevel: " + rem);
+        return rem;
+    }
 
 
     private int getNormalizedDataAcc1(int index) {
@@ -431,6 +511,8 @@ public class ApparatModel {
             else {
                 sleep_patterns.add(UNKNOWN);
             }
+
+            calculatePeak(sizeNew-1);
         }
     }
 
