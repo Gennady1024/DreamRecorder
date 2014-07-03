@@ -51,7 +51,7 @@ public class ApparatModel {
     private final double MOVEMENT_LIMIT_CHANGE = 1.05;
 
     public static int remLimit = 1000;
-    public static final int REM_LIMIT_MIN = 700;
+    public static final int REM_LIMIT_MIN = 1000;
     boolean isUp1 = false;
     
     private boolean isRem = false;
@@ -411,7 +411,7 @@ public class ApparatModel {
 
     
     private void calculatePeak(int index) {
-        if(isSleep(index)) {
+     /*   if(isSleep(index)) {
             int derivative = getDerivativeAbs(index);
             if ( derivative > REM_LIMIT_MIN) {
                 if(!isUp1) {
@@ -424,15 +424,15 @@ public class ApparatModel {
                     isUp1 = false;
                 }
             }
-        }
+        }   */
 
 
-      /*  if(isSleep(index)) {
+        if(isSleep(index)) {
             int derivative = getDerivativeAbs(index);
             if ( derivative > REM_LIMIT_MIN) {
                 peaks.add(derivative);
             }
-        } */
+        }
     }
     
     public int calculateRemMax() {
@@ -442,7 +442,7 @@ public class ApparatModel {
         for(int i=0; i<peaks_arr.length; i++) {
             System.out.println(i+" peak: "+peaks_arr[i]);
         }
-        int indexMax = (int) (0.9 * peaks_arr.length);
+        int indexMax =  Math.max(0, peaks_arr.length - 150);
         int rem = peaks_arr[indexMax]/2;
         System.out.println("peaks number: " + peaks.size());
         System.out.println("RemLevel: " + rem);
