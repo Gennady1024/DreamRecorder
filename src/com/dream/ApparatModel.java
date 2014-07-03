@@ -30,6 +30,7 @@ public class ApparatModel {
     private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
     
     private DataList<Integer>  peaks = new DataList<Integer>();
+    Integer peaks_arr[] = new Integer[peaks.size()];
 
     private DataList<Integer> sleep_patterns = new DataList<Integer>();
 
@@ -219,6 +220,18 @@ public class ApparatModel {
             @Override
             protected Integer getData(int index) {
                 return sleep_data.get(index);
+            }
+        };
+    }
+
+    public DataStream<Integer> getArray() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                if(index < peaks_arr.length){
+                    return peaks_arr[index];
+                }
+                return 0;
             }
         };
     }
@@ -423,7 +436,7 @@ public class ApparatModel {
     }
     
     public int calculateRemMax() {
-        Integer peaks_arr[] =  new Integer[peaks.size()];
+        peaks_arr =  new Integer[peaks.size()];
         peaks.toArray(peaks_arr);
         Arrays.sort(peaks_arr);
         for(int i=0; i<peaks_arr.length; i++) {

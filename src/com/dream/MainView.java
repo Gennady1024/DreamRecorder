@@ -85,6 +85,7 @@ public class MainView extends JFrame {
         //DataStream<Integer> eyeDerivative = new FilterDerivativeAvgAbs(model.getCh1DataList(),20);
         DataStream<Integer> eyeDerivative = new FilterDerivative(model.getCh1DataList());
         graphsViewer.addGraph(1,eyeDerivative);
+        graphsViewer.addGraph(1,model.getArray());
 
         graphsViewer.addGraph(2, model.getSleepPatternsStream());
 
