@@ -228,8 +228,8 @@ public class ApparatModel {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                if(index < peaks.size()){
-                    return peaks.get(index);
+                if(index < peaks_arr.length){
+                    return peaks_arr[index];
                 }
                 return 0;
             }
