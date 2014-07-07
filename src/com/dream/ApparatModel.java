@@ -41,8 +41,7 @@ public class ApparatModel {
     public static final int MOVE = Integer.MAX_VALUE - 100;
     public static final int GAP = 99;
     
-    private int derivativeMax = 0;
-    private int indexDerivativeMax=0;
+   private int noise = Integer.MAX_VALUE;
 
 
     private long startTime; //time when data recording was started
@@ -228,13 +227,15 @@ public class ApparatModel {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                if(index < peaks_arr.length){
+              /*  if(index < peaks_arr.length){
                     return peaks_arr[index];
                 }
-                return 0;
+                return 0;  */
+                return getDerivativeEvg(index, 40);
             }
         };
     }
+
 
 
     private int getAccPosition(int index) {
@@ -312,10 +313,8 @@ public class ApparatModel {
        int sum = 0;
        int number = 1;
        for (int i = 0; i < ticks; i++) {
-           if(getDerivativeAbs(index - i) < remLimit/2) {
-               sum = sum + getDerivativeAbs(index - i);
-               number++;
-           }
+           sum = sum + getDerivativeAbs(index - i);
+           number++;
        }
         return sum/number;
     }
@@ -323,7 +322,7 @@ public class ApparatModel {
 
     private int getDerivativeMax(int index, int ticks) {
         if(index < ticks) {
-            return 0;
+            return Integer.MAX_VALUE;
         }
         int max = 0;
         for (int i = 0; i < ticks; i++) {
@@ -332,9 +331,10 @@ public class ApparatModel {
         }
         return max;
     }
+   
 
 
-    private boolean isRemBegin(int index){
+    private boolean isRemBegin1(int index){
         int time_3_peaks = 90; // 90 ticks or 9 sec
         if(!isSleep(index)) {
             peaksCounter = 0;
@@ -369,6 +369,60 @@ public class ApparatModel {
         }
         return false;
     }
+    
+    public int getPeak(int index) {
+        if(index < 3) {
+            return 0;
+        }
+        int deriv_before = getDerivativeAbs(index - 2);
+        int deriv_after = getDerivativeAbs(index);
+        int deriv = getDerivativeAbs(index - 1);
+         if((deriv_before < deriv) && (deriv_after <= deriv)) {
+             return deriv;
+         }
+        return 0;
+    }
+
+
+    private int peakCounter(int index, int period, int level) {
+        int counter=0;
+        int ticks = Math.min(index, period);
+        for(int i = 0; i < ticks; i++){
+            if(getPeak(index - i) > level)  {
+                counter++;
+            }
+        }
+        return counter;
+    }
+    
+    private boolean isRemBegin(int index){
+        int time_3_peaks = 90; // 90 ticks or 9 sec
+        if(!isSleep(index)) {
+            peaksCounter = 0;
+            return false;
+        }
+
+        if((getPeak(index) > remLimit) && peakCounter(index, 100, 400) < 14) {
+                peaksCounter++;
+                lastRemPeak = index;
+                if(peaksCounter == 1) {
+                    firstRemPeak = index;
+                }
+                if((index - firstRemPeak) > time_3_peaks) {
+                    firstRemPeak = index;
+                    peaksCounter = 1;
+                }
+                if(peaksCounter > 2) {
+                    for (int i = 0; i < (index-firstRemPeak); i++) {
+                        sleep_patterns.set(firstRemPeak+i, REM);
+                    }
+                    peaksCounter = 0;
+                    return true;
+                }
+        }
+        return false;
+    }
+
 
     private boolean isRemEnd(int index) {
         int time_repose = 40; // 40 ticks or 4 sec
@@ -394,14 +448,7 @@ public class ApparatModel {
     private boolean isRem(int index){
         if(isRem) {
             isRem = !isRemEnd(index);
-            long time = startTime + (long)((indexDerivativeMax) * PERIOD_MSEC);
-            DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-            String timeStamp = dateFormat.format(new Date(time)) ;
-           // System.out.println("Max/2: " + derivativeMax / 2);
-           // System.out.println("index: "+indexDerivativeMax);
-           // System.out.println("time: "+timeStamp);
-            //System.out.println("peaks number: "+peaks.size());
-
+            System.out.println("noise: " + noise);
         }
         else {
             isRem = isRemBegin(index);
@@ -411,7 +458,7 @@ public class ApparatModel {
 
     
     private void calculatePeak(int index) {
-     /*   if(isSleep(index)) {
+       if(isSleep(index)) {
             int derivative = getDerivativeAbs(index);
             if ( derivative > REM_LIMIT_MIN) {
                 if(!isUp1) {
@@ -424,30 +471,29 @@ public class ApparatModel {
                     isUp1 = false;
                 }
             }
-        }   */
+        }
 
 
-        if(isSleep(index)) {
+      /*  if(isSleep(index)) {
             int derivative = getDerivativeAbs(index);
             if ( derivative > REM_LIMIT_MIN) {
                 peaks.add(derivative);
             }
-        }
+        } */
     }
     
     public int calculateRemMax() {
         peaks_arr =  new Integer[peaks.size()];
         peaks.toArray(peaks_arr);
         Arrays.sort(peaks_arr);
-        for(int i=0; i<peaks_arr.length; i++) {
-            System.out.println(i+" peak: "+peaks_arr[i]);
-        }
-        int indexMax =  Math.max(0, peaks_arr.length - 150);
-        int rem = peaks_arr[indexMax]/2;
+        int indexMax =  Math.max(0, peaks_arr.length - 50);
+        int rem = (peaks_arr[indexMax] - 3*noise)/2;
         System.out.println("peaks number: " + peaks.size());
         System.out.println("RemLevel: " + rem);
-        return rem;
+        System.out.println("noise: " + noise);
+         return rem;
     }
+
 
 
     private int getNormalizedDataAcc1(int index) {
@@ -523,6 +569,11 @@ public class ApparatModel {
            }
             else {
                 sleep_patterns.add(UNKNOWN);
+            }
+            
+            if((sizeNew-1)%100 == 0) {
+                noise = Math.min(noise, getDerivativeMax((sizeNew-1), 100));
+
             }
 
             calculatePeak(sizeNew-1);
