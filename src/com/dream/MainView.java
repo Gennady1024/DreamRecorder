@@ -62,7 +62,7 @@ public class MainView extends JFrame {
         graphsViewer.setPreferredSize(getWorkspaceDimention());
        // graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
-        graphsViewer.addGraphPanel(1, true);
+        graphsViewer.addGraphPanel(1, false);
         graphsViewer.addGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, false);
@@ -78,14 +78,14 @@ public class MainView extends JFrame {
 
         DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 300);
         DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
-        graphsViewer.addGraph(0, selectedEyeHiPassedData);
+       // graphsViewer.addGraph(0, selectedEyeHiPassedData);
+        graphsViewer.addGraph(0, eyeHiPassedData);
 
 
 
-        //DataStream<Integer> eyeDerivative = new FilterDerivativeAvgAbs(model.getCh1DataList(),20);
-        DataStream<Integer> eyeDerivative = new FilterDerivative(model.getCh1DataList());
-        graphsViewer.addGraph(1,eyeDerivative);
-        graphsViewer.addGraph(1,model.getArray());
+        graphsViewer.addGraph(1, new FilterHiPassAbs(model.getCh1DataList(), 30));
+        graphsViewer.addGraph(1,new FilterDerivativeAbs(model.getCh1DataList()));
+
 
         graphsViewer.addGraph(2, model.getSleepPatternsStream());
 

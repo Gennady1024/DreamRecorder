@@ -231,7 +231,7 @@ public class ApparatModel {
                     return peaks_arr[index];
                 }
                 return 0;  */
-                return getDerivativeEvg(index, 40);
+                return getDerivativeEvg(index, 5);
             }
         };
     }
@@ -299,6 +299,13 @@ public class ApparatModel {
         return false;
     }
 
+    private int getDerivative(int index) {
+        if (index == 0) {
+            return 0;
+        }
+        return chanel_1_data.get(index) - chanel_1_data.get(index - 1);
+    }
+
     private int getDerivativeAbs(int index) {
         if (index == 0) {
             return 0;
@@ -312,9 +319,15 @@ public class ApparatModel {
        }
        int sum = 0;
        int number = 1;
+       if(Math.abs(getDerivative(index)) > 150 ) {
+          return getDerivative(index);
+       }
        for (int i = 0; i < ticks; i++) {
-           sum = sum + getDerivativeAbs(index - i);
-           number++;
+           int derivative = getDerivative(index - i);
+           if(Math.abs(derivative) < 150 ) {
+               sum = sum + derivative;
+               number++;
+           }
        }
         return sum/number;
     }
