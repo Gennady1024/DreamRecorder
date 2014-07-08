@@ -83,7 +83,7 @@ public class MainView extends JFrame {
 
 
 
-        graphsViewer.addGraph(1, new FilterHiPassAbs(model.getCh1DataList(), 30));
+        graphsViewer.addGraph(1, new FilterHiPassAbs(model.getCh1DataList(), 1));
         graphsViewer.addGraph(1,new FilterDerivativeAbs(model.getCh1DataList()));
 
 

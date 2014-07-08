@@ -22,7 +22,7 @@ public class FilterHiPass extends Filter<Integer> {
             return 0;
         }
         int sum = 0;
-        for (int i = 1; i < bufferSize; i++) {
+        for (int i = 1; i <=bufferSize; i++) {
             sum += (inputData.get(index - i) + inputData.get(index + i));
         }
         return inputData.get(index) - sum/(2*bufferSize);
