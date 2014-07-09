@@ -461,7 +461,6 @@ public class ApparatModel {
     private boolean isRem(int index){
         if(isRem) {
             isRem = !isRemEnd(index);
-            System.out.println("noise: " + noise);
         }
         else {
             isRem = isRemBegin(index);
