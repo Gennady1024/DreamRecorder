@@ -8,7 +8,7 @@ import com.dream.Data.DataStream;
 public class FilterHiPassAdapt extends Filter<Integer> {
     private int bufferSize=0;
     private int NOISE_LEVEL = 200;
-    private int BUFFER_SCALE = 60;
+    private int BUFFER_SCALE = 30;
 
     public FilterHiPassAdapt(DataStream<Integer> inputData) {
         super(inputData);
@@ -21,12 +21,12 @@ public class FilterHiPassAdapt extends Filter<Integer> {
             derivation = inputData.get(index) - inputData.get(index - 1);
         }
         if(Math.abs(derivation) > NOISE_LEVEL) {
-            int newBufferSize = (Math.abs(derivation) - NOISE_LEVEL)*BUFFER_SCALE/NOISE_LEVEL;
+            int newBufferSize = ((Math.abs(derivation) - NOISE_LEVEL)*BUFFER_SCALE)/NOISE_LEVEL;
             bufferSize = Math.max(bufferSize, newBufferSize);
-            bufferSize = Math.min(bufferSize, 300);
+            bufferSize = Math.min(bufferSize, 200);
         }
         if(bufferSize == 0) {
-            return derivation;
+            return 0;
         }
         if (index < bufferSize) {
             return 0;
@@ -40,7 +40,8 @@ public class FilterHiPassAdapt extends Filter<Integer> {
         }
         int result = inputData.get(index) - sum/(2*bufferSize);
         System.out.println(index+"   buffer: "+bufferSize);
-        bufferSize--;
+        bufferSize -= 2;
+        bufferSize = Math.max(bufferSize, 0);
         return  result;
 
     }

@@ -61,7 +61,7 @@ public class ApparatModel {
     int peaksCounter =0;
     int timer = 0;
 
-    private final int FALLING_ASLEEP_TIME = 60; // seconds
+    private final int FALLING_ASLEEP_TIME = 30; // seconds
     private int sleepTimer = 0;
 
     private final int SIN_90 = 1800 / 4;  // if (F(X,Y) = 4) arc_F(X,Y) = 180 Grad
@@ -103,11 +103,11 @@ public class ApparatModel {
     }
 
     private boolean isSleep(int index) {
-        if(index < 18000) {   //выкидиваем первые полчаса от начала записи
-            return false;
-        }
+//        if(index < 18000) {   //выкидиваем первые полчаса от начала записи
+//            return false;
+//        }
         if (isStand(index)) {
-            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *5) / PERIOD_MSEC;
+            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *1) / PERIOD_MSEC;
         }
         if (isMoved(index)) {
             sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / PERIOD_MSEC);
