@@ -11,7 +11,7 @@ public class FilterTest_2  extends Filter<Integer> {
     private int derivative_0 = 0;
     private int derivative_1 = 0;
     private int derivative_2 = 0;
-    private final int NOISELEVEL = 400;
+    private final int NOISELEVEL = 200;
     private int sum_1 = 0;
     private int sum_2 = 0;
 
