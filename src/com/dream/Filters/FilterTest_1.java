@@ -19,7 +19,7 @@ public class FilterTest_1 extends Filter<Integer> {
     protected Integer getData(int index) {
         if(index > 1) {
             if(Math.abs(inputData.get(index) - inputData.get(index - 1)) > NOISE_LEVEL) {
-                timer = 50;
+                timer = 200;
             }
                 sum += (inputData.get(index) - inputData.get(index - 1));
                 timer--;
