@@ -60,11 +60,13 @@ public class MainView extends JFrame {
 
         graphsViewer = new GraphsViewer(model.COMPRESSION_120);
         graphsViewer.setPreferredSize(getWorkspaceDimention());
-       // graphsViewer.addGraphPanel(1, true);
+
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
-        graphsViewer.addCompressedGraphPanel(1, false);
+        graphsViewer.addGraphPanel(1, true);
+        graphsViewer.addGraphPanel(1, false);
+
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
 
@@ -76,13 +78,16 @@ public class MainView extends JFrame {
         graphsViewer.addGraph(0, AccMovementLimitGraphData);    */
 
 
-        DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 300);
-        DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
-        // graphsViewer.addGraph(0, selectedEyeHiPassedData);
-        graphsViewer.addGraph(0, new FilterHiPass(model.getCh1DataList(), 50));
-        graphsViewer.addGraph(1, new FilterTest(model.getCh1DataList()));
+//        DataStream<Integer> eyeHiPassedData =  new FilterHiPass(model.getCh1DataList(), 300);
+//        DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
+//        graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
-        graphsViewer.addGraph(2, new FilterDerivative(model.getCh1DataList()));
+        graphsViewer.addGraph(0, new FilterHiPass(model.getCh1DataList(), 300));
+        graphsViewer.addGraph(1, new FilterTest_1(model.getCh1DataList()));
+        graphsViewer.addGraph(2, new FilterTest_2(model.getCh1DataList()));
+        graphsViewer.addGraph(3, new FilterDerivative(model.getCh1DataList()));
+        graphsViewer.addGraph(4, new FilterDerivativeAbs(model.getCh1DataList()));
+
 
         //graphsViewer.addGraph(2, new FilterHiPassAdapt(model.getCh1DataList(), 15));
         //graphsViewer.addGraph(2,new FilterDerivativeAbs(model.getCh1DataList()));
@@ -96,24 +101,25 @@ public class MainView extends JFrame {
         graphsViewer.addCompressedGraph(0, selectedCompressedDreamGraph);
 
 
-        DataStream<Integer> eyeDerivativeAvg = new FilterDerivativeAvgAbs(model.getCh1DataList(), 20);
-        DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(eyeDerivativeAvg);
-        DataStream<Integer>  selectedCompressedSlowDreamGraph = new Multiplexer(compressedSlowDreamGraph, compressedNotSleepEvents);
+//        DataStream<Integer> eyeDerivativeAvg = new FilterDerivative1Plus2Abs(model.getCh1DataList(), 20);
+//        DataStream<Integer> compressedSlowDreamGraph = new CompressorDerivating(eyeDerivativeAvg);
+//        DataStream<Integer>  selectedCompressedSlowDreamGraph = new Multiplexer(compressedSlowDreamGraph, compressedNotSleepEvents);
 
-        graphsViewer.addCompressedGraph(2, selectedCompressedSlowDreamGraph);
 
-        DataStream<Integer> eyeDerivativeAbs =  new FilterDerivativeAbs(model.getCh1DataList());
-        DataStream<Integer> compressedREMGraph = new CompressorREM(eyeDerivativeAbs);
-        DataStream<Integer>  selectedCompressedREMGraph = new Multiplexer(compressedREMGraph, compressedNotSleepEvents);
-        graphsViewer.addCompressedGraph(1, selectedCompressedREMGraph);
 
+//        DataStream<Integer> eyeDerivativeAbs =  new FilterDerivativeAbs(model.getCh1DataList());
+//        DataStream<Integer> compressedREMGraph = new CompressorREM(eyeDerivativeAbs);
+//        DataStream<Integer>  selectedCompressedREMGraph = new Multiplexer(compressedREMGraph, compressedNotSleepEvents);
+//        graphsViewer.addCompressedGraph(1, selectedCompressedREMGraph);
+
+        // graphsViewer.addCompressedGraph(2, selectedCompressedSlowDreamGraph);
 
         DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream());
-        graphsViewer.addCompressedGraph(2, compressedAccPosition);
+        graphsViewer.addCompressedGraph(1, compressedAccPosition);
 
         DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream());
         compressedAccMovement = new FilterScaling(compressedAccMovement); // scaling
-        graphsViewer.addCompressedGraph(2, compressedAccMovement);
+        graphsViewer.addCompressedGraph(1, compressedAccMovement);
 
         add(graphsViewer, BorderLayout.CENTER);
 

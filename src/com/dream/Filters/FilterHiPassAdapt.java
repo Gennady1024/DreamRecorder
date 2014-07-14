@@ -43,6 +43,5 @@ public class FilterHiPassAdapt extends Filter<Integer> {
         bufferSize -= 2;
         bufferSize = Math.max(bufferSize, 0);
         return  result;
-
     }
 }
