@@ -14,7 +14,7 @@ public class FilterDerivativeTest extends Filter<Integer> {
 
     @Override
     protected Integer getData(int index) {
-        int bufferSize =  1;
+        int bufferSize =  2;
         if (index <= bufferSize) {
             return 0;
         }
@@ -26,6 +26,5 @@ public class FilterDerivativeTest extends Filter<Integer> {
         }
 
         return (sum1 - sum2)/ (bufferSize + 1);
-
     }
 }

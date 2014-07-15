@@ -65,7 +65,7 @@ public class MainView extends JFrame {
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
-        graphsViewer.addGraphPanel(1, false);
+        graphsViewer.addGraphPanel(1, true);
 
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
@@ -86,7 +86,7 @@ public class MainView extends JFrame {
         graphsViewer.addGraph(1, new FilterTest_1(model.getCh1DataList()));
         graphsViewer.addGraph(2, new FilterTest_2(model.getCh1DataList()));
         graphsViewer.addGraph(3, new FilterDerivative(model.getCh1DataList()));
-        graphsViewer.addGraph(4, new FilterDerivativeAbs(model.getCh1DataList()));
+        graphsViewer.addGraph(4, new FilterDerivativeTest(model.getCh1DataList()));
 
 
         //graphsViewer.addGraph(2, new FilterHiPassAdapt(model.getCh1DataList(), 15));
