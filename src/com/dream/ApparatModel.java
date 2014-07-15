@@ -543,6 +543,7 @@ public class ApparatModel {
     }
 
     public void clear() {
+        startTime = 0;
         chanel_1_data.clear();
         chanel_2_data.clear();
         acc_1_data.clear();
