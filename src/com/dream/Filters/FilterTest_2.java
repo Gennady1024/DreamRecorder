@@ -30,6 +30,12 @@ public class FilterTest_2  extends Filter<Integer> {
             sum += derivative;
             derivative_1 = derivative;
         }
+        else {
+            if(Math.abs(sum) > 0 ) {
+                sum += derivative;
+                //derivative_1 = derivative;
+            }
+        }
 
         if( isOppositeSign(derivative_1, derivative_2))    {
             if(Math.abs(sum) > NOISE_LEVEL) {
