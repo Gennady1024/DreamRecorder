@@ -28,7 +28,7 @@ public class ApparatModel {
     private DataList<Integer> acc_2_data = new DataList<Integer>();   //list with accelerometer 2 chanel data
     private DataList<Integer> acc_3_data = new DataList<Integer>();   //list with accelerometer 3 chanel data
     private DataList<Integer> sleep_data = new DataList<Integer>();   // 0 - sleep, 1 - not sleep
-    
+
     private DataList<Integer>  peaks = new DataList<Integer>();
     Integer peaks_arr[] = new Integer[peaks.size()];
 
@@ -468,7 +468,7 @@ public class ApparatModel {
         return isRem;
     }
 
-    
+
     private void calculatePeak(int index) {
        if(isSleep(index)) {
             int derivative = getDerivativeAbs(index);
@@ -493,7 +493,7 @@ public class ApparatModel {
             }
         } */
     }
-    
+
     public int calculateRemMax() {
         peaks_arr =  new Integer[peaks.size()];
         peaks.toArray(peaks_arr);
@@ -540,6 +540,17 @@ public class ApparatModel {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public void clear() {
+        chanel_1_data.clear();
+        chanel_2_data.clear();
+        acc_1_data.clear();
+        acc_2_data.clear();
+        acc_3_data.clear();
+        
+        sleep_patterns.clear();
+        sleep_data.clear();
     }
 
 

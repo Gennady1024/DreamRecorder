@@ -74,6 +74,7 @@ public class FileIOManager {
         try {
             long startTime = inputStream.readLong();
             double frequency = inputStream.readDouble();
+            model.clear();
             model.setStartTime(startTime);
             while (true) {
                 model.addCh1Data(inputStream.readInt());

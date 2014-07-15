@@ -18,7 +18,7 @@ public class FilterHiPass extends Filter<Integer> {
         if (index < bufferSize) {
             return 0;
         }
-        if (index > size()-bufferSize) {
+        if (index >= size()-bufferSize) {
             return 0;
         }
         int sum = 0;
