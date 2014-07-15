@@ -38,7 +38,7 @@ public class FilterTest_2  extends Filter<Integer> {
         }
 
         if( isOppositeSign(derivative_1, derivative_2))    {
-            if(Math.abs(sum) > NOISE_LEVEL) {
+            if(Math.abs(sum) > 2*NOISE_LEVEL) {
                 result = sum;
             }
             sum = 0;
@@ -57,8 +57,11 @@ public class FilterTest_2  extends Filter<Integer> {
     }
 
     protected int getDerivative(int index) {
-        int bufferSize =  0;
+        int bufferSize =  2;
         if (index <= bufferSize) {
+            return 0;
+        }
+        if (index >= (size() - bufferSize)) {
             return 0;
         }
         int sum1 = 0;
@@ -69,5 +72,13 @@ public class FilterTest_2  extends Filter<Integer> {
         }
 
         return (sum1 - sum2)/ (bufferSize + 1);
+    }
+
+    protected int getDerivative1(int index) {
+        int bufferSize =  5;
+        if (index <= bufferSize) {
+            return 0;
+        }
+        return (inputData.get(index) - inputData.get(index-bufferSize));
     }
 }

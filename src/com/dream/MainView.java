@@ -83,7 +83,7 @@ public class MainView extends JFrame {
 //        graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
         graphsViewer.addGraph(0, new FilterHiPass(model.getCh1DataList(), 300));
-        graphsViewer.addGraph(1, new FilterTest_1(model.getCh1DataList()));
+        graphsViewer.addGraph(1, new FilterTest_3(model.getCh1DataList()));
         graphsViewer.addGraph(2, new FilterTest_2(model.getCh1DataList()));
         graphsViewer.addGraph(3, new FilterDerivative(model.getCh1DataList()));
         graphsViewer.addGraph(4, new FilterDerivativeTest(model.getCh1DataList()));
