@@ -32,7 +32,7 @@ public class FilterTest_2  extends Filter<Integer> {
         }
 
         if( isOppositeSign(derivative_1, derivative_2))    {
-            if(sum > NOISE_LEVEL) {
+            if(Math.abs(sum) > NOISE_LEVEL) {
                 result = sum;
             }
             sum = 0;
