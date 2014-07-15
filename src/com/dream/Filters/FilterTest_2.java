@@ -8,39 +8,6 @@ import com.dream.Data.DataStream;
  * To change this template use File | Settings | File Templates.
  */
 public class FilterTest_2  extends Filter<Integer> {
- /*   private int derivative_0 = 0;
-    private int derivative_1 = 0;
-    private int derivative_2 = 0;
-    private final int NOISELEVEL = 100;
-    private int sum_1 = 0;
-    private int sum_2 = 0;
-
-    public FilterTest_2 (DataStream<Integer> inputData) {
-        super(inputData);
-    }
-
-    @Override
-    protected Integer getData(int index) {
-        if(index > 2) {
-            derivative_0 = inputData.get(index) - inputData.get(index - 1);
-            if(Math.abs(derivative_0) > NOISELEVEL){
-                derivative_1 = derivative_0;
-                sum_1 += derivative_0;
-            }
-
-            sum_2 = 0;
-        }
-
-        if((derivative_1 < 0 && derivative_2 > 0) ||
-           (derivative_1 > 0 && derivative_2 < 0))    {
-            sum_2 = (sum_1);
-            sum_1 = 0;
-            derivative_1 = 0;
-        }
-        derivative_2 = derivative_1;
-        return sum_2;
-    }  */
-
 
     private int derivative_1 = 0;
     private int derivative_2 = 0;
@@ -55,12 +22,11 @@ public class FilterTest_2  extends Filter<Integer> {
     protected Integer getData(int index) {
         int result = 0;
         int derivative = 0;
-        if(index > 2) {
-            derivative = inputData.get(index) - inputData.get(index - 1);
-            if(Math.abs(derivative) > NOISELEVEL){
-                sum += derivative;
-                derivative_1 = derivative;
-            }
+
+        derivative = getDerivative(index);
+        if(Math.abs(derivative) > NOISELEVEL){
+            sum += derivative;
+            derivative_1 = derivative;
         }
 
         if( isOppositeSign(derivative_1, derivative_2))    {
@@ -78,5 +44,20 @@ public class FilterTest_2  extends Filter<Integer> {
         }
 
         return false;
+    }
+
+    protected int getDerivative(int index) {
+        int bufferSize =  2;
+        if (index <= bufferSize) {
+            return 0;
+        }
+        int sum1 = 0;
+        int sum2 = 0;
+        for (int i = 0; i <= bufferSize; i++) {
+            sum1 = inputData.get(index+i);
+            sum2 = inputData.get(index - 1 - i);
+        }
+
+        return (sum1 - sum2)/ (bufferSize + 1);
     }
 }
