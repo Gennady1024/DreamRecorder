@@ -11,7 +11,8 @@ public class FilterTest_2  extends Filter<Integer> {
 
     private int derivative_1 = 0;
     private int derivative_2 = 0;
-    private final int NOISELEVEL = 100;
+    private final int SPEED_MIN = 100;
+    private final int NOISE_LEVEL = 400;
     private int sum = 0;
 
     public FilterTest_2 (DataStream<Integer> inputData) {
@@ -22,15 +23,18 @@ public class FilterTest_2  extends Filter<Integer> {
     protected Integer getData(int index) {
         int result = 0;
         int derivative = 0;
+        
 
         derivative = getDerivative(index);
-        if(Math.abs(derivative) > NOISELEVEL){
+        if(Math.abs(derivative) > SPEED_MIN){
             sum += derivative;
             derivative_1 = derivative;
         }
 
         if( isOppositeSign(derivative_1, derivative_2))    {
-            result = sum;
+            if(sum > NOISE_LEVEL) {
+                result = sum;
+            }
             sum = 0;
             derivative_1 = 0;
         }
@@ -47,7 +51,7 @@ public class FilterTest_2  extends Filter<Integer> {
     }
 
     protected int getDerivative(int index) {
-        int bufferSize =  2;
+        int bufferSize =  0;
         if (index <= bufferSize) {
             return 0;
         }
