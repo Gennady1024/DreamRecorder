@@ -42,13 +42,17 @@ public class FileIOManager {
 
     private void saveStateToStream(DataOutputStream outStream, ApparatModel model) throws IOException {
         outStream.writeLong(model.getStartTime());
-        outStream.writeDouble(1000.0 / model.PERIOD_MSEC );
-        for (int i = 0; i < model.getDataSize(); i++) {
+        double frequency = model.getFrequency();
+        int accDivider = (int) (frequency/model.ACC_MAX_FREQUENCY);
+        outStream.writeDouble(frequency);
+        for (int i = 0; i < model.getCh1DataList().size(); i++) {
             outStream.writeInt(model.getCh1DataList().get(i));
             outStream.writeInt(model.getCh2DataList().get(i));
-            outStream.writeInt(model.getAcc1DataList().get(i));
-            outStream.writeInt(model.getAcc2DataList().get(i));
-            outStream.writeInt(model.getAcc3DataList().get(i));
+            if((i % accDivider) == 0) {
+                outStream.writeInt(model.getAcc1DataList().get(i));
+                outStream.writeInt(model.getAcc2DataList().get(i));
+                outStream.writeInt(model.getAcc3DataList().get(i));
+            }
         }
     }
 
@@ -74,14 +78,20 @@ public class FileIOManager {
         try {
             long startTime = inputStream.readLong();
             double frequency = inputStream.readDouble();
+            int accDivider = (int) (frequency/model.ACC_MAX_FREQUENCY);
             model.clear();
+            model.setFrequency(frequency);
             model.setStartTime(startTime);
+            int i = 0;
             while (true) {
                 model.addCh1Data(inputStream.readInt());
                 model.addCh2Data(inputStream.readInt());
-                model.addAcc1Data(inputStream.readInt());
-                model.addAcc2Data(inputStream.readInt());
-                model.addAcc3Data(inputStream.readInt());
+                if((i % accDivider) == 0) {
+                    model.addAcc1Data(inputStream.readInt());
+                    model.addAcc2Data(inputStream.readInt());
+                    model.addAcc3Data(inputStream.readInt());
+                }
+                i++;
             }
         } catch (EOFException e) {
             log.info("End of file");

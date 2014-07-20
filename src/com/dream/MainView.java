@@ -65,7 +65,6 @@ public class MainView extends JFrame {
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
         graphsViewer.addGraphPanel(1, true);
-        graphsViewer.addGraphPanel(1, true);
 
         graphsViewer.addCompressedGraphPanel(1, false);
         graphsViewer.addCompressedGraphPanel(1, true);
@@ -83,11 +82,9 @@ public class MainView extends JFrame {
 //        graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
         graphsViewer.addGraph(0, new FilterHiPass(model.getCh1DataList(), 300));
-        graphsViewer.addGraph(1, new FilterTest_3(model.getCh1DataList()));
-        graphsViewer.addGraph(2, new FilterTest_2(model.getCh1DataList()));
-        graphsViewer.addGraph(3, new FilterDerivative(model.getCh1DataList()));
-        graphsViewer.addGraph(4, new FilterDerivativeTest(model.getCh1DataList()));
-
+        graphsViewer.addGraph(1, new FilterHiPass(model.getCh2DataList(), 300));
+        graphsViewer.addGraph(2, new FilterDerivative(model.getCh1DataList()));
+        graphsViewer.addGraph(3, new FilterDerivative(model.getCh2DataList()));
 
         //graphsViewer.addGraph(2, new FilterHiPassAdapt(model.getCh1DataList(), 15));
         //graphsViewer.addGraph(2,new FilterDerivativeAbs(model.getCh1DataList()));
@@ -95,8 +92,8 @@ public class MainView extends JFrame {
 
         //graphsViewer.addGraph(2, model.getSleepPatternsStream());
 
-        DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getCh1DataList()));
-        DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream());
+        DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getCh1DataList()), model.getCompression());
+        DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream(), model.getCompression());
         DataStream<Integer>  selectedCompressedDreamGraph = new Multiplexer(compressedDreamGraph, compressedNotSleepEvents);
         graphsViewer.addCompressedGraph(0, selectedCompressedDreamGraph);
 
@@ -114,10 +111,10 @@ public class MainView extends JFrame {
 
         // graphsViewer.addCompressedGraph(2, selectedCompressedSlowDreamGraph);
 
-        DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream());
+        DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream(), model.getCompression());
         graphsViewer.addCompressedGraph(1, compressedAccPosition);
 
-        DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream());
+        DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream(), model.getCompression());
         compressedAccMovement = new FilterScaling(compressedAccMovement); // scaling
         graphsViewer.addCompressedGraph(1, compressedAccMovement);
 

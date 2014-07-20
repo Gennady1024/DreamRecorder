@@ -12,8 +12,8 @@ import com.dream.Data.DataStream;
  */
 
 public class CompressorREM extends Filter<Integer> {
-    public CompressorREM(DataStream<Integer> inputData) {
-        super(inputData, ApparatModel.COMPRESSION_120);
+    public CompressorREM(DataStream<Integer> inputData, int compression ) {
+        super(inputData, compression);
     }
 
     @Override

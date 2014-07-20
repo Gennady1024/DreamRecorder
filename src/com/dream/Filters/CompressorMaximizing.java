@@ -8,8 +8,8 @@ import com.dream.Data.DataStream;
  */
 
 public class CompressorMaximizing extends Filter<Integer> {
-    public CompressorMaximizing(DataStream<Integer> inputData) {
-        super(inputData, ApparatModel.COMPRESSION_120);
+    public CompressorMaximizing(DataStream<Integer> inputData, int compression) {
+        super(inputData, compression);
     }
 
     @Override

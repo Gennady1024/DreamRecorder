@@ -19,9 +19,11 @@ import java.util.Date;
 public class ApparatModel {
 
 
-    public static final int COMPRESSION_120 = 120; //compression for big-scaled graphs
-    public static final int COMPRESSION_10 = 10; //compression for sleep patterns
-    public static final int PERIOD_MSEC = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
+    public final int COMPRESSION_120 = 120; //compression for big-scaled graphs
+
+    public final int ACC_MAX_FREQUENCY = 10;
+    public  int period_msec  = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
+
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
     private DataList<Integer> acc_1_data = new DataList<Integer>();   //list with accelerometer 1 chanel data
@@ -71,6 +73,22 @@ public class ApparatModel {
     int Z_mod = 90;
 
 
+    public void setFrequency(double frequency) {
+        period_msec = (int)(1000 / frequency);
+    }
+
+    public double getFrequency() {
+        return 1000 / period_msec;
+    }
+
+    public int getPeriodMsec() {
+        return period_msec;
+    }
+
+    public int getCompression() {
+        return COMPRESSION_120 * getAccDivider();
+    }
+
     public void movementLimitUp() {
         movementLimit *= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
@@ -107,10 +125,10 @@ public class ApparatModel {
 //            return false;
 //        }
         if (isStand(index)) {
-            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *1) / PERIOD_MSEC;
+            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *1) / period_msec;
         }
         if (isMoved(index)) {
-            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / PERIOD_MSEC);
+            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / period_msec);
         }
 
         boolean isSleep = true;
@@ -222,20 +240,6 @@ public class ApparatModel {
             }
         };
     }
-
-    public DataStream<Integer> getArray() {
-        return new DataStreamAdapter<Integer>() {
-            @Override
-            protected Integer getData(int index) {
-              /*  if(index < peaks_arr.length){
-                    return peaks_arr[index];
-                }
-                return 0;  */
-                return getDerivativeEvg(index, 5);
-            }
-        };
-    }
-
 
 
     private int getAccPosition(int index) {
@@ -506,29 +510,35 @@ public class ApparatModel {
          return rem;
     }
 
-
+    private int getAccDivider() {
+        return (int) (getFrequency()/ ACC_MAX_FREQUENCY);
+    }
 
     private int getNormalizedDataAcc1(int index) {
-        return (acc_1_data.get(index) - ACC_X_NULL);
+        int accIndex = index/getAccDivider();
+        return (acc_1_data.get(accIndex) - ACC_X_NULL);
     }
 
 
     private int getNormalizedDataAcc2(int index) {
-        return -(acc_2_data.get(index) - ACC_Y_NULL);
+        int accIndex = index/getAccDivider();
+        return -(acc_2_data.get(accIndex) - ACC_Y_NULL);
     }
 
 
     private int getNormalizedDataAcc3(int index) {
-        return -(acc_3_data.get(index) + ACC_Z_NULL);
+        int accIndex = index/getAccDivider();
+        return -(acc_3_data.get(accIndex) + ACC_Z_NULL);
     }
 
 
     public int getDataSize() {
+        int accDivider = getAccDivider();
         int size = chanel_1_data.size();
         size = Math.min(size, chanel_2_data.size());
-        size = Math.min(size, acc_1_data.size());
-        size = Math.min(size, acc_2_data.size());
-        size = Math.min(size, acc_3_data.size());
+        size = Math.min(size, acc_1_data.size() * accDivider);
+        size = Math.min(size, acc_2_data.size() * accDivider);
+        size = Math.min(size, acc_3_data.size() * accDivider);
 
         return size;
     }

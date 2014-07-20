@@ -7,8 +7,8 @@ import com.dream.Data.DataStream;
  *
  */
 public class CompressorAveraging extends Filter<Integer> {
-    public CompressorAveraging(DataStream<Integer> inputData) {
-        super(inputData, ApparatModel.COMPRESSION_120);
+    public CompressorAveraging(DataStream<Integer> inputData, int compression) {
+        super(inputData, compression);
     }
 
     @Override

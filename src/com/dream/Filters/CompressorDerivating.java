@@ -12,8 +12,8 @@ import com.dream.Data.DataStream;
  */
 public class CompressorDerivating extends Filter<Integer> {
 
-    public CompressorDerivating(DataStream<Integer> inputData) {
-        super(inputData, ApparatModel.COMPRESSION_120);
+    public CompressorDerivating(DataStream<Integer> inputData, int compression) {
+        super(inputData, compression);
     }
 
     @Override

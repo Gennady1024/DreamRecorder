@@ -19,6 +19,8 @@ public class  Controller {
 
     private Timer repaintTimer;
     private Model model;
+    //private final int MODEL_FREQUENCY = 10;
+    private final int MODEL_FREQUENCY = 250;
     private MainWindow mainWindow;
     private ApplicationProperties applicationProperties;
     private static final Log log = LogFactory.getLog(Controller.class);
@@ -61,6 +63,7 @@ public class  Controller {
                 mainWindow.repaint();
             }
         });
+
         channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * channel0Divider)) {
             @Override
             public void notifyListeners(int value) {
@@ -93,6 +96,8 @@ public class  Controller {
         };
     }
 
+
+
     public void setMainWindow(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
     }
@@ -101,7 +106,7 @@ public class  Controller {
         return isRecording;
     }
 
-    protected void updateModel() {
+  /*  protected void updateModel() {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
             for (int i = 0; i < nrOfChannel0Samples; i++) {
@@ -123,6 +128,30 @@ public class  Controller {
         if (isAutoScroll) {
             model.setFastGraphIndexMaximum();
         }
+    }   */
+
+    protected void updateModel() {
+        while (incomingDataBuffer.available()) {
+            int[] frame = incomingDataBuffer.poll();
+            for (int i = 0; i < nrOfChannel0Samples; i++) {
+                model.addEyeData(frame[i]);
+            }
+            for (int i = nrOfChannel0Samples; i < nrOfChannel0Samples + nrOfChannel1Samples; i++) {
+                model.addCh2Data(frame[i]);
+            }
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                model.addAcc1Data(frame[accelerometerOffset + i]);
+            }
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                model.addAcc2Data(frame[accelerometerOffset + nrOfAccelerometerSamples + i]);
+            }
+            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
+                model.addAcc1Data(frame[accelerometerOffset + 2 * nrOfAccelerometerSamples + i]);
+            }
+        }
+        if (isAutoScroll) {
+            model.setFastGraphIndexMaximum();
+        }
     }
 
     public void startRecording() {
@@ -135,7 +164,7 @@ public class  Controller {
         bdfWriter = new BdfWriter(bdfHeaderData);
         ads.addAdsDataListener(bdfWriter);
         model.clear();
-        model.setFrequency(10);
+        model.setFrequency(MODEL_FREQUENCY);
         model.setStartTime(System.currentTimeMillis());  //todo remove
         repaintTimer.start();
         incomingDataBuffer = new IncomingDataBuffer();
