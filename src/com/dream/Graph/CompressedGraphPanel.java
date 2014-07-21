@@ -50,7 +50,7 @@ class CompressedGraphPanel extends GraphPanel {
     }
 
     int getSlotWidth() {
-        return  getWorkspaceWidth() / compression;
+        return  Math.max(1, (getWorkspaceWidth() / compression));
     }
 
     public void addSlotListener(SlotListener slotListener) {
