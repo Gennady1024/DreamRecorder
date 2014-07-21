@@ -51,7 +51,7 @@ public class Model {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                return acc1DataList.get(index%getAccDivider());
+                return acc1DataList.get(index/getAccDivider());
             }
         };
     }
@@ -60,7 +60,7 @@ public class Model {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                return acc2DataList.get(index%getAccDivider());
+                return acc2DataList.get(index/getAccDivider());
             }
         };
     }
@@ -69,7 +69,7 @@ public class Model {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                return acc3DataList.get(index%getAccDivider());
+                return acc3DataList.get(index/getAccDivider());
             }
         };
     }
