@@ -1,5 +1,7 @@
 package com.github.dreamrec;
 
+import com.github.dreamrec.filters.Filter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import java.util.List;
  */
 public class Model {
     private int xSize; //data points per screen.
-    public final int ACC_MAX_FREQUENCY = 10;
+    public static final int ACC_MAX_FREQUENCY = 10;
     public static final int DIVIDER = 120; //frequency divider for slow graphics
     private DataList<Integer> eyeDataList = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel2DataList = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
@@ -25,20 +27,77 @@ public class Model {
         return eyeDataList;
     }
 
-    public DataList<Integer> getAcc1DataList() {
+    public DataList<Integer> getAcc1DataList_() {
         return acc1DataList;
     }
 
-    public DataList<Integer> getAcc2DataList() {
+    public DataList<Integer> getAcc2DataList_() {
         return acc2DataList;
     }
 
-    public DataList<Integer> getAcc3DataList() {
+    public DataList<Integer> getAcc3DataList_() {
         return acc3DataList;
     }
 
      public DataList<Integer> getCh2DataList() {
         return chanel2DataList;
+    }
+
+    private int getAccDivider() {
+        return (int) (getFrequency()/ ACC_MAX_FREQUENCY);
+    }
+
+    public  Filter<Integer> getAcc1DataList() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return acc1DataList.get(index%getAccDivider());
+            }
+        };
+    }
+
+    public  Filter<Integer> getAcc2DataList() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return acc2DataList.get(index%getAccDivider());
+            }
+        };
+    }
+
+    public  Filter<Integer> getAcc3DataList() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                return acc3DataList.get(index%getAccDivider());
+            }
+        };
+    }
+
+
+    abstract class DataStreamAdapter<Integer> implements Filter<Integer> {
+        protected abstract Integer getData(int index);
+
+        public final Integer get(int index) {
+            checkIndexBounds(index);
+            return getData(index);
+        }
+
+        public int divider() {
+            return 1;
+        }
+
+
+        private void checkIndexBounds(int index){
+            if(index > size() || index < 0 ){
+                throw  new IndexOutOfBoundsException("index:  "+index+", available:  "+size());
+            }
+        }
+
+        @Override
+        public int size() {
+            return getDataSize();
+        }
     }
 
     public void addEyeData(int data) {

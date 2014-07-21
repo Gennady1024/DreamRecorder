@@ -49,9 +49,9 @@ public class FileIOManager {
             outStream.writeInt(model.getCh1DataList().get(i));
             outStream.writeInt(model.getCh2DataList().get(i));
             if((i % accDivider) == 0) {
-                outStream.writeInt(model.getAcc1DataList().get(i));
-                outStream.writeInt(model.getAcc2DataList().get(i));
-                outStream.writeInt(model.getAcc3DataList().get(i));
+                outStream.writeInt(model.getAcc1DataList().get(i % accDivider));
+                outStream.writeInt(model.getAcc2DataList().get(i % accDivider));
+                outStream.writeInt(model.getAcc3DataList().get(i % accDivider));
             }
         }
     }
