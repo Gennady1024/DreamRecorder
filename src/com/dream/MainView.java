@@ -58,7 +58,7 @@ public class MainView extends JFrame {
             }
         });
 
-        graphsViewer = new GraphsViewer(model.COMPRESSION_120);
+        graphsViewer = new GraphsViewer(model.getCompression());
         graphsViewer.setPreferredSize(getWorkspaceDimention());
 
         graphsViewer.addGraphPanel(1, true);
