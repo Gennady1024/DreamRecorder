@@ -146,7 +146,7 @@ public class  Controller {
                 model.addAcc2Data(frame[accelerometerOffset + nrOfAccelerometerSamples + i]);
             }
             for (int i = 0; i < nrOfAccelerometerSamples; i++) {
-                model.addAcc1Data(frame[accelerometerOffset + 2 * nrOfAccelerometerSamples + i]);
+                model.addAcc3Data(frame[accelerometerOffset + 2 * nrOfAccelerometerSamples + i]);
             }
         }
         if (isAutoScroll) {
