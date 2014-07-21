@@ -28,8 +28,7 @@ public class GraphsViewer extends JPanel {
     private JScrollPane scrollPanel = new JScrollPane(scrollablePanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
     private ViewController viewController = new ViewController();
 
-    public GraphsViewer(int compression) {
-        this.compression = compression;
+    public GraphsViewer() {
         setLayout(new BorderLayout());
 
         PaintingPanel.setLayout(new BoxLayout(PaintingPanel, BoxLayout.Y_AXIS));
@@ -64,7 +63,8 @@ public class GraphsViewer extends JPanel {
         });
     }
 
-    public void setStart(long startTime, int period_msec) {
+    public void setStart(long startTime, int period_msec, int compression) {
+        this.compression = compression;
         for (GraphPanel panel : graphPanels) {
             panel.setStart(startTime, period_msec);
         }

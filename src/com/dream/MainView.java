@@ -58,7 +58,7 @@ public class MainView extends JFrame {
             }
         });
 
-        graphsViewer = new GraphsViewer(model.getCompression());
+        graphsViewer = new GraphsViewer();
         graphsViewer.setPreferredSize(getWorkspaceDimention());
 
         graphsViewer.addGraphPanel(1, true);
@@ -134,7 +134,7 @@ public class MainView extends JFrame {
     }
 
     public void setStart(long starTime, int period_msec) {
-        graphsViewer.setStart(starTime, period_msec);
+        graphsViewer.setStart(starTime, period_msec, model.getCompression());
     }
 
     private Dimension getWorkspaceDimention() {
