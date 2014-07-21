@@ -69,6 +69,7 @@ public class GraphsViewer extends JPanel {
             panel.setStart(startTime, period_msec);
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
+            panel.setCompression(compression);
             panel.setStart(startTime, period_msec * compression);
         }
 
@@ -82,7 +83,7 @@ public class GraphsViewer extends JPanel {
     }
 
     public void addCompressedGraphPanel(int weight, boolean isXCentered) {
-        CompressedGraphPanel panel = new CompressedGraphPanel(weight, compression, isXCentered);
+        CompressedGraphPanel panel = new CompressedGraphPanel(weight, isXCentered);
         panel.addSlotListener(viewController);
         compressedGraphPanels.add(panel);
         PaintingPanel.add(panel);

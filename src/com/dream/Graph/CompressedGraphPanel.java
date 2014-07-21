@@ -20,14 +20,12 @@ class CompressedGraphPanel extends GraphPanel {
 
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
     private int slotIndex = 0;  // according to the beginning of Data arrays
-    private int compression = 0;
+    private int compression = 1;
     private Color slotColor = Color.MAGENTA;
 
 
-    CompressedGraphPanel(int weight, int compression, boolean isXCentered ) {
+    CompressedGraphPanel(int weight, boolean isXCentered ) {
         super(weight, isXCentered);
-        this.compression = compression;
-
         //MouseListener to move Slot
         addMouseListener(new MouseAdapter() {
             @Override
@@ -37,6 +35,10 @@ class CompressedGraphPanel extends GraphPanel {
                 notifySlotListeners(newSlotIndex);
             }
         });
+    }
+
+    void setCompression(int compression) {
+        this.compression = compression;
     }
 
     int getSlotIndex() {
