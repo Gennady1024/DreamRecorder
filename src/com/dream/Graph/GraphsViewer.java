@@ -69,8 +69,7 @@ public class GraphsViewer extends JPanel {
             panel.setStart(startTime, period_msec);
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setCompression(compression);
-            panel.setStart(startTime, period_msec * compression);
+            panel.setStart(startTime, period_msec * compression, compression);
         }
 
     }

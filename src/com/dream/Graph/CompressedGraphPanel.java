@@ -37,7 +37,8 @@ class CompressedGraphPanel extends GraphPanel {
         });
     }
 
-    void setCompression(int compression) {
+    void setStart(long startTime, int period_msec, int compression) {
+        super.setStart(startTime, period_msec);
         this.compression = compression;
     }
 
@@ -50,6 +51,9 @@ class CompressedGraphPanel extends GraphPanel {
     }
 
     int getSlotWidth() {
+        if(compression <= 1) {
+            return 0;
+        }
         return  Math.max(1, (getWorkspaceWidth() / compression));
     }
 

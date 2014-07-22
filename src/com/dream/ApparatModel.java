@@ -3,11 +3,7 @@ package com.dream;
 import com.dream.Data.DataList;
 import com.dream.Data.DataStream;
 
-import java.awt.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,7 +15,7 @@ import java.util.Date;
 public class ApparatModel {
 
 
-    public final int COMPRESSION_120 = 120; //compression for big-scaled graphs
+    public final int COMPRESSION_BASE = 60; //compression for big-scaled graphs
 
     public final int ACC_MAX_FREQUENCY = 10;
     public  int period_msec  = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
@@ -86,7 +82,7 @@ public class ApparatModel {
     }
 
     public int getCompression() {
-        return COMPRESSION_120 * getAccDivider();
+        return COMPRESSION_BASE * getAccDivider();
     }
 
     public void movementLimitUp() {
@@ -125,7 +121,7 @@ public class ApparatModel {
 //            return false;
 //        }
         if (isStand(index)) {
-            sleepTimer = (FALLING_ASLEEP_TIME * 1000 *1) / period_msec;
+            sleepTimer = (FALLING_ASLEEP_TIME * 1000) / period_msec;
         }
         if (isMoved(index)) {
             sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / period_msec);
@@ -191,6 +187,23 @@ public class ApparatModel {
 
         int dXYZ = Math.abs(dX) + Math.abs(dY) + Math.abs(dZ);
         return dXYZ;
+    }
+
+    public DataStream<Integer> getEyeData() {
+        return new DataStreamAdapter<Integer>() {
+            @Override
+            protected Integer getData(int index) {
+                int buffer = 5;
+                if(index < buffer) {
+                    return 0;
+                }
+                int sum = 0;
+                for (int i = 0; i < buffer; i++) {
+                   sum += chanel_1_data.get(index-i);
+                }
+                return sum/buffer;
+            }
+        };
     }
 
     public DataStream<Integer> getSleepPatternsStream() {

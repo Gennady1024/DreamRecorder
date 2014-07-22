@@ -158,7 +158,7 @@ class GraphPanel extends JPanel {
         g2d.transform(AffineTransform.getScaleInstance(1.0, -1.0)); // flip transformation
 
 
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         long newStartTime = (startTime/period_msec)*period_msec + period_msec;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
             long iTime = newStartTime + (long)((startIndex + i) * period_msec);
@@ -175,7 +175,13 @@ class GraphPanel extends JPanel {
                 g.drawLine(i, 0, i, 0);
             }
 
-            if((iTime % MINUTE) == 0){
+          /*  if((iTime % MINUTE) == 0){
+                String timeStamp = dateFormat.format(new Date(iTime)) ;
+                // Paint Time Stamp
+                g.drawString(timeStamp, i - 15, +18);
+            }  */
+
+            if((iTime % SECOND) == 0){
                 String timeStamp = dateFormat.format(new Date(iTime)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
