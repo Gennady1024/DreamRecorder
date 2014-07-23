@@ -18,6 +18,7 @@ import java.util.Date;
  */
 public class  Controller {
     public static final int DRM_FREQUENCY = 50;
+    public static final int ACC_FREQUENCY = 10;
     private Timer repaintTimer;
     private Model model;
     private MainWindow mainWindow;
@@ -76,13 +77,13 @@ public class  Controller {
                 model.addCh2Data(value);
             }
         };
-        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
+        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (ACC_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc1Data(value);
             }
         };
-        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
+        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (ACC_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc2Data(value);

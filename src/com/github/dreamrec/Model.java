@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class Model {
     private int xSize; //data points per screen.
-    public static final int ACC_MAX_FREQUENCY = 10;
+    public static final int ACC_MAX_FREQUENCY = Controller.ACC_FREQUENCY;
     public static final int DIVIDER = 120; //frequency divider for slow graphics
     private DataList<Integer> eyeDataList = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel2DataList = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
@@ -18,7 +18,7 @@ public class Model {
     private DataList<Integer> acc2DataList = new DataList<Integer>();   //list with accelerometer 1 chanel data
     private DataList<Integer> acc3DataList = new DataList<Integer>();   //list with accelerometer 1 chanel data
 
-    private double frequency = 250; //frequency Hz of the incoming data (for fast graphics)
+    private double frequency = 50; //frequency Hz of the incoming data (for fast graphics)
     private long startTime; //time when data recording was started
     private int fastGraphIndex; //index for the first point on a screen for fast graphics
     private int slowGraphIndex; //index for the first point on a screen for slow graphics
