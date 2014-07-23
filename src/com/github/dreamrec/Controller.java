@@ -89,7 +89,7 @@ public class  Controller {
                 model.addAcc2Data(value);
             }
         };
-        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
+        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (ACC_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc3Data(value);
