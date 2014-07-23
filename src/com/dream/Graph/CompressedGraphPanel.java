@@ -20,8 +20,8 @@ class CompressedGraphPanel extends GraphPanel {
 
     private ArrayList<SlotListener> slotListeners = new ArrayList<SlotListener>();
     private int slotIndex = 0;  // according to the beginning of Data arrays
-    private int compression = 1;
     private Color slotColor = Color.MAGENTA;
+    private int compression = 1;
 
 
     CompressedGraphPanel(int weight, boolean isXCentered ) {
@@ -37,10 +37,6 @@ class CompressedGraphPanel extends GraphPanel {
         });
     }
 
-    void setStart(long startTime, int period_msec, int compression) {
-        super.setStart(startTime, period_msec);
-        this.compression = compression;
-    }
 
     int getSlotIndex() {
         return slotIndex;
@@ -48,6 +44,13 @@ class CompressedGraphPanel extends GraphPanel {
 
     void setSlotIndex(int slotIndex) {
         this.slotIndex = slotIndex;
+    }
+
+    @Override
+    protected void setStart(long startTime, int period_msec) {
+        compression =  GraphsViewer.COMPRESSED_POINT_DISTANCE_MSEC / period_msec;
+        super.setStart(startTime, GraphsViewer.COMPRESSED_POINT_DISTANCE_MSEC);
+
     }
 
     int getSlotWidth() {
@@ -92,10 +95,10 @@ class CompressedGraphPanel extends GraphPanel {
             startTime = System.currentTimeMillis();
         }
 
-        long newStartTime = (startTime/period_msec)*period_msec + period_msec;
+        long newStartTime = (startTime/ point_distance_msec)* point_distance_msec + point_distance_msec;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
 
-            long iTime = newStartTime + (long)((startIndex + i) * period_msec);
+            long iTime = newStartTime + (long)((startIndex + i) * point_distance_msec);
             if((iTime % MINUTES_10) == 0){
                 // Paint Triangle
                 g.fillPolygon(new int[]{i - 3, i + 3, i}, new int[]{0, 0, 6}, 3);

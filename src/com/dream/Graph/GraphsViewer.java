@@ -18,7 +18,8 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GraphsViewer extends JPanel {
-    private int compression = 120;
+    public  int compression = 1;
+    public static final int COMPRESSED_POINT_DISTANCE_MSEC = 6000;
 
     private ArrayList<GraphPanel> graphPanels = new ArrayList<GraphPanel>();
     private ArrayList<CompressedGraphPanel> compressedGraphPanels = new ArrayList<CompressedGraphPanel>();
@@ -63,15 +64,18 @@ public class GraphsViewer extends JPanel {
         });
     }
 
-    public void setStart(long startTime, int period_msec, int compression) {
-        this.compression = compression;
+    public void setStart(long startTime, int point_distance_msec) {
+        compression =  COMPRESSED_POINT_DISTANCE_MSEC / point_distance_msec;
         for (GraphPanel panel : graphPanels) {
-            panel.setStart(startTime, period_msec);
+            panel.setStart(startTime, point_distance_msec);
         }
         for (CompressedGraphPanel panel : compressedGraphPanels) {
-            panel.setStart(startTime, period_msec * compression, compression);
+            panel.setStart(startTime, point_distance_msec);
         }
+    }
 
+    public int getCompression() {
+         return compression;
     }
 
     public void addGraphPanel(int weight, boolean isXCentered) {

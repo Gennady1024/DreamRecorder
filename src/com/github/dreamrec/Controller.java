@@ -17,7 +17,7 @@ import java.util.Date;
  *
  */
 public class  Controller {
-
+    public static final int DRM_FREQUENCY = 50;
     private Timer repaintTimer;
     private Model model;
     //private final int MODEL_FREQUENCY = 10;
@@ -66,31 +66,31 @@ public class  Controller {
             }
         });
 
-        channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * channel0Divider)) {
+        channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * channel0Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addEyeData(value);
             }
         };
-        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * channel1Divider)) {
+        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * channel1Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addCh2Data(value);
             }
         };
-        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
+        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc1Data(value);
             }
         };
-        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
+        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc2Data(value);
             }
         };
-        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
+        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (DRM_FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc3Data(value);
@@ -131,30 +131,6 @@ public class  Controller {
             model.setFastGraphIndexMaximum();
         }
     }
-
-   /* protected void updateModel() {
-        while (incomingDataBuffer.available()) {
-            int[] frame = incomingDataBuffer.poll();
-            for (int i = 0; i < nrOfChannel0Samples; i++) {
-                model.addEyeData(frame[i]);
-            }
-            for (int i = nrOfChannel0Samples; i < nrOfChannel0Samples + nrOfChannel1Samples; i++) {
-                model.addCh2Data(frame[i]);
-            }
-            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
-                model.addAcc1Data(frame[accelerometerOffset + i]);
-            }
-            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
-                model.addAcc2Data(frame[accelerometerOffset + nrOfAccelerometerSamples + i]);
-            }
-            for (int i = 0; i < nrOfAccelerometerSamples; i++) {
-                model.addAcc3Data(frame[accelerometerOffset + 2 * nrOfAccelerometerSamples + i]);
-            }
-        }
-        if (isAutoScroll) {
-            model.setFastGraphIndexMaximum();
-        }
-    }  */
 
     public void startRecording() {
         isRecording = true;

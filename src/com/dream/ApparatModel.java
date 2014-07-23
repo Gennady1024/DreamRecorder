@@ -14,9 +14,8 @@ import java.util.Arrays;
  */
 public class ApparatModel {
 
-    public static final int COMPRESSION = 60; //compression for big-scaled graphs
-    public static final int FREQUENCY = 50;
     private static final int ACC_FREQUENCY = 10;
+    private int frequency = 50;
 
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
@@ -67,6 +66,14 @@ public class ApparatModel {
     int Z_mod = 90;
 
 
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
     public void movementLimitUp() {
         movementLimit *= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
@@ -98,15 +105,17 @@ public class ApparatModel {
         return false;
     }
 
+
+
     private boolean isSleep(int index) {
 //        if(index < 18000) {   //выкидиваем первые полчаса от начала записи
 //            return false;
 //        }
         if (isStand(index)) {
-            sleepTimer = FALLING_ASLEEP_TIME * FREQUENCY;
+            sleepTimer = FALLING_ASLEEP_TIME * frequency;
         }
         if (isMoved(index)) {
-            sleepTimer = Math.max(sleepTimer, FALLING_ASLEEP_TIME  * FREQUENCY);
+            sleepTimer = Math.max(sleepTimer, FALLING_ASLEEP_TIME  * frequency);
         }
 
         boolean isSleep = true;
@@ -505,8 +514,8 @@ public class ApparatModel {
          return rem;
     }
 
-    public int getAccDivider() {
-        return FREQUENCY/ ACC_FREQUENCY;
+ public int getAccDivider() {
+        return frequency / ACC_FREQUENCY;
     }
 
     private int getNormalizedDataAcc1(int index) {

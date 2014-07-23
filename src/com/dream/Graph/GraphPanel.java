@@ -36,7 +36,7 @@ class GraphPanel extends JPanel {
     protected boolean isXCentered = true;
     protected long startTime = 0;
     protected int weight = 1;
-    protected int period_msec = 0; //milliseconds!!!  period of the incoming data
+    protected int point_distance_msec = 0;
 
 
     GraphPanel(int weight, boolean isXCentered) {
@@ -52,9 +52,9 @@ class GraphPanel extends JPanel {
     }
 
 
-    protected void setStart(long startTime, int period_msec) {
+    protected void setStart(long startTime, int point_distance_msec) {
             this.startTime = startTime;
-            this.period_msec = period_msec;
+            this.point_distance_msec = point_distance_msec;
     }
 
 
@@ -159,9 +159,9 @@ class GraphPanel extends JPanel {
 
 
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        long newStartTime = (startTime/period_msec)*period_msec + period_msec;
+        long newStartTime = (startTime/ point_distance_msec)* point_distance_msec + point_distance_msec;
         for (int i = 0; i  < getWorkspaceWidth(); i++) {
-            long iTime = newStartTime + (long)((startIndex + i) * period_msec);
+            long iTime = newStartTime + (long)((startIndex + i) * point_distance_msec);
             if((iTime % SECONDS_10) == 0){
                 // Paint Rectangle
                 g.fillRect(i - 1, -4, 3, 9);
@@ -181,7 +181,7 @@ class GraphPanel extends JPanel {
                 g.drawString(timeStamp, i - 15, +18);
             }  */
 
-            if((iTime % SECOND) == 0){
+            if((iTime % SECONDS_10) == 0){
                 String timeStamp = dateFormat.format(new Date(iTime)) ;
                 // Paint Time Stamp
                 g.drawString(timeStamp, i - 15, +18);
@@ -256,7 +256,7 @@ class GraphPanel extends JPanel {
 
         paintAxisY(g);
 
-        if(period_msec != 0) {
+        if(point_distance_msec != 0) {
             paintAxisX(g);
         }
 

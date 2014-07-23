@@ -7,22 +7,16 @@ import com.dream.Data.DataStream;
  */
 public abstract class Filter<T> implements DataStream {
     protected final DataStream<T> inputData;
-    protected int compression = 1;
-
-    public Filter(DataStream<T> inputData, int compression) {
-        this.inputData = inputData;
-        this.compression = compression;
-    }
 
     public Filter(DataStream<T> inputData) {
-        this(inputData, 1);
+        this.inputData = inputData;
     }
 
     protected abstract T getData(int index);
 
 
-    public final int size() {
-        return inputData.size()/compression;
+    public int size() {
+        return inputData.size();
     }
 
 

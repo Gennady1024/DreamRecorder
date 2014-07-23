@@ -38,7 +38,7 @@ public class Controller {
                 File selectedFile =  fileChooser.getSelectedFile();
                 new FileIOManager().readFromFile(selectedFile, model);
                 mainWindow.setTitle(selectedFile.getName());
-                mainWindow.setStart(model.getStartTime(), model.getPeriodMsec());
+                mainWindow.setStart(model.getStartTime(), 1000 / model.getFrequency());
             }
         } catch (ApplicationException e) {
             mainWindow.showMessage(e.getMessage());

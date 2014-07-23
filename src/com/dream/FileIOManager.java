@@ -78,10 +78,10 @@ public class FileIOManager {
         try {
             long startTime = inputStream.readLong();
             double frequency = inputStream.readDouble();
-            int accDivider = (int) (frequency/model.ACC_FREQUENCY);
             model.clear();
-            model.setFrequency(frequency);
+            model.setFrequency((int)frequency);
             model.setStartTime(startTime);
+            int accDivider = model.getAccDivider();
             int i = 0;
             while (true) {
                 model.addCh1Data(inputStream.readInt());
