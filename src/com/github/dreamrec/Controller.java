@@ -20,8 +20,6 @@ public class  Controller {
     public static final int DRM_FREQUENCY = 50;
     private Timer repaintTimer;
     private Model model;
-    //private final int MODEL_FREQUENCY = 10;
-    private final int MODEL_FREQUENCY = 250;
     private MainWindow mainWindow;
     private ApplicationProperties applicationProperties;
     private static final Log log = LogFactory.getLog(Controller.class);
@@ -142,7 +140,7 @@ public class  Controller {
         bdfWriter = new BdfWriter(bdfHeaderData);
         ads.addAdsDataListener(bdfWriter);
         model.clear();
-        model.setFrequency(MODEL_FREQUENCY);
+        model.setFrequency(DRM_FREQUENCY);
         model.setStartTime(System.currentTimeMillis());  //todo remove
         repaintTimer.start();
         incomingDataBuffer = new IncomingDataBuffer();
