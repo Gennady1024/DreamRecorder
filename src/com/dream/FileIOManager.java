@@ -43,7 +43,7 @@ public class FileIOManager {
     private void saveStateToStream(DataOutputStream outStream, ApparatModel model) throws IOException {
         outStream.writeLong(model.getStartTime());
         double frequency = model.getFrequency();
-        int accDivider = (int) (frequency/model.ACC_MAX_FREQUENCY);
+        int accDivider = model.getAccDivider();
         outStream.writeDouble(frequency);
         for (int i = 0; i < model.getCh1DataList().size(); i++) {
             outStream.writeInt(model.getCh1DataList().get(i));
@@ -78,7 +78,7 @@ public class FileIOManager {
         try {
             long startTime = inputStream.readLong();
             double frequency = inputStream.readDouble();
-            int accDivider = (int) (frequency/model.ACC_MAX_FREQUENCY);
+            int accDivider = (int) (frequency/model.ACC_FREQUENCY);
             model.clear();
             model.setFrequency(frequency);
             model.setStartTime(startTime);

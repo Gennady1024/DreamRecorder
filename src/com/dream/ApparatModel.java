@@ -14,11 +14,9 @@ import java.util.Arrays;
  */
 public class ApparatModel {
 
-
-    public final int COMPRESSION_BASE = 60; //compression for big-scaled graphs
-
-    public final int ACC_MAX_FREQUENCY = 10;
-    public  int period_msec  = 100;  // milliseconds!!!!  period of the incoming data (for fast graphics)
+    public static final int COMPRESSION = 60; //compression for big-scaled graphs
+    public static final int FREQUENCY = 50;
+    private static final int ACC_FREQUENCY = 10;
 
     private DataList<Integer> chanel_1_data = new DataList<Integer>();   //list with prefiltered incoming data of eye movements
     private DataList<Integer> chanel_2_data = new DataList<Integer>();   //list with prefiltered incoming chanel2 data
@@ -69,22 +67,6 @@ public class ApparatModel {
     int Z_mod = 90;
 
 
-    public void setFrequency(double frequency) {
-        period_msec = (int)(1000 / frequency);
-    }
-
-    public double getFrequency() {
-        return 1000 / period_msec;
-    }
-
-    public int getPeriodMsec() {
-        return period_msec;
-    }
-
-    public int getCompression() {
-        return COMPRESSION_BASE * getAccDivider();
-    }
-
     public void movementLimitUp() {
         movementLimit *= MOVEMENT_LIMIT_CHANGE;
         sleepTimer = 0;
@@ -121,10 +103,10 @@ public class ApparatModel {
 //            return false;
 //        }
         if (isStand(index)) {
-            sleepTimer = (FALLING_ASLEEP_TIME * 1000) / period_msec;
+            sleepTimer = FALLING_ASLEEP_TIME * FREQUENCY;
         }
         if (isMoved(index)) {
-            sleepTimer = Math.max(sleepTimer, (FALLING_ASLEEP_TIME  * 1000) / period_msec);
+            sleepTimer = Math.max(sleepTimer, FALLING_ASLEEP_TIME  * FREQUENCY);
         }
 
         boolean isSleep = true;
@@ -193,7 +175,7 @@ public class ApparatModel {
         return new DataStreamAdapter<Integer>() {
             @Override
             protected Integer getData(int index) {
-                int buffer = 5;
+                int buffer = 10;
                 if(index < buffer) {
                     return 0;
                 }
@@ -523,8 +505,8 @@ public class ApparatModel {
          return rem;
     }
 
-    private int getAccDivider() {
-        return (int) (getFrequency()/ ACC_MAX_FREQUENCY);
+    public int getAccDivider() {
+        return FREQUENCY/ ACC_FREQUENCY;
     }
 
     private int getNormalizedDataAcc1(int index) {

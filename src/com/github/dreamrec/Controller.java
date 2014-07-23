@@ -1,6 +1,7 @@
 package com.github.dreamrec;
 
 import com.crostec.ads.*;
+import com.dream.ApparatModel;
 import com.github.dreamrec.filters.FrequencyDividingPreFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +58,7 @@ public class  Controller {
         nrOfAccelerometerSamples = maxDiv / accelerometerDivider;
         accelerometerOffset = AdsUtils.getDecodedFrameSize(adsConfiguration) - 2 - 3 * nrOfAccelerometerSamples;
 
+
         repaintTimer = new Timer(applicationProperties.getRepaintDelay(), new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 updateModel();
@@ -64,31 +66,31 @@ public class  Controller {
             }
         });
 
-        channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * channel0Divider)) {
+        channel0FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * channel0Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addEyeData(value);
             }
         };
-        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * channel1Divider)) {
+        channel1FrequencyDividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * channel1Divider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addCh2Data(value);
             }
         };
-        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+        accelerometer0DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc1Data(value);
             }
         };
-        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+        accelerometer1DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc2Data(value);
             }
         };
-        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (10 * accelerometerDivider)) {
+        accelerometer2DividingPreFilter = new FrequencyDividingPreFilter(sps / (ApparatModel.FREQUENCY * accelerometerDivider)) {
             @Override
             public void notifyListeners(int value) {
                 model.addAcc3Data(value);
@@ -106,7 +108,7 @@ public class  Controller {
         return isRecording;
     }
 
-  /*  protected void updateModel() {
+    protected void updateModel() {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
             for (int i = 0; i < nrOfChannel0Samples; i++) {
@@ -128,9 +130,9 @@ public class  Controller {
         if (isAutoScroll) {
             model.setFastGraphIndexMaximum();
         }
-    }   */
+    }
 
-    protected void updateModel() {
+   /* protected void updateModel() {
         while (incomingDataBuffer.available()) {
             int[] frame = incomingDataBuffer.poll();
             for (int i = 0; i < nrOfChannel0Samples; i++) {
@@ -152,7 +154,7 @@ public class  Controller {
         if (isAutoScroll) {
             model.setFastGraphIndexMaximum();
         }
-    }
+    }  */
 
     public void startRecording() {
         isRecording = true;

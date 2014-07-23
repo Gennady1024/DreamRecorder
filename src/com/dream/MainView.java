@@ -92,8 +92,8 @@ public class MainView extends JFrame {
 
         //graphsViewer.addGraph(2, model.getSleepPatternsStream());
 
-        DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getEyeData()), model.COMPRESSION_BASE*25);
-        DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream(), model.COMPRESSION_BASE*25);
+        DataStream<Integer> compressedDreamGraph = new CompressorAveraging(new FilterDerivativeAbs(model.getEyeData()), model.COMPRESSION *25);
+        DataStream<Integer>  compressedNotSleepEvents = new CompressorMaximizing(model.getNotSleepEventsStream(), model.COMPRESSION *25);
         DataStream<Integer>  selectedCompressedDreamGraph = new Multiplexer(compressedDreamGraph, compressedNotSleepEvents);
         graphsViewer.addCompressedGraph(0, selectedCompressedDreamGraph);
 
@@ -111,10 +111,10 @@ public class MainView extends JFrame {
 
         // graphsViewer.addCompressedGraph(2, selectedCompressedSlowDreamGraph);
 
-        DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream(), model.COMPRESSION_BASE*25);
+        DataStream<Integer> compressedAccPosition = new CompressorAveraging(model.getAccPositionStream(), model.COMPRESSION *25);
         graphsViewer.addCompressedGraph(1, compressedAccPosition);
 
-        DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream(), model.COMPRESSION_BASE*25);
+        DataStream<Integer> compressedAccMovement = new CompressorMaximizing(model.getAccMovementStream(), model.COMPRESSION *25);
         compressedAccMovement = new FilterScaling(compressedAccMovement); // scaling
         graphsViewer.addCompressedGraph(1, compressedAccMovement);
 
