@@ -81,9 +81,9 @@ public class MainView extends JFrame {
 //        DataStream<Integer> selectedEyeHiPassedData = new Multiplexer(eyeHiPassedData, model.getNotSleepEventsStream());
 //        graphsViewer.addGraph(0, selectedEyeHiPassedData);
 
-        graphsViewer.addGraph(0, new FilterHiPass(model.getEyeData(), 300));
+        graphsViewer.addGraph(0, new FilterHiPass(model.getCh1DataList(), 300));
         graphsViewer.addGraph(1, new FilterHiPass(model.getCh2DataList(), 300));
-        graphsViewer.addGraph(2, new FilterDerivative(model.getEyeData()));
+        graphsViewer.addGraph(2, new FilterDerivative(model.getCh1DataList()));
         graphsViewer.addGraph(3, new FilterDerivative(model.getCh2DataList()));
 
         //graphsViewer.addGraph(2, new FilterHiPassAdapt(model.getCh1DataList(), 15));
